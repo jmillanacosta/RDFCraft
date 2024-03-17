@@ -15,7 +15,7 @@ class FileService:
 
     async def create_file(
         self, name: str, extension: str, bytes: bytes
-    ):
+    ) -> FileDocument:
         self.logger.info(
             f"Creating file {name} with mime type {extension}"
         )

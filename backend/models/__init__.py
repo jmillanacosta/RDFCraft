@@ -3,7 +3,12 @@ from models.authorization_document import (
 )
 from models.file_document import FileDocument
 from models.mapping_document import MappingDocument
-from models.ontology_document import OntologyDocument
+from models.ontology_document import (
+    OntologyDocument,
+    OntologyClassDocument,
+    OntologyIndividualModel,
+    OntologyPropertyDocument,
+)
 from models.prefix_document import PrefixDocument
 from models.source_document import SourceDocument
 from models.user_document import UserDocument
@@ -15,6 +20,9 @@ all_documents = [
     FileDocument,
     MappingDocument,
     OntologyDocument,
+    OntologyClassDocument,
+    OntologyIndividualModel,
+    OntologyPropertyDocument,
     PrefixDocument,
     SourceDocument,
     UserDocument,

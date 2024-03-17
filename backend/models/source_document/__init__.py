@@ -8,6 +8,16 @@ class SourceType(str, Enum):
     CSV = "csv"
     JSON = "json"
 
+    @classmethod
+    def from_extension(cls, extension: str) -> "SourceType":
+        if extension == "csv":
+            return cls.CSV
+        if extension == "json":
+            return cls.JSON
+        raise ValueError(
+            f"Extension {extension} is not supported"
+        )
+
 
 class SourceDocument(Document):
     name: str

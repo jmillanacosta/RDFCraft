@@ -8,10 +8,10 @@ from models.source_document import SourceDocument
 class WorkspaceDocument(Document):
     name: str
     description: str
-    sources: list[Link[SourceDocument]]
-    prefixes: list[Link[PrefixDocument]]
-    ontologies: list[Link[OntologyDocument]]
-    mappings: list[Link[MappingDocument]]
+    sources: list[Link[SourceDocument]] = []
+    prefixes: list[Link[PrefixDocument]] = []
+    ontologies: list[Link[OntologyDocument]] = []
+    mappings: list[Link[MappingDocument]] = []
 
 
 __all__ = ["WorkspaceDocument"]

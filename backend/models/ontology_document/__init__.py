@@ -1,20 +1,22 @@
 from enum import Enum
 from beanie import (
-    BackLink,
     Document,
     Indexed,
     Link,
+    PydanticObjectId,
 )
-from pydantic import BaseModel
+
 from helpers.pydantic_uri import PydanticUriRef
 from models.file_document import FileDocument
+
+from models.prefix_document import PrefixDocument
 
 
 class OntologyIndividualModel(Document):
     full_uri: PydanticUriRef = Indexed(
         PydanticUriRef, unique=True
     )
-    base_uri: PydanticUriRef = Indexed(PydanticUriRef)
+    ontology_id: PydanticObjectId
     label: str
     description: str
     is_deprecated: bool
@@ -29,7 +31,7 @@ class OntologyPropertyDocument(Document):
     full_uri: PydanticUriRef = Indexed(
         PydanticUriRef, unique=True
     )
-    base_uri: PydanticUriRef = Indexed(PydanticUriRef)
+    ontology_id: PydanticObjectId
     label: str
     description: str
     is_deprecated: bool
@@ -43,7 +45,7 @@ class OntologyClassDocument(Document):
     full_uri: PydanticUriRef = Indexed(
         PydanticUriRef, unique=True
     )
-    base_uri: PydanticUriRef = Indexed(PydanticUriRef)
+    ontology_id: PydanticObjectId
     label: str
     description: str
     is_deprecated: bool
@@ -52,11 +54,8 @@ class OntologyClassDocument(Document):
 class OntologyDocument(Document):
     name: str
     description: str
-    uri: PydanticUriRef = Indexed(
-        PydanticUriRef, unique=True
-    )
     file: Link[FileDocument]
-    prefix: Link
+    prefix: Link[PrefixDocument]
 
 
 __all__ = [

@@ -1,14 +1,10 @@
-from typing import Optional
-from beanie import Document, Link
-from pydantic import BaseModel
+from beanie import Document, Indexed
 from helpers.pydantic_uri import PydanticUriRef
-from models.ontology_document import OntologyDocument
 
 
 class PrefixDocument(Document):
-    prefix: str
-    uri: PydanticUriRef
-    ontology: Optional[Link[OntologyDocument]]
+    prefix: str = Indexed(str)
+    uri: PydanticUriRef = Indexed(PydanticUriRef)
 
 
 __all__ = ["PrefixDocument"]

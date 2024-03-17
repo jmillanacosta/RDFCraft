@@ -2,62 +2,22 @@
 This file is used to bootstrap the application. It is called from the main
 """
 
-from fastapi import logger
+import logging
+import logging.config
 from kink import di
 from pathlib import Path
 from dotenv import load_dotenv
 from os import getenv
-from beanie import init_beanie, Document
+from beanie import init_beanie
 from motor.motor_asyncio import AsyncIOMotorClient
 
-
-logging_config = {
-    "version": 1,
-    "formatters": {
-        "simple": {
-            "format": (
-                "%(asctime)s - %(filename)s - %(levelname)s - %(message)s"
-            )
-        }
-    },
-    "handlers": {
-        "console": {
-            "class": "logging.StreamHandler",
-            "level": "INFO",
-            "formatter": "simple",
-            "stream": "ext://sys.stdout",
-        },
-        "file": {
-            "class": "logging.FileHandler",
-            "level": "INFO",
-            "formatter": "simple",
-            "filename": "app.log",
-            "mode": "a",
-        },
-    },
-    "root": {
-        "level": "DEBUG",
-        "handlers": ["console", "file"],
-    },
-}
+from models import all_documents
 
 
 async def bootstrap():
     load_dotenv()
     # Either assign the env variables to global variables or use some kind of DI
     # di["temp_dir"] = Path(os.getenv("TEMP_DIR") or "/app_tmp")
-
-    di["DEBUG"] = bool(getenv("DEBUG")) or False
-
-    logging_config["handlers"]["console"]["level"] = (
-        getenv("LOG_LEVEL") or "INFO"
-    )
-    logging_config["handlers"]["file"]["level"] = (
-        getenv("LOG_LEVEL") or "INFO"
-    )
-    logging_config["root"]["level"] = (
-        getenv("LOG_LEVEL") or "INFO"
-    )
 
     di["mongodb_host"] = (
         getenv("MONGODB_HOST") or "localhost"
@@ -75,19 +35,23 @@ async def bootstrap():
     )
 
     di[AsyncIOMotorClient] = AsyncIOMotorClient(
-        f"mongodb://{di['mongodb_user']}:{di['mongodb_password']}@{di['mongodb_host']}:{di['mongodb_port']}/{di['default_mongodb_database']}"
+        f"mongodb://{di['mongodb_user']}:{di['mongodb_password']}@{di['mongodb_host']}:{di['mongodb_port']}/{di['default_mongodb_database']}?authSource=admin"
     )
 
     await init_beanie(
         di[AsyncIOMotorClient].get_default_database(),
+        document_models=all_documents,
     )
 
     di["jwt_secret"] = getenv("JWT_SECRET") or "secret"
+    di["jwt_algorithm"] = getenv("JWT_ALGORITHM") or "HS256"
+    di["jwt_expiration"] = int(
+        getenv("JWT_EXPIRATION") or 3600
+    )
     di["temp_storage"] = Path(
         getenv("TEMP_STORAGE") or "./temp_storage"
     )
-    di["file_storage"] = (
+    di["file_storage"] = Path(
         getenv("FILE_STORAGE") or "./file_storage"
     )
-
-    logger.logger.info("Bootstrap done")
+    logging.info("Bootstrap done")

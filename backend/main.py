@@ -1,16 +1,54 @@
+import asyncio
+import json
+import logging
+import logging.config
 from fastapi import FastAPI
+from contextlib import asynccontextmanager
 from bootstrap import bootstrap
 
-bootstrap()
+import coloredlogs
 
-app = FastAPI()
 
-from routers.hello_router.hello import router as hello_router
+@asynccontextmanager
+async def setup(app: FastAPI):
+    await bootstrap()
+    yield
+    await asyncio.sleep(1)
 
-app.include_router(hello_router)
+
+app = FastAPI(lifespan=setup)
+
+from routers.users import router as user_router
+from routers.authentication import router as auth_router
+from routers.authorization import router as authz_router
+from routers.files import router as file_router
+
+app.include_router(
+    user_router, prefix="/users", tags=["users"]
+)
+
+app.include_router(
+    auth_router, prefix="/auth", tags=["auth"]
+)
+app.include_router(
+    authz_router, prefix="/authz", tags=["authz"]
+)
+app.include_router(
+    file_router, prefix="/files", tags=["files"]
+)
 
 
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    with open("logging_config.json", "r") as f:
+        log_config = json.load(f)
+
+    logging.config.dictConfig(log_config)
+    coloredlogs.install()
+
+    uvicorn.run(
+        app,
+        host="0.0.0.0",
+        port=8000,
+    )

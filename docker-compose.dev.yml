@@ -1,0 +1,10 @@
+services:
+  backend:
+    profiles:
+      - donotstart
+  frontend:
+    profiles:
+      - donotstart
+  nginx:
+    profiles:
+      - donotstart

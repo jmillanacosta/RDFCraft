@@ -8,13 +8,15 @@
             "name": "Python: FastAPI",
             "type": "python",
             "request": "launch",
-            "module": "uvicorn",
+            // Launch without uvicorn use main.py
+            "module": "main",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            },
             "args": [
-                "main:app",
                 "--reload"
             ],
-            "jinja": true,
-            "justMyCode": true,
+            "jinja": true
         }
     ]
 }

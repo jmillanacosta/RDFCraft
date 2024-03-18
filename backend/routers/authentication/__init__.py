@@ -6,6 +6,7 @@ from fastapi.security import (
 from kink import di
 
 from services.authentication_service import (
+    JWT,
     AuthenticationService,
 )
 
@@ -26,7 +27,7 @@ async def login(
         OAuth2PasswordRequestForm, Depends()
     ],
     auth_service: AuthenticationServiceDep,
-):
+) -> JWT:
     return await auth_service.authenticate_user(
         login_data.username, login_data.password
     )

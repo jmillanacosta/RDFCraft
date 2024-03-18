@@ -85,7 +85,7 @@ class FileService:
         self.logger.info(f"File {name} created")
         return document
 
-    async def get_file_document(self, file_id: str):
+    async def get_file_document(self, file_id: str) -> FileDocument:
         self.logger.info(f"Getting file {file_id}")
 
         document = await FileDocument.get(file_id)
@@ -100,7 +100,7 @@ class FileService:
         self.logger.info(f"File {file_id} found")
         return document
 
-    async def get_file(self, file_id: str):
+    async def get_file(self, file_id: str) -> bytes:
         self.logger.info(f"Getting file {file_id}")
 
         document: FileDocument | None = (
@@ -117,7 +117,7 @@ class FileService:
         self.logger.info(f"File {file_id} found")
         return document.path.read_bytes()
 
-    async def delete_file(self, file_id: str):
+    async def delete_file(self, file_id: str) -> FileDocument:
         # TODO: Add Reference counting to avoid deleting files that are still in use
         self.logger.info(f"Deleting file {file_id}")
 

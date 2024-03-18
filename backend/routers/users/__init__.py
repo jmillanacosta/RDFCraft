@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, List
 from fastapi import (
     APIRouter,
     Depends,
@@ -8,6 +8,7 @@ from fastapi import (
 from fastapi.security import OAuth2PasswordBearer
 from kink import di
 
+from models.user_document import UserDocument
 from services.authentication_service import (
     AuthenticationService,
     JWTData,
@@ -45,7 +46,7 @@ async def get_users(
             scopes=["admin", "curator"],
         ),
     ],
-):
+) -> List[UserDocument]:
     return await user_service.get_all_users()
 
 
@@ -60,7 +61,7 @@ async def get_user_by_id(
             scopes=["admin", "curator"],
         ),
     ],
-):
+) -> UserDocument:
     return await user_service.get_user_by_id(user_id)
 
 
@@ -75,7 +76,7 @@ async def get_user_by_username(
             scopes=["admin", "curator"],
         ),
     ],
-):
+) -> UserDocument:
     return await user_service.get_user_by_username(username)
 
 
@@ -92,7 +93,7 @@ async def create_user(
             scopes=["admin"],
         ),
     ],
-):
+) -> UserDocument:
     return await user_service.create_user(
         username, password, roles
     )
@@ -111,7 +112,7 @@ async def update_user(
             verify_token,
         ),
     ],
-):
+) -> UserDocument:
     if (
         current_user.user_id != user_id
         or "admin" not in current_user.scopes
@@ -136,7 +137,7 @@ async def delete_user(
             scopes=["admin"],
         ),
     ],
-):
+) -> UserDocument:
     if (
         current_user.user_id != user_id
         or "admin" not in current_user.scopes

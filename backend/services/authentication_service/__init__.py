@@ -14,7 +14,7 @@ from utils.password_util import (
 
 class JWT(BaseModel):
     access_token: str
-    token_type: str = "bearer"
+    token_type: str = "Bearer"
 
 
 class JWTData(BaseModel):

@@ -1,4 +1,5 @@
 import logging
+from typing import List
 
 from beanie import DeleteRules
 from fastapi import HTTPException
@@ -23,7 +24,7 @@ class WorkspaceService:
 
     async def create_workspace(
         self, name: str, description: str
-    ):
+    ) -> WorkspaceDocument:
         self.logger.info(
             f"Creating workspace with name {name}"
         )
@@ -33,11 +34,13 @@ class WorkspaceService:
             description=description,
         )
 
-        document = await WorkspaceDocument.insert(document)
+        document = await WorkspaceDocument.insert(document)  # type: ignore
 
         return document
 
-    async def get_workspace(self, workspace_id: str):
+    async def get_workspace(
+        self, workspace_id: str
+    ) -> WorkspaceDocument:
         document = await WorkspaceDocument.get(
             workspace_id, fetch_links=True
         )
@@ -48,7 +51,9 @@ class WorkspaceService:
             )
         return document
 
-    async def get_workspaces(self):
+    async def get_workspaces(
+        self,
+    ) -> List[WorkspaceDocument]:
         documents = await WorkspaceDocument.find(
             {}
         ).to_list()
@@ -68,7 +73,7 @@ class WorkspaceService:
 
     async def update_workspace(
         self, workspace_id: str, name: str, description: str
-    ):
+    ) -> WorkspaceDocument:
         document = await WorkspaceDocument.get(
             workspace_id, fetch_links=True
         )
@@ -94,7 +99,7 @@ class WorkspaceService:
         file_name: str,
         file_extension: str,
         bytes: bytes,
-    ):
+    ) -> WorkspaceDocument:
         workspace = await WorkspaceDocument.get(
             workspace_id, fetch_links=True
         )
@@ -113,7 +118,7 @@ class WorkspaceService:
         )
 
         workspace.sources.append(mapping.source)
-        workspace.mappings.append(mapping)
+        workspace.mappings.append(mapping)  # type: ignore
 
         workspace = await WorkspaceDocument.replace(
             workspace
@@ -123,7 +128,7 @@ class WorkspaceService:
 
     async def delete_mapping_from_workspace(
         self, workspace_id: str, mapping_id: str
-    ):
+    ) -> WorkspaceDocument:
         workspace = await WorkspaceDocument.get(
             workspace_id, fetch_links=True
         )
@@ -156,7 +161,7 @@ class WorkspaceService:
         workspace_id: str,
         prefix: str,
         uri: str,
-    ):
+    ) -> WorkspaceDocument:
         workspace = await WorkspaceDocument.get(
             workspace_id, fetch_links=True
         )
@@ -212,7 +217,7 @@ class WorkspaceService:
 
     async def delete_prefix_from_workspace(
         self, workspace_id: str, prefix_id: str
-    ):
+    ) -> WorkspaceDocument:
         workspace = await WorkspaceDocument.get(
             workspace_id, fetch_links=True
         )
@@ -258,7 +263,7 @@ class WorkspaceService:
         file_name: str,
         file_extension: str,
         bytes: bytes,
-    ):
+    ) -> WorkspaceDocument:
         workspace = await WorkspaceDocument.get(
             workspace_id, fetch_links=True
         )
@@ -337,7 +342,7 @@ class WorkspaceService:
         workspace_id: str,
         ontology_id: str,
         prefix_id: str,
-    ):
+    ) -> WorkspaceDocument:
         workspace = await WorkspaceDocument.get(
             workspace_id, fetch_links=True
         )

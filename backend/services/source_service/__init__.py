@@ -1,4 +1,5 @@
 import logging
+from typing import List
 from fastapi import HTTPException
 from kink import inject
 
@@ -71,7 +72,7 @@ class SourceService:
                 status_code=400,
             )
 
-    async def get_source_by_id(self, source_id: str):
+    async def get_source_by_id(self, source_id: str) -> SourceDocument:
         source = await SourceDocument.get(
             source_id, fetch_links=True
         )
@@ -82,11 +83,11 @@ class SourceService:
             )
         return source
 
-    async def get_sources(self):
+    async def get_sources(self) -> List[SourceDocument]:
         sources = await SourceDocument.find({}).to_list()
         return sources
 
-    async def remove_source(self, source_id: str):
+    async def remove_source(self, source_id: str) -> SourceDocument:
         source = await SourceDocument.get(source_id)
         if source is None:
             raise HTTPException(
@@ -101,7 +102,7 @@ class SourceService:
         source_id: str,
         name: str,
         description: str,
-    ):
+    ) -> SourceDocument:
         source = await SourceDocument.get(
             source_id, fetch_links=True
         )
@@ -132,7 +133,7 @@ class SourceService:
         file_name: str,
         file_extension: str,
         bytes: bytes,
-    ):
+    ) -> SourceDocument:
         source = await SourceDocument.get(
             source_id, fetch_links=True
         )

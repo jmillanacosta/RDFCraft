@@ -1,4 +1,5 @@
 import logging
+from typing import List
 from beanie import PydanticObjectId
 from fastapi import HTTPException
 from kink import inject
@@ -34,7 +35,7 @@ class OntologyService:
         name: str,
         description: str,
         prefix_id: str,
-    ):
+    )-> OntologyDocument:
         # Check if prefix exists, raises 404 if not
         prefix = await self.prefix_service.get_prefix_by_id(
             prefix_id
@@ -169,7 +170,7 @@ class OntologyService:
 
     async def update_prefix(
         self, ontology_id: str, prefix_id: str
-    ):
+    ) -> OntologyDocument:
         ontology = await OntologyDocument.get(ontology_id)
         if ontology is None:
             raise HTTPException(
@@ -197,7 +198,7 @@ class OntologyService:
             )
         return ontology
 
-    async def get_ontology_classes(self, ontology_id: str):
+    async def get_ontology_classes(self, ontology_id: str) -> List[OntologyClassDocument]:
         classes = await OntologyClassDocument.find(
             OntologyClassDocument.ontology_id == ontology_id
         ).to_list()
@@ -205,7 +206,7 @@ class OntologyService:
 
     async def get_ontology_properties(
         self, ontology_id: str
-    ):
+    ) -> List[OntologyPropertyDocument]:
         properties = await OntologyPropertyDocument.find(
             OntologyPropertyDocument.ontology_id
             == ontology_id
@@ -214,14 +215,14 @@ class OntologyService:
 
     async def get_ontology_individuals(
         self, ontology_id: str
-    ):
+    ) -> List[OntologyIndividualModel]:
         individuals = await OntologyIndividualModel.find(
             OntologyIndividualModel.ontology_id
             == ontology_id
         ).to_list()
         return individuals
 
-    async def delete_ontology(self, ontology_id: str):
+    async def delete_ontology(self, ontology_id: str) -> OntologyDocument:
         ontology = await OntologyDocument.get(
             ontology_id, fetch_links=True
         )

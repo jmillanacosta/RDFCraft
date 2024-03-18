@@ -1,125 +1,38 @@
 'use client';
 
-import Image from 'next/image';
-import styles from './page.module.css';
-import { useEffect, useState } from 'react';
+import { ThemeProvider } from '@emotion/react';
+import { Box, CssBaseline } from '@mui/material';
+import { SnackbarProvider } from 'notistack';
+import LoginBox from '@/components/login/LoginBox';
+import { useLayoutEffect } from 'react';
+import useAuthStore from '@/lib/stores/AuthStore';
+import { useRouter } from 'next/navigation';
+import useLocalTheme from '@/lib/hooks/useLocalTheme';
 
 export default function Home() {
-    const [response, setResponse] = useState('');
+  const theme = useLocalTheme();
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+  const token = useAuthStore(state => state.token);
+  const router = useRouter();
 
-    useEffect(() => {
-        const fetchData = async () => {
-            const res = await fetch('/api/hello');
-            const json = await res.json();
-            setResponse(json.message);
-        };
+  useLayoutEffect(() => {
+    if (isAuthenticated()) router.replace('/workspace');
+  }, [isAuthenticated, router, token]);
 
-        fetchData();
-
-        return () => {
-            setResponse('');
-        };
-    }, []);
-
-    return (
-        <main className={styles.main}>
-            <div className={styles.description}>
-                <p>
-                    Get started by editing&nbsp;
-                    <code className={styles.code}>src/app/page.tsx</code>
-                </p>
-                <p>
-                    Response from API:{' '}
-                    <code className={styles.code}>{response}</code>
-                </p>
-                <div>
-                    <a
-                        href='https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app'
-                        target='_blank'
-                        rel='noopener noreferrer'
-                    >
-                        By{' '}
-                        <Image
-                            src='/vercel.svg'
-                            alt='Vercel Logo'
-                            className={styles.vercelLogo}
-                            width={100}
-                            height={24}
-                            priority
-                        />
-                    </a>
-                </div>
-            </div>
-
-            <div className={styles.center}>
-                <Image
-                    className={styles.logo}
-                    src='/next.svg'
-                    alt='Next.js Logo'
-                    width={180}
-                    height={37}
-                    priority
-                />
-            </div>
-
-            <div className={styles.grid}>
-                <a
-                    href='https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app'
-                    className={styles.card}
-                    target='_blank'
-                    rel='noopener noreferrer'
-                >
-                    <h2>
-                        Docs <span>-&gt;</span>
-                    </h2>
-                    <p>
-                        Find in-depth information about Next.js features and
-                        API.
-                    </p>
-                </a>
-
-                <a
-                    href='https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app'
-                    className={styles.card}
-                    target='_blank'
-                    rel='noopener noreferrer'
-                >
-                    <h2>
-                        Learn <span>-&gt;</span>
-                    </h2>
-                    <p>
-                        Learn about Next.js in an interactive course
-                        with&nbsp;quizzes!
-                    </p>
-                </a>
-
-                <a
-                    href='https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app'
-                    className={styles.card}
-                    target='_blank'
-                    rel='noopener noreferrer'
-                >
-                    <h2>
-                        Templates <span>-&gt;</span>
-                    </h2>
-                    <p>Explore starter templates for Next.js.</p>
-                </a>
-
-                <a
-                    href='https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app'
-                    className={styles.card}
-                    target='_blank'
-                    rel='noopener noreferrer'
-                >
-                    <h2>
-                        Deploy <span>-&gt;</span>
-                    </h2>
-                    <p>
-                        Instantly deploy your Next.js site to a shareable URL
-                        with Vercel.
-                    </p>
-                </a>
-            </div>
-        </main>
-    );
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <SnackbarProvider />
+      <Box
+        color={theme.palette.text.primary}
+        bgcolor={theme.palette.background.default}
+        height='100vh'
+        display='flex'
+        justifyContent='center'
+        alignItems='center'
+      >
+        <LoginBox />
+      </Box>
+    </ThemeProvider>
+  );
 }

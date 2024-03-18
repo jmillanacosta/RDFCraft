@@ -1,4 +1,5 @@
 import logging
+from typing import List
 from fastapi import HTTPException
 from kink import inject
 
@@ -11,7 +12,9 @@ class PrefixService:
     def __init__(self) -> None:
         self.logger = logging.getLogger(__name__)
 
-    async def create_prefix(self, prefix: str, uri: str):
+    async def create_prefix(
+        self, prefix: str, uri: str
+    ) -> PrefixDocument:
         """
         Create Prefix
         Allows for duplicate prefixes as they might be used in different workspaces
@@ -23,7 +26,6 @@ class PrefixService:
         document = PrefixDocument(
             prefix=prefix,
             uri=PydanticUriRef(uri),
-            ontology=None,
         )
         document = await PrefixDocument.insert_one(document)
 
@@ -39,7 +41,9 @@ class PrefixService:
         self.logger.info(f"Prefix {prefix} created")
         return document
 
-    async def get_prefix_by_id(self, prefix_id: str):
+    async def get_prefix_by_id(
+        self, prefix_id: str
+    ) -> PrefixDocument:
         """
         Get Prefix by ID
         """
@@ -62,7 +66,9 @@ class PrefixService:
         )
         return document
 
-    async def get_prefix_by_prefix(self, prefix: str):
+    async def get_prefix_by_prefix(
+        self, prefix: str
+    ) -> PrefixDocument:
         """
         Get Prefix
         """
@@ -81,7 +87,9 @@ class PrefixService:
         self.logger.info(f"Prefix {prefix} found")
         return document
 
-    async def get_prefix_by_uri(self, uri: str):
+    async def get_prefix_by_uri(
+        self, uri: str
+    ) -> PrefixDocument:
         """
         Get Prefix by URI
         """
@@ -104,7 +112,7 @@ class PrefixService:
 
     async def update_prefix(
         self, prefix: str, uri: str, prefix_id: str
-    ):
+    ) -> PrefixDocument:
         """
         Update Prefix
         """
@@ -127,7 +135,7 @@ class PrefixService:
         self.logger.info(f"Prefix {prefix} updated")
         return document
 
-    async def delete_prefix(self, prefix_id: str):
+    async def delete_prefix(self, prefix_id: str) -> PrefixDocument:
         """
         Delete Prefix
         """
@@ -152,7 +160,7 @@ class PrefixService:
         )
         return document
 
-    async def get_all_prefixes(self):
+    async def get_all_prefixes(self) -> List[PrefixDocument]:
         """
         Get All Prefixes
         """
@@ -164,7 +172,7 @@ class PrefixService:
 
     async def get_prefixes_by_ontology_id(
         self, ontology_id: str
-    ):
+    ) -> List[PrefixDocument]:
         """
         Get Prefixes by Ontology ID
         """

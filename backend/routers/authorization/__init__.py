@@ -10,6 +10,7 @@ from fastapi.security import (
 )
 from kink import di
 
+from models.authorization_document import AuthorizationDocument
 from services.authentication_service import (
     AuthenticationService,
     JWTData,
@@ -30,7 +31,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 async def verify_token(
     token: Annotated[str, Depends(oauth2_scheme)],
     auth_service: AuthServiceDep,
-):
+) -> JWTData:
     return await auth_service.verify_token(token)
 
 
@@ -53,7 +54,7 @@ async def get_authorization_document(
         JWTData,
         Security(verify_token, scopes=["admin", "curator"]),
     ],
-):
+) -> AuthorizationDocument:
     result = await auth_service.get_resource(
         collection=collection, object_id=document
     )
@@ -80,7 +81,7 @@ async def add_user_to_resource(
         JWTData,
         Security(verify_token, scopes=["admin", "curator"]),
     ],
-):
+) -> AuthorizationDocument:
     result = await auth_service.authorize_user_for_resource(
         collection=collection,
         object_id=document,
@@ -101,7 +102,7 @@ async def remove_user_from_resource(
         JWTData,
         Security(verify_token, scopes=["admin", "curator"]),
     ],
-):
+) -> AuthorizationDocument:
     result = await auth_service.remove_user_access_level_for_resource(
         collection=collection,
         object_id=document,

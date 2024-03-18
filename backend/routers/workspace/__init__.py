@@ -1,5 +1,5 @@
 #### AUTH
-from typing import Annotated
+from typing import Annotated, List
 
 from fastapi import (
     APIRouter,
@@ -13,6 +13,7 @@ from fastapi.security import OAuth2PasswordBearer
 from kink import di
 from pydantic import BaseModel
 
+from models.workspace_document import WorkspaceDocument
 from services.authentication_service import (
     AuthenticationService,
     JWTData,
@@ -50,7 +51,7 @@ WorkspaceServiceDep = Annotated[
 async def get_all_workspaces(
     workspace_service: WorkspaceServiceDep,
     auth: JWTData = Security(verify_token),
-):
+) -> List[WorkspaceDocument]:
     return await workspace_service.get_workspaces()
 
 
@@ -59,7 +60,7 @@ async def get_workspace(
     workspace_id: str,
     workspace_service: WorkspaceServiceDep,
     auth: JWTData = Security(verify_token),
-):
+) -> WorkspaceDocument:
     return await workspace_service.get_workspace(
         workspace_id
     )
@@ -71,7 +72,7 @@ async def create_workspace(
     description: str,
     workspace_service: WorkspaceServiceDep,
     auth: JWTData = Security(verify_token),
-):
+) -> WorkspaceDocument:
     return await workspace_service.create_workspace(
         name, description
     )
@@ -84,7 +85,7 @@ async def update_workspace(
     description: str,
     workspace_service: WorkspaceServiceDep,
     auth: JWTData = Security(verify_token),
-):
+) -> WorkspaceDocument:
     return await workspace_service.update_workspace(
         workspace_id, name, description
     )
@@ -95,7 +96,7 @@ async def delete_workspace(
     workspace_id: str,
     workspace_service: WorkspaceServiceDep,
     auth: JWTData = Security(verify_token),
-):
+) -> WorkspaceDocument:
     return await workspace_service.delete_workspace(
         workspace_id
     )
@@ -109,7 +110,7 @@ async def create_mapping(
     workspace_service: WorkspaceServiceDep,
     file: UploadFile = File(...),
     auth: JWTData = Security(verify_token),
-):
+) -> WorkspaceDocument:
     if file.filename is None:
         raise HTTPException(
             status_code=400,
@@ -133,7 +134,7 @@ async def delete_mapping(
     mapping_id: str,
     workspace_service: WorkspaceServiceDep,
     auth: JWTData = Security(verify_token),
-):
+) -> WorkspaceDocument:
     return await workspace_service.delete_mapping_from_workspace(
         workspace_id, mapping_id
     )
@@ -146,7 +147,7 @@ async def add_prefix(
     uri: str,
     workspace_service: WorkspaceServiceDep,
     auth: JWTData = Security(verify_token),
-):
+) -> WorkspaceDocument:
     return await workspace_service.add_prefix_to_workspace(
         workspace_id, prefix, uri
     )
@@ -158,7 +159,7 @@ async def delete_prefix(
     prefix_id: str,
     workspace_service: WorkspaceServiceDep,
     auth: JWTData = Security(verify_token),
-):
+) -> WorkspaceDocument:
     return await workspace_service.delete_prefix_from_workspace(
         workspace_id, prefix_id
     )
@@ -173,7 +174,7 @@ async def add_ontology(
     workspace_service: WorkspaceServiceDep,
     file: UploadFile = File(...),
     auth: JWTData = Security(verify_token),
-):
+) -> WorkspaceDocument:
     if file.filename is None:
         raise HTTPException(
             status_code=400,

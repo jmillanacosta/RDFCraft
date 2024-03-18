@@ -183,7 +183,7 @@ class AuthorizationService:
 
     async def remove_resource(
         self, collection: str, object_id: str
-    ) -> None:
+    ) -> dict:
         self.logger.info(
             f"Removing resource {collection}/{object_id}"
         )
@@ -207,11 +207,11 @@ class AuthorizationService:
         self.logger.info(
             f"Resource {collection}/{object_id} removed"
         )
-        return None
+        return {"message": "Resource removed successfully"}
 
     async def get_resource(
         self, collection: str, object_id: str
-    ):
+    ) -> None | AuthorizationDocument:
         self.logger.info(
             f"Retrieving resource for {collection}/{object_id}"
         )

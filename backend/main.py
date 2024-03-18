@@ -55,6 +55,11 @@ app.include_router(
 app.include_router(
     mapping_router, prefix="/mappings", tags=["mappings"]
 )
+app.include_router(
+    workspace_router,
+    prefix="/workspaces",
+    tags=["workspaces"],
+)
 
 
 if __name__ == "__main__":

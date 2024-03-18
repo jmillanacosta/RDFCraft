@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, List
 from fastapi import (
     APIRouter,
     Depends,
@@ -13,6 +13,7 @@ from fastapi.security import (
 )
 from kink import di
 
+from models.ontology_document import OntologyClassDocument, OntologyDocument, OntologyIndividualModel, OntologyPropertyDocument
 from services.authentication_service import (
     AuthenticationService,
     JWTData,
@@ -57,7 +58,7 @@ async def get_ontologies(
             verify_token,
         ),
     ],
-):
+) -> OntologyDocument:
     result = await ontology_service.get_ontology_by_id(
         ontology_id
     )
@@ -77,7 +78,7 @@ async def create_ontology(
     description: str,
     prefix_id: str,
     file: UploadFile = File(...),
-):
+) -> OntologyDocument:
     if file.filename is None:
         raise HTTPException(
             status_code=400,
@@ -108,7 +109,7 @@ async def download_ontology_file(
             verify_token,
         ),
     ],
-):
+) -> FileResponse:
     result = await ontology_service.get_ontology_by_id(
         ontology_id
     )
@@ -129,7 +130,7 @@ async def get_ontology_classes(
             verify_token,
         ),
     ],
-):
+) -> List[OntologyClassDocument]:
     result = await ontology_service.get_ontology_classes(
         ontology_id
     )
@@ -146,7 +147,7 @@ async def get_ontology_data_properties(
             verify_token,
         ),
     ],
-):
+) -> List[OntologyPropertyDocument]:
     result = await ontology_service.get_ontology_properties(
         ontology_id
     )
@@ -163,7 +164,7 @@ async def get_ontology_individuals(
             verify_token,
         ),
     ],
-):
+) -> List[OntologyIndividualModel]:
     result = (
         await ontology_service.get_ontology_individuals(
             ontology_id
@@ -182,7 +183,7 @@ async def delete_ontology(
             verify_token,
         ),
     ],
-):
+) -> OntologyDocument:
     result = await ontology_service.delete_ontology(
         ontology_id
     )

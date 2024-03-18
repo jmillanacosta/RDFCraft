@@ -25,7 +25,7 @@ class MappingService:
         file_name: str,
         file_extension: str,
         bytes: bytes,
-    ):
+    ) -> MappingDocument:
         self.logger.info(
             f"Creating mapping for source with name {file_name} and extension {file_extension}"
         )
@@ -48,13 +48,11 @@ class MappingService:
             current_mapping=mapping,  # type: ignore
         )
 
-        mapping_document = await MappingDocument.insert(
-            mapping_document
-        )
+        mapping_document: MappingDocument = await mapping_document.insert()  # type: ignore
 
         return mapping_document
 
-    async def get_mapping(self, mapping_id: str):
+    async def get_mapping(self, mapping_id: str) -> MappingDocument:
         document = await MappingDocument.get(
             mapping_id, fetch_links=True
         )
@@ -68,7 +66,7 @@ class MappingService:
 
     async def revert_mapping(
         self, mapping_id: str, mapping_model_id: str
-    ):
+    ) -> MappingDocument:
         document = await MappingDocument.get(
             mapping_id, fetch_links=True
         )
@@ -98,7 +96,7 @@ class MappingService:
         mapping_id: str,
         node_data: list[NodeModel],
         edge_data: list[EdgeModel],
-    ):
+    ) -> MappingDocument:
         document = await MappingDocument.get(
             mapping_id, fetch_links=True
         )
@@ -126,7 +124,7 @@ class MappingService:
 
         return document
 
-    async def delete_mapping(self, mapping_id: str):
+    async def delete_mapping(self, mapping_id: str) -> MappingDocument:
         document = await MappingDocument.get(mapping_id)
         if document is None:
             raise HTTPException(

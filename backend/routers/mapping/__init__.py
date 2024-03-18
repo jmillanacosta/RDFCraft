@@ -16,6 +16,7 @@ from pydantic import BaseModel
 
 from models.mapping_document import (
     EdgeModel,
+    MappingDocument,
     MappingModel,
     NodeModel,
 )
@@ -62,7 +63,7 @@ async def create_mapping(
     description: str,
     file: UploadFile = File(...),
     auth: JWTData = Security(verify_token),
-):
+) -> MappingDocument:
     if file.filename is None:
         raise HTTPException(
             status_code=400,
@@ -85,7 +86,7 @@ async def get_mapping(
     mapping_service: MappingServiceDep,
     mapping_id: str,
     auth: JWTData = Security(verify_token),
-):
+) -> MappingDocument:
     mapping = await mapping_service.get_mapping(mapping_id)
     return mapping
 
@@ -96,7 +97,7 @@ async def revert_mapping(
     mapping_id: str,
     mapping_model_id: str,
     auth: JWTData = Security(verify_token),
-):
+) -> MappingDocument:
     mapping = await mapping_service.revert_mapping(
         mapping_id, mapping_model_id
     )
@@ -114,7 +115,7 @@ async def save_mapping(
     mapping_id: str,
     data: SaveRequest,
     auth: JWTData = Security(verify_token),
-):
+) -> MappingDocument:
     mapping = await mapping_service.save_mapping(
         mapping_id=mapping_id,
         node_data=data.nodes,
@@ -128,7 +129,7 @@ async def delete_mapping(
     mapping_service: MappingServiceDep,
     mapping_id: str,
     auth: JWTData = Security(verify_token),
-):
+) -> dict[str, str]:
     await mapping_service.delete_mapping(mapping_id)
     return {"status": "ok"}
 

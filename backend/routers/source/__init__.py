@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, List
 from fastapi import (
     APIRouter,
     Depends,
@@ -13,6 +13,7 @@ from fastapi.security import (
 )
 from kink import di
 
+from models.source_document import SourceDocument
 from services.authentication_service import (
     AuthenticationService,
     JWTData,
@@ -51,7 +52,7 @@ SourceServiceDep = Annotated[
 async def get_sources(
     source_service: SourceServiceDep,
     auth: JWTData = Security(verify_token),
-):
+) -> List[SourceDocument]:
     return await source_service.get_sources()
 
 
@@ -60,7 +61,7 @@ async def get_source(
     source_id: str,
     source_service: SourceServiceDep,
     auth: JWTData = Security(verify_token),
-):
+) -> SourceDocument:
     return await source_service.get_source_by_id(source_id)
 
 
@@ -71,7 +72,7 @@ async def create_source(
     source_service: SourceServiceDep,
     file: UploadFile = File(...),
     auth: JWTData = Security(verify_token),
-):
+) -> SourceDocument:
     if file.filename is None:
         raise HTTPException(
             detail="File does not have a name",
@@ -94,7 +95,7 @@ async def get_source_file(
     source_id: str,
     source_service: SourceServiceDep,
     auth: JWTData = Security(verify_token),
-):
+) -> FileResponse:
     source = await source_service.get_source_by_id(
         source_id
     )
@@ -110,7 +111,7 @@ async def remove_source(
     source_id: str,
     source_service: SourceServiceDep,
     auth: JWTData = Security(verify_token),
-):
+) -> SourceDocument:
     return await source_service.remove_source(source_id)
 
 
@@ -121,7 +122,7 @@ async def update_source(
     description: str,
     source_service: SourceServiceDep,
     auth: JWTData = Security(verify_token),
-):
+) -> SourceDocument:
     return await source_service.update_source(
         source_id, name, description
     )
@@ -133,7 +134,7 @@ async def update_source_file(
     source_service: SourceServiceDep,
     file: UploadFile = File(...),
     auth: JWTData = Security(verify_token),
-):
+) -> SourceDocument:
     if file.filename is None:
         raise HTTPException(
             detail="File does not have a name",

@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, List
 from fastapi import (
     APIRouter,
     Depends,
@@ -10,6 +10,7 @@ from fastapi.security import (
 )
 from kink import di
 
+from models.prefix_document import PrefixDocument
 from services.authentication_service import (
     AuthenticationService,
     JWTData,
@@ -51,7 +52,7 @@ async def get_prefixes(
             verify_token,
         ),
     ],
-):
+) -> List[PrefixDocument]:
     result = await prefix_service.get_all_prefixes()
     return result
 
@@ -68,7 +69,7 @@ async def create_prefix(
             scopes=["admin", "curator"],
         ),
     ],
-):
+) -> PrefixDocument:
     result = await prefix_service.create_prefix(prefix, uri)
     return result
 
@@ -83,7 +84,7 @@ async def get_prefix_by_id(
             verify_token,
         ),
     ],
-):
+) -> PrefixDocument:
     result = await prefix_service.get_prefix_by_id(
         prefix_id
     )
@@ -100,7 +101,7 @@ async def get_prefix_by_prefix(
             verify_token,
         ),
     ],
-):
+) -> PrefixDocument:
     result = await prefix_service.get_prefix_by_prefix(
         prefix
     )
@@ -117,7 +118,7 @@ async def get_prefix_by_uri(
             verify_token,
         ),
     ],
-):
+) -> PrefixDocument:
     result = await prefix_service.get_prefix_by_uri(uri)
     return result
 
@@ -133,7 +134,7 @@ async def delete_prefix(
             scopes=["admin", "curator"],
         ),
     ],
-):
+) -> PrefixDocument:
     result = await prefix_service.delete_prefix(prefix_id)
     return result
 
@@ -151,7 +152,7 @@ async def update_prefix(
             scopes=["admin", "curator"],
         ),
     ],
-):
+) -> PrefixDocument:
     result = await prefix_service.update_prefix(
         prefix, uri, prefix_id
     )

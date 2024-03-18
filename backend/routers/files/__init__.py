@@ -13,6 +13,7 @@ from fastapi.security import (
 )
 from kink import di
 
+from models.file_document import FileDocument
 from services.authentication_service import (
     AuthenticationService,
     JWTData,
@@ -60,7 +61,7 @@ async def get_file_document(
             scopes=["admin", "curator", "reader"],
         ),
     ],
-):
+) -> FileDocument:
     result = await file_service.get_file_document(file_id)
     if result is None:
         raise HTTPException(
@@ -80,7 +81,7 @@ async def download_file(
             scopes=["admin", "curator", "reader"],
         ),
     ],
-):
+) -> FileResponse:
     document = await file_service.get_file_document(file_id)
     if document is None:
         raise HTTPException(
@@ -106,7 +107,7 @@ async def upload_file(
         ),
     ],
     file: UploadFile = File(...),
-):
+) -> FileDocument:
     if file.filename is None:
         raise HTTPException(
             status_code=400, detail="No file name provided"

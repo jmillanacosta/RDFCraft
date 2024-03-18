@@ -17,8 +17,7 @@ from services.authentication_service import (
     AuthenticationService,
     JWTData,
 )
-from services.ontology_service import OntologyService
-from services.prefix_service import PrefixService
+
 from services.source_service import SourceService
 
 #### AUTH

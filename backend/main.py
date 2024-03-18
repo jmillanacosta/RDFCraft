@@ -26,6 +26,7 @@ from routers.prefix import router as prefix_router
 from routers.ontology import router as ontology_router
 from routers.source import router as source_router
 from routers.mapping import router as mapping_router
+from routers.workspace import router as workspace_router
 
 app.include_router(
     user_router, prefix="/users", tags=["users"]

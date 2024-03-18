@@ -1,5 +1,6 @@
 import logging
 
+from beanie import DeleteRules
 from fastapi import HTTPException
 
 from models.workspace_document import WorkspaceDocument
@@ -53,14 +54,16 @@ class WorkspaceService:
         ).to_list()
         return documents
 
-    async def remove_workspace(self, workspace_id: str):
+    async def delete_workspace(self, workspace_id: str):
         document = await WorkspaceDocument.get(workspace_id)
         if document is None:
             raise HTTPException(
                 detail="Workspace not found",
                 status_code=404,
             )
-        await WorkspaceDocument.delete(document)
+        await document.delete(
+            link_rule=DeleteRules.DELETE_LINKS  # type: ignore
+        )
         return document
 
     async def update_workspace(
@@ -86,6 +89,7 @@ class WorkspaceService:
     async def add_mapping_to_workspace(
         self,
         workspace_id: str,
+        name: str,
         description: str,
         file_name: str,
         file_extension: str,
@@ -101,7 +105,7 @@ class WorkspaceService:
             )
 
         mapping = await self.mapping_service.create_mapping(
-            file_name,
+            name,
             description,
             file_name,
             file_extension,
@@ -117,7 +121,7 @@ class WorkspaceService:
 
         return workspace
 
-    async def remove_mapping_from_workspace(
+    async def delete_mapping_from_workspace(
         self, workspace_id: str, mapping_id: str
     ):
         workspace = await WorkspaceDocument.get(
@@ -136,6 +140,10 @@ class WorkspaceService:
         workspace.sources.remove(mapping.source)
 
         workspace.mappings.remove(mapping)  # type: ignore
+
+        await self.mapping_service.delete_mapping(
+            mapping_id
+        )
 
         workspace = await WorkspaceDocument.replace(
             workspace
@@ -202,7 +210,7 @@ class WorkspaceService:
 
         return workspace
 
-    async def remove_prefix_from_workspace(
+    async def delete_prefix_from_workspace(
         self, workspace_id: str, prefix_id: str
     ):
         workspace = await WorkspaceDocument.get(
@@ -245,8 +253,8 @@ class WorkspaceService:
         self,
         workspace_id: str,
         name: str,
-        prefix_id: str,
         description: str,
+        prefix_id: str,
         file_name: str,
         file_extension: str,
         bytes: bytes,
@@ -298,7 +306,7 @@ class WorkspaceService:
 
         return workspace
 
-    async def remove_ontology_from_workspace(
+    async def delete_ontology_from_workspace(
         self, workspace_id: str, ontology_id: str
     ):
         workspace = await WorkspaceDocument.get(
@@ -375,5 +383,3 @@ class WorkspaceService:
         )
 
         return workspace
-    
-    

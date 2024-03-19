@@ -14,7 +14,6 @@ export const metadata: Metadata = {
   description: 'RDFCraft is a RDF mapping tool',
 };
 
-
 export default function RootLayout({
   children,
 }: {

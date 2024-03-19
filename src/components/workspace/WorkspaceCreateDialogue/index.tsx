@@ -1,5 +1,6 @@
 'use client';
 
+import useWorkspaceStore from '@/lib/stores/WorkspaceStore';
 import {
   Button,
   Dialog,
@@ -23,12 +24,16 @@ type _WorkspaceCreateDialogueState = {
 };
 
 const WorkspaceCreateDialogue = (props: _WorkspaceCreateDialogueProps) => {
+  const create = useWorkspaceStore(state => state.create);
+
   const [state, setState] = useState<_WorkspaceCreateDialogueState>({
     name: '',
     description: '',
     nameError: null,
     descriptionError: null,
   });
+
+  const [loading, setLoading] = useState(false);
 
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -37,8 +42,9 @@ const WorkspaceCreateDialogue = (props: _WorkspaceCreateDialogueProps) => {
       <DialogTitle>Create a new workspace</DialogTitle>
       <form
         ref={formRef}
-        onSubmit={e => {
+        onSubmit={async e => {
           e.preventDefault();
+          setLoading(true);
           let nameError = null,
             descriptionError = null;
           if (!state.name) {
@@ -49,9 +55,12 @@ const WorkspaceCreateDialogue = (props: _WorkspaceCreateDialogueProps) => {
           }
           if (!state.name || !state.description) {
             setState({ ...state, nameError, descriptionError });
+            setLoading(false);
             return;
           }
-          console.log('Create workspace', state);
+          await create(state.name, state.description);
+          setLoading(false);
+          props.onClose();
         }}
       >
         <DialogContent>
@@ -65,6 +74,7 @@ const WorkspaceCreateDialogue = (props: _WorkspaceCreateDialogueProps) => {
             onChange={e => setState({ ...state, name: e.target.value })}
             error={!!state.nameError}
             helperText={state.nameError}
+            disabled={loading}
           />
           <TextField
             margin='dense'
@@ -75,13 +85,14 @@ const WorkspaceCreateDialogue = (props: _WorkspaceCreateDialogueProps) => {
             onChange={e => setState({ ...state, description: e.target.value })}
             error={!!state.descriptionError}
             helperText={state.descriptionError}
+            disabled={loading}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={props.onClose} color='primary'>
+          <Button onClick={props.onClose} color='primary' disabled={loading}>
             Cancel
           </Button>
-          <Button type='submit' color='primary'>
+          <Button type='submit' color='primary' disabled={loading}>
             Create
           </Button>
         </DialogActions>

@@ -1,6 +1,6 @@
 'use client';
 
-import { ApiError, AuthService, OpenAPI } from '@/generated';
+import AuthService from '@/lib/api/AuthService';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 
@@ -24,17 +24,19 @@ const _login = async (
   password: string,
 ): Promise<string> => {
   try {
-    const response = await AuthService.loginAuthLoginPost({
-      username,
-      password,
-    });
-    set({ token: `${response.token_type} ${response.access_token}` });
-    OpenAPI.TOKEN = `${response.token_type} ${response.access_token}`;
-    return '';
-  } catch (error) {
-    if (error instanceof ApiError) {
-      return error.message;
+    const response = await AuthService.login(username, password);
+    if (response.success) {
+      set({
+        token: `${response.data.token_type} ${response.data.access_token}`,
+      });
+      localStorage.setItem(
+        'token',
+        `${response.data.token_type} ${response.data.access_token}`,
+      );
+      return '';
     }
+    return response.message;
+  } catch (error) {
     return 'An unexpected error occurred';
   }
 };
@@ -48,7 +50,7 @@ const useAuthStore = create<AuthState & AuthActions>()(
         login: (username, password) => _login(set, username, password),
         reset: () => {
           set(defaultState);
-          OpenAPI.TOKEN = '';
+          localStorage.removeItem('token');
         },
       }),
       {

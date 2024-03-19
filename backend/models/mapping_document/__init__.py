@@ -75,12 +75,6 @@ class EdgeModel(BaseModel):
     data: EdgeDataModel
 
 
-class ObjectNodeModel(BaseModel):
-    id: str
-    type: str
-    position: dict
-
-
 class MappingModel(Document):
     nodes: list[NodeModel] = []
     edges: list[EdgeModel] = []
@@ -108,6 +102,5 @@ __all__ = [
     "EdgeType",
     "EdgeDataModel",
     "EdgeModel",
-    "ObjectNodeModel",
     "MappingModel",
 ]

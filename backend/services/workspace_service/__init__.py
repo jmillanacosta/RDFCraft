@@ -3,6 +3,7 @@ from typing import List
 
 from beanie import DeleteRules
 from fastapi import HTTPException
+from kink import inject
 
 from models.workspace_document import WorkspaceDocument
 from services.mapping_service import MappingService
@@ -10,6 +11,7 @@ from services.ontology_service import OntologyService
 from services.prefix_service import PrefixService
 
 
+@inject
 class WorkspaceService:
     def __init__(
         self,

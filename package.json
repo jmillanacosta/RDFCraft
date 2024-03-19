@@ -6,8 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "generate": "openapi --input ./openapi.json --output ./src/generated"
+    "lint": "next lint"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",
@@ -30,7 +29,6 @@
     "eslint": "^8",
     "eslint-config-next": "14.0.4",
     "eslint-config-prettier": "^9.1.0",
-    "openapi-typescript-codegen": "^0.27.0",
     "typescript": "^5"
   }
 }

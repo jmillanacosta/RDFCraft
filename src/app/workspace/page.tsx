@@ -3,6 +3,7 @@
 import WorkspaceCard from '@/components/workspace/WorksapceCard';
 import WorkspaceAppBar from '@/components/workspace/WorkspaceAppBar';
 import WorkspaceCreateDialogue from '@/components/workspace/WorkspaceCreateDialogue';
+import WorkspaceDeleteConfirmationDialog from '@/components/workspace/WorkspaceDeleteConfirmationDialog';
 import useLocalTheme from '@/lib/hooks/useLocalTheme';
 import useAuthStore from '@/lib/stores/AuthStore';
 import useWorkspaceStore from '@/lib/stores/WorkspaceStore';
@@ -10,9 +11,9 @@ import { ThemeProvider } from '@emotion/react';
 import { Box, CssBaseline, Grid, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { SnackbarProvider, enqueueSnackbar } from 'notistack';
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 
-const WorkspacePage = () => {
+const WorkspacesPage = () => {
   const theme = useLocalTheme();
 
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
@@ -25,9 +26,23 @@ const WorkspacePage = () => {
 
   const workspaceError = useWorkspaceStore(state => state.error);
   const workspaces = useWorkspaceStore(state => state.workspaces);
-  const fetch = useWorkspaceStore(state => state.fetch);
+  const fetch = useWorkspaceStore(state => state.fetchAll);
+  const deleteWorkspace = useWorkspaceStore(state => state.delete);
   const [createWorkspaceDialogOpen, setCreateWorkspaceDialogOpen] =
     useState(false);
+
+  const [toBeDeleted, setToBeDeleted] = useState<string | null>(null);
+
+  const showDeleteConfirmation = useCallback((id: string) => {
+    setToBeDeleted(id);
+  }, []);
+
+  const onDelete = useCallback(async () => {
+    if (toBeDeleted) {
+      await deleteWorkspace(toBeDeleted);
+      setToBeDeleted(null);
+    }
+  }, [toBeDeleted, deleteWorkspace]);
 
   useEffect(() => {
     if (workspaceError) {
@@ -47,6 +62,14 @@ const WorkspacePage = () => {
         <WorkspaceCreateDialogue
           open={createWorkspaceDialogOpen}
           onClose={() => setCreateWorkspaceDialogOpen(false)}
+        />
+        <WorkspaceDeleteConfirmationDialog
+          open={!!toBeDeleted}
+          onClose={() => setToBeDeleted(null)}
+          onConfirm={onDelete}
+          workspaceName={
+            workspaces.find(w => w._id === toBeDeleted)?.name || ''
+          }
         />
         <Box
           color={theme.palette.text.primary}
@@ -74,7 +97,10 @@ const WorkspacePage = () => {
             <Grid container spacing={2} style={{ padding: 16 }}>
               {workspaces.map(workspace => (
                 <Grid item xs={12} sm={6} md={4} lg={3} key={workspace._id}>
-                  <WorkspaceCard workspace={workspace} />
+                  <WorkspaceCard
+                    workspace={workspace}
+                    onDelete={() => showDeleteConfirmation(workspace._id)}
+                  />
                 </Grid>
               ))}
             </Grid>
@@ -85,4 +111,4 @@ const WorkspacePage = () => {
   );
 };
 
-export default WorkspacePage;
+export default WorkspacesPage;

@@ -2,7 +2,7 @@ from models.authorization_document import (
     AuthorizationDocument,
 )
 from models.file_document import FileDocument
-from models.mapping_document import MappingDocument
+from models.mapping_document import MappingDocument, MappingModel
 from models.ontology_document import (
     OntologyDocument,
     OntologyClassDocument,
@@ -19,6 +19,7 @@ all_documents = [
     AuthorizationDocument,
     FileDocument,
     MappingDocument,
+    MappingModel,
     OntologyDocument,
     OntologyClassDocument,
     OntologyIndividualModel,

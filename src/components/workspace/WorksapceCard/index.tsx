@@ -1,20 +1,22 @@
-'use client'
+'use client';
 
 import { ItemCard } from '@/components/general/ItemCard';
 import { WorkspaceModel } from '@/lib/models/Workspace';
-import useWorkspaceStore from '@/lib/stores/WorkspaceStore';
 import { Button, Typography } from '@mui/material';
+import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
 
-const WorkspaceCard = ({ workspace }: { workspace: WorkspaceModel }) => {
-  const deleteWorkspace = useWorkspaceStore(state => state.delete);
+const WorkspaceCard = ({
+  workspace,
+  onDelete,
+}: {
+  workspace: WorkspaceModel;
+  onDelete: () => void;
+}) => {
+  const router = useRouter();
   const onSelect = useCallback(() => {
-    console.log('Selected workspace', workspace._id);
-  }, [workspace._id]);
-
-  const onDelete = useCallback(async () => {
-    await deleteWorkspace(workspace._id);
-  }, [workspace._id]);
+    router.push(`/workspace/${workspace._id}`);
+  }, [workspace._id, router]);
 
   return (
     <>

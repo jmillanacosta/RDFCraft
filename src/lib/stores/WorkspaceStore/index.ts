@@ -8,17 +8,19 @@ import { devtools } from 'zustand/middleware';
 type WorkspaceStoreState = {
   loading: boolean;
   workspaces: WorkspaceModel[];
+  currentWorkspace: WorkspaceModel | null;
   error: string | null;
 };
 
 const defaultState: WorkspaceStoreState = {
   loading: false,
   workspaces: [],
+  currentWorkspace: null,
   error: null,
 };
 
 type WorkspaceStoreActions = {
-  fetch: () => void;
+  fetchAll: () => void;
   create: (name: string, description: string) => void;
   delete: (id: string) => void;
 };
@@ -26,7 +28,7 @@ type WorkspaceStoreActions = {
 const useWorkspaceStore = create<WorkspaceStoreState & WorkspaceStoreActions>()(
   devtools((set, get) => ({
     ...defaultState,
-    fetch: async () => {
+    fetchAll: async () => {
       set({ loading: true });
       try {
         const workspaces = await WorkspaceService.fetchAllWorkspaces();
@@ -39,6 +41,7 @@ const useWorkspaceStore = create<WorkspaceStoreState & WorkspaceStoreActions>()(
         set({ error: 'An unexpected error occurred', loading: false });
       }
     },
+
     create: async (name, description) => {
       try {
         const response = await WorkspaceService.createWorkspace(
@@ -49,7 +52,7 @@ const useWorkspaceStore = create<WorkspaceStoreState & WorkspaceStoreActions>()(
           set({ error: response.message });
           return;
         }
-        get().fetch();
+        get().fetchAll();
       } catch (error) {
         set({ error: 'An unexpected error occurred' });
       }
@@ -61,7 +64,7 @@ const useWorkspaceStore = create<WorkspaceStoreState & WorkspaceStoreActions>()(
           set({ error: response.message });
           return;
         }
-        get().fetch();
+        get().fetchAll();
       } catch (error) {
         set({ error: 'An unexpected error occurred' });
       }

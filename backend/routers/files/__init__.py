@@ -89,7 +89,7 @@ async def download_file(
         )
     return FileResponse(
         path=document.path,
-        filename="f{document.name}.{document.extension}",
+        filename=f"{document.name}.{document.extension}",
         media_type="application/octet-stream",  # TODO: create a ext->mime type map
     )
 

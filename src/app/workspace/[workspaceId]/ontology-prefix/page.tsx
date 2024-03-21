@@ -1,17 +1,27 @@
 'use client';
 
+import ConfirmationDialog from '@/components/general/ConfirmationDialog';
+import DeleteDialog from '@/components/general/DeleteDialog';
+import OntologyAddDialog from '@/components/ontology_prefix/OntologyAddDialog';
 import OntologyPrefixAppBar from '@/components/ontology_prefix/OntologyPrefixAppBar';
+import OntologyTab from '@/components/ontology_prefix/OntologyTab';
 import PrefixAddDialog from '@/components/ontology_prefix/PrefixAddDialog';
 import PrefixBulkAddDialog from '@/components/ontology_prefix/PrefixBulkAddDialog';
-import PrefixCard from '@/components/ontology_prefix/PrefixCard';
+import PrefixTab from '@/components/ontology_prefix/PrefixTab';
 import useLocalTheme from '@/lib/hooks/useLocalTheme';
 import useAuthStore from '@/lib/stores/AuthStore';
 import useWorkspaceItem from '@/lib/stores/WorkspaceItemStore';
 import { ThemeProvider } from '@emotion/react';
-import { Box, CssBaseline, Grid, Tab, Tabs, Typography } from '@mui/material';
+import { Box, Button, CssBaseline, Tab, Tabs } from '@mui/material';
 import { useParams, useRouter } from 'next/navigation';
 import { SnackbarProvider, enqueueSnackbar } from 'notistack';
-import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useState,
+} from 'react';
 
 const OntologyAndPrefixPage = () => {
   const theme = useLocalTheme();
@@ -34,12 +44,29 @@ const OntologyAndPrefixPage = () => {
   const addBulkPrefix = useWorkspaceItem(state => state.addBulkPrefix);
   const removePrefix = useWorkspaceItem(state => state.removePrefix);
 
+  const addOntology = useWorkspaceItem(state => state.addOntology);
+  const deleteOntology = useWorkspaceItem(state => state.deleteOntology);
+
   const [activeDialog, setActiveDialog] = useState<
-    'ontology' | 'prefix' | 'prefix-bulk' | null
+    | 'ontology'
+    | 'prefix'
+    | 'prefix-bulk'
+    | 'prefix-delete'
+    | 'ontology-delete'
+    | null
   >(null);
 
+  const [objectIdToDelete, setObjectIdToDelete] = useState<string | null>(null);
+
   const activateDialog = useCallback(
-    (dialog: 'ontology' | 'prefix' | 'prefix-bulk') => {
+    (
+      dialog:
+        | 'ontology'
+        | 'prefix'
+        | 'prefix-bulk'
+        | 'prefix-delete'
+        | 'ontology-delete',
+    ) => {
       setActiveDialog(dialog);
     },
     [],
@@ -81,11 +108,32 @@ const OntologyAndPrefixPage = () => {
     'aria-controls': `simple-tabpanel-${index}`,
   });
 
+  const availablePrefixes = useMemo(() => {
+    const prefixes = workspace?.prefixes || [];
+    const prefixesUsedByOntologies =
+      workspace?.ontologies.map(o => o.prefix.id) || [];
+    return prefixes.filter(p => !prefixesUsedByOntologies.includes(p.id));
+  }, [workspace?.ontologies, workspace?.prefixes]);
   return (
     <>
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <SnackbarProvider />
+        <OntologyAddDialog
+          open={activeDialog === 'ontology'}
+          onClose={() => setActiveDialog(null)}
+          onConfirm={async (
+            name: string,
+            description: string,
+            prefix_id: string,
+            file: File,
+          ) => {
+            await addOntology(name, description, prefix_id, file);
+            setActiveDialog(null);
+          }}
+          loading={loading}
+          availablePrefixes={availablePrefixes}
+        />
         <PrefixAddDialog
           open={activeDialog === 'prefix'}
           onClose={() => setActiveDialog(null)}
@@ -104,6 +152,39 @@ const OntologyAndPrefixPage = () => {
           }}
           loading={loading}
         />
+        <DeleteDialog
+          title='Delete Prefix'
+          description={'Are you sure you want to delete the prefix?'}
+          open={activeDialog === 'prefix-delete'}
+          onClose={() => {
+            setObjectIdToDelete(null);
+            setActiveDialog(null);
+          }}
+          onConfirm={async () => {
+            if (objectIdToDelete) {
+              await removePrefix(objectIdToDelete);
+              setObjectIdToDelete(null);
+            }
+            setActiveDialog(null);
+          }}
+        />
+        <DeleteDialog
+          title='Delete Ontology'
+          description={'Are you sure you want to delete the ontology?'}
+          open={activeDialog === 'ontology-delete'}
+          onClose={() => {
+            setObjectIdToDelete(null);
+            setActiveDialog(null);
+          }}
+          onConfirm={async () => {
+            if (objectIdToDelete) {
+              await deleteOntology(objectIdToDelete);
+              setObjectIdToDelete(null);
+            }
+            setActiveDialog(null);
+          }}
+        />
+
         <Box
           color={theme.palette.text.primary}
           bgcolor={theme.palette.background.default}
@@ -133,37 +214,25 @@ const OntologyAndPrefixPage = () => {
               <Tab label='Prefix' {...tabProps(1)} />
             </Tabs>
           </Box>
-          <Box
-            width='100%'
-            display='flex'
-            flexDirection='column'
-            alignItems='center'
-            sx={{ display: activeTab === 0 ? 'flex' : 'none' }}
-          >
-            Ontology
-          </Box>
-          <Box
-            width='100%'
-            display='flex'
-            flexDirection='column'
-            alignItems='center'
-            sx={{ display: activeTab === 1 ? 'flex' : 'none' }}
-          >
-            {workspace?.prefixes.length === 0 ? (
-              <Typography variant='h6'>No prefixes added yet</Typography>
-            ) : (
-              <Grid container spacing={2} style={{ padding: 16 }}>
-                {workspace?.prefixes.map(prefix => (
-                  <Grid item xs={12} sm={6} md={4} lg={3} key={prefix._id}>
-                    <PrefixCard
-                      prefix={prefix}
-                      removePrefix={_id => removePrefix(_id)}
-                    />
-                  </Grid>
-                ))}
-              </Grid>
-            )}
-          </Box>
+          <OntologyTab
+            active={activeTab === 0}
+            ontologies={workspace?.ontologies || []}
+            removeOntology={(id: string) => {
+              setObjectIdToDelete(id);
+              setActiveDialog('ontology-delete');
+            }}
+            showOntologyDetails={(id: string) => {
+              router.push(`/workspace/${params.workspaceId}/ontology/${id}`);
+            }}
+          />
+          <PrefixTab
+            active={activeTab === 1}
+            prefixes={workspace?.prefixes || []}
+            removePrefix={(id: string) => {
+              setObjectIdToDelete(id);
+              setActiveDialog('prefix-delete');
+            }}
+          />
         </Box>
       </ThemeProvider>
     </>

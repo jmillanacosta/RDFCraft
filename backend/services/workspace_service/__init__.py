@@ -237,7 +237,7 @@ class WorkspaceService:
             (
                 o
                 for o in workspace.ontologies
-                if o.prefix.id == prefix_id  # type: ignore
+                if str(o.prefix.id) == prefix_id  # type: ignore
             ),
             None,
         )
@@ -249,6 +249,8 @@ class WorkspaceService:
             )
 
         workspace.prefixes.remove(prefix)  # type: ignore
+
+        await self.prefix_service.delete_prefix(prefix_id)
 
         workspace = await WorkspaceDocument.replace(
             workspace
@@ -283,7 +285,7 @@ class WorkspaceService:
             (
                 o
                 for o in workspace.ontologies
-                if o.prefix.id == prefix_id  # type: ignore
+                if str(o.prefix.id) == prefix_id  # type: ignore
             ),
             None,
         )
@@ -333,6 +335,10 @@ class WorkspaceService:
 
         workspace.ontologies.remove(ontology)  # type: ignore
 
+        await self.ontology_service.delete_ontology(
+            ontology_id
+        )
+
         workspace = await WorkspaceDocument.replace(
             workspace
         )
@@ -368,7 +374,7 @@ class WorkspaceService:
             (
                 o
                 for o in workspace.ontologies
-                if o.prefix.id == prefix_id  # type: ignore
+                if str(o.prefix.id) == prefix_id  # type: ignore
             ),
             None,
         )

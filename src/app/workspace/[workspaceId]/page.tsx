@@ -77,6 +77,7 @@ const WorkspacePage = () => {
       <>
         <ThemeProvider theme={theme}>
           <CssBaseline />
+          <SnackbarProvider />
           <Box
             color={theme.palette.text.primary}
             bgcolor={theme.palette.background.default}

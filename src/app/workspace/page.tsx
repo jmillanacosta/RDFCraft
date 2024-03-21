@@ -91,7 +91,7 @@ const WorkspacesPage = () => {
               color='text.secondary'
               sx={{ margin: 'auto' }}
             >
-              No projects found
+              No workspaces found
             </Typography>
           ) : (
             <Grid container spacing={2} style={{ padding: 16 }}>

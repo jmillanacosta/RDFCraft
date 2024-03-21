@@ -35,7 +35,7 @@ class OntologyService:
         name: str,
         description: str,
         prefix_id: str,
-    )-> OntologyDocument:
+    ) -> OntologyDocument:
         # Check if prefix exists, raises 404 if not
         prefix = await self.prefix_service.get_prefix_by_id(
             prefix_id
@@ -188,8 +188,8 @@ class OntologyService:
         return ontology
 
     async def get_ontology_by_id(self, ontology_id: str):
-        ontology = await OntologyDocument.find_one(
-            OntologyDocument.id == ontology_id,
+        ontology = await OntologyDocument.get(
+            ontology_id,
             fetch_links=True,
         )
         if ontology is None:
@@ -198,9 +198,12 @@ class OntologyService:
             )
         return ontology
 
-    async def get_ontology_classes(self, ontology_id: str) -> List[OntologyClassDocument]:
+    async def get_ontology_classes(
+        self, ontology_id: str
+    ) -> List[OntologyClassDocument]:
         classes = await OntologyClassDocument.find(
-            OntologyClassDocument.ontology_id == ontology_id
+            OntologyClassDocument.ontology_id
+            == PydanticObjectId(ontology_id)
         ).to_list()
         return classes
 
@@ -209,7 +212,7 @@ class OntologyService:
     ) -> List[OntologyPropertyDocument]:
         properties = await OntologyPropertyDocument.find(
             OntologyPropertyDocument.ontology_id
-            == ontology_id
+            == PydanticObjectId(ontology_id)
         ).to_list()
         return properties
 
@@ -218,11 +221,13 @@ class OntologyService:
     ) -> List[OntologyIndividualModel]:
         individuals = await OntologyIndividualModel.find(
             OntologyIndividualModel.ontology_id
-            == ontology_id
+            == PydanticObjectId(ontology_id)
         ).to_list()
         return individuals
 
-    async def delete_ontology(self, ontology_id: str) -> OntologyDocument:
+    async def delete_ontology(
+        self, ontology_id: str
+    ) -> OntologyDocument:
         ontology = await OntologyDocument.get(
             ontology_id, fetch_links=True
         )

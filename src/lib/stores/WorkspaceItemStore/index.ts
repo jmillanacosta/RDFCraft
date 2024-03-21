@@ -19,6 +19,14 @@ type WorkspaceItemStoreActions = {
   addPrefix: (prefix: string, uri: string) => void;
   addBulkPrefix: (models: PrefixModel[]) => void;
   removePrefix: (prefixId: string) => void;
+  addOntology: (
+    name: string,
+    description: string,
+    prefix_id: string,
+    file: File,
+  ) => void;
+  deleteOntology: (id: string) => void;
+  assignPrefix: (ontologyId: string, prefixId: string) => void;
 };
 
 const defaultState: WorkspaceItemStoreState = {
@@ -156,6 +164,123 @@ const useWorkspaceItem = create<
         try {
           const response = await WorkspaceService.removePrefixFromWorkspace(
             get().workspace!._id,
+            prefixId,
+          );
+          if (!response.success) {
+            set({
+              error: response.message,
+              loading: false,
+              status_code: response.status,
+            });
+            return;
+          }
+          set({
+            workspace: response.data,
+            loading: false,
+            error: null,
+          });
+        } catch (error) {
+          set({
+            error: 'An unexpected error occurred',
+            loading: false,
+            status_code: 500,
+          });
+        }
+      },
+      addOntology: async (
+        name: string,
+        description: string,
+        prefix_id: string,
+        file: File,
+      ) => {
+        set({ loading: true, error: null });
+        if (!get().workspace) {
+          set({
+            error: 'Workspace not found, please go back and try again',
+            loading: false,
+            status_code: 404,
+          });
+          return;
+        }
+        try {
+          const response = await WorkspaceService.addOntologyToWorkspace(
+            get().workspace!._id,
+            name,
+            description,
+            prefix_id,
+            file,
+          );
+          if (!response.success) {
+            set({
+              error: response.message,
+              loading: false,
+              status_code: response.status,
+            });
+            return;
+          }
+          set({
+            workspace: response.data,
+            loading: false,
+            error: null,
+          });
+        } catch (error) {
+          set({
+            error: 'An unexpected error occurred',
+            loading: false,
+            status_code: 500,
+          });
+        }
+      },
+      deleteOntology: async (id: string) => {
+        set({ loading: true, error: null });
+        if (!get().workspace) {
+          set({
+            error: 'Workspace not found, please go back and try again',
+            loading: false,
+            status_code: 404,
+          });
+          return;
+        }
+        try {
+          const response = await WorkspaceService.removeOntologyFromWorkspace(
+            get().workspace!._id,
+            id,
+          );
+          if (!response.success) {
+            set({
+              error: response.message,
+              loading: false,
+              status_code: response.status,
+            });
+            return;
+          }
+          set({
+            workspace: response.data,
+            loading: false,
+            error: null,
+          });
+        } catch (error) {
+          set({
+            error: 'An unexpected error occurred',
+            loading: false,
+            status_code: 500,
+          });
+        }
+      },
+      assignPrefix: async (ontologyId: string, prefixId: string) => {
+        set({ loading: true, error: null });
+        if (!get().workspace) {
+          set({
+            error: 'Workspace not found, please go back and try again',
+            loading: false,
+            status_code: 404,
+          });
+          return;
+        }
+        try {
+          const response = await WorkspaceService.assignPrefixToOntology(
+            get().workspace!._id,
+            ontologyId,
             prefixId,
           );
           if (!response.success) {

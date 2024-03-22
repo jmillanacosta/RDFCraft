@@ -294,6 +294,11 @@ class OntologyIndexer:
             )
             for individual, label, deprecated, definition in result  # type: ignore
         ]
+        _dedup_dict = {
+            individual.full_uri: individual
+            for individual in individual_list
+        }
+        individual_list = list(_dedup_dict.values())
 
         self.logger.info(
             f"Extracted {len(individual_list)} individuals from ontology"

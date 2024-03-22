@@ -2,6 +2,8 @@
 
 import OntologyAppBar from '@/components/ontology/OntologyAppBar';
 import OntologyClassTab from '@/components/ontology/OntologyClassTab';
+import OntologyIndividualTab from '@/components/ontology/OntologyIndividualTab';
+import OntologyPropertyTab from '@/components/ontology/OntologyPropertyTab';
 import useLocalTheme from '@/lib/hooks/useLocalTheme';
 import { OntologyModel } from '@/lib/models/OntologyModel';
 import useAuthStore from '@/lib/stores/AuthStore';
@@ -51,6 +53,7 @@ const OntologyPage = () => {
     setOntology(_ontology);
   }, [params.ontologyId, ontologies, fetchOntologyItems]);
 
+  const [selected, setSelected] = useState<string>('');
   const [activeTab, setActiveTab] = useState(0);
   const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     setActiveTab(newValue);
@@ -138,6 +141,34 @@ const OntologyPage = () => {
               classes={allClasses[`${params.ontologyId}`] || []}
               class_domains={allClassDomains[`${params.ontologyId}`] || {}}
               class_ranges={allClassRanges[`${params.ontologyId}`] || {}}
+              selected={selected}
+              goToProperty={async uri => {
+                setActiveTab(1);
+                setSelected(uri);
+                await new Promise(resolve => setTimeout(resolve, 100));
+                const property = document.getElementById(uri);
+                if (property) {
+                  property.scrollIntoView();
+                }
+              }}
+            />
+            <OntologyPropertyTab
+              open={activeTab === 1}
+              properties={allProperties[`${params.ontologyId}`] || []}
+              selected={selected}
+              goToClass={async uri => {
+                setActiveTab(0);
+                setSelected(uri);
+                await new Promise(resolve => setTimeout(resolve, 100));
+                const _class = document.getElementById(uri);
+                if (_class) {
+                  _class.scrollIntoView();
+                }
+              }}
+            />
+            <OntologyIndividualTab
+              open={activeTab === 2}
+              individuals={allIndividuals[`${params.ontologyId}`] || []}
             />
           </Box>
         </Box>

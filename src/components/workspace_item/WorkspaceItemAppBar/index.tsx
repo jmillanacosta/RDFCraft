@@ -1,11 +1,12 @@
 'use client';
 
-import { ArrowBack, ScatterPlot } from '@mui/icons-material';
+import { ArrowBack, LibraryAdd, ScatterPlot } from '@mui/icons-material';
 import { AppBar, Button, IconButton, Toolbar, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
 
 type _WorkspaceItemAppBarProps = {
   name: string;
+  openDialog: (dialog: 'addMapping') => void;
 };
 
 const WorkspaceItemAppBar = (props: _WorkspaceItemAppBarProps) => {
@@ -43,6 +44,18 @@ const WorkspaceItemAppBar = (props: _WorkspaceItemAppBarProps) => {
         >
           <ScatterPlot />
           <Typography>Ontologies and Prefixes</Typography>
+        </Button>
+        <Button
+          title='Add Mapping'
+          onClick={() => props.openDialog('addMapping')}
+          variant='text'
+          color='inherit'
+          sx={{
+            textTransform: 'none',
+          }}
+        >
+          <LibraryAdd />
+          <Typography>Add Mapping</Typography>
         </Button>
       </Toolbar>
     </AppBar>

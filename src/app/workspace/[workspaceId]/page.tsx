@@ -1,5 +1,6 @@
 'use client';
 
+import WorkspaceAddMapping from '@/components/workspace_item/AddMappingDialog';
 import WorkspaceItemAppBar from '@/components/workspace_item/WorkspaceItemAppBar';
 import useLocalTheme from '@/lib/hooks/useLocalTheme';
 import { WorkspaceModel } from '@/lib/models/Workspace';
@@ -36,6 +37,8 @@ const WorkspacePage = () => {
   const loading = useWorkspaceItem(state => state.loading);
   const error = useWorkspaceItem(state => state.error);
   const status_code = useWorkspaceItem(state => state.status_code);
+
+  const [activeDialog, setActiveDialog] = useState<'addMapping' | null>(null);
 
   useEffect(() => {
     if (error) {
@@ -78,6 +81,19 @@ const WorkspacePage = () => {
         <ThemeProvider theme={theme}>
           <CssBaseline />
           <SnackbarProvider />
+          <WorkspaceAddMapping
+            open={activeDialog === 'addMapping'}
+            onClose={() => setActiveDialog(null)}
+            loading={loading}
+            onConfirm={async (name, description, file) => {
+              console.log(name, description, file);
+              const data = await file.text();
+              const json = JSON.parse(data);
+
+              console.log(json);
+              console.log(json.length);
+            }}
+          />
           <Box
             color={theme.palette.text.primary}
             bgcolor={theme.palette.background.default}
@@ -87,7 +103,10 @@ const WorkspacePage = () => {
             flexDirection='column'
             alignItems='center'
           >
-            <WorkspaceItemAppBar name={workspace.name || ''} />
+            <WorkspaceItemAppBar
+              name={workspace.name || ''}
+              openDialog={(dialog: 'addMapping') => setActiveDialog(dialog)}
+            />
             {loading && <Typography variant='h6'>Loading...</Typography>}
           </Box>
         </ThemeProvider>
@@ -107,7 +126,10 @@ const WorkspacePage = () => {
           flexDirection='column'
           alignItems='center'
         >
-          <WorkspaceItemAppBar name='' />
+          <WorkspaceItemAppBar
+            name=''
+            openDialog={dialog => setActiveDialog(dialog)}
+          />
           <Typography variant='h6'>Loading...</Typography>
         </Box>
       </ThemeProvider>

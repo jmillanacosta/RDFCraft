@@ -41,6 +41,8 @@ class MappingService:
 
         mapping = MappingModel()
 
+        mapping = await MappingModel.insert_one(mapping)
+
         mapping_document = MappingDocument(
             name=name,
             source=source,  # type: ignore
@@ -48,11 +50,13 @@ class MappingService:
             current_mapping=mapping,  # type: ignore
         )
 
-        mapping_document: MappingDocument = await mapping_document.insert()  # type: ignore
+        await MappingDocument.insert(mapping_document)
 
         return mapping_document
 
-    async def get_mapping(self, mapping_id: str) -> MappingDocument:
+    async def get_mapping(
+        self, mapping_id: str
+    ) -> MappingDocument:
         document = await MappingDocument.get(
             mapping_id, fetch_links=True
         )
@@ -124,12 +128,21 @@ class MappingService:
 
         return document
 
-    async def delete_mapping(self, mapping_id: str) -> MappingDocument:
-        document = await MappingDocument.get(mapping_id)
+    async def delete_mapping(
+        self, mapping_id: str
+    ) -> MappingDocument:
+        document = await MappingDocument.get(
+            mapping_id, fetch_links=True
+        )
         if document is None:
             raise HTTPException(
                 detail="Mapping not found",
                 status_code=404,
             )
+        await self.source_service.remove_source(
+            document.source.id  #  type: ignore
+        )
+        for mapping in document.mappings:
+            await MappingModel.delete(mapping)
         await MappingDocument.delete(document)
         return document

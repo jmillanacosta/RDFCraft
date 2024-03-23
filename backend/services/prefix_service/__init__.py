@@ -1,5 +1,6 @@
 import logging
 from typing import List
+
 from fastapi import HTTPException
 from kink import inject
 
@@ -9,7 +10,7 @@ from models.prefix_document import PrefixDocument
 
 @inject
 class PrefixService:
-    def __init__(self) -> None:
+    def __init__(self):
         self.logger = logging.getLogger(__name__)
 
     async def create_prefix(
@@ -135,7 +136,9 @@ class PrefixService:
         self.logger.info(f"Prefix {prefix} updated")
         return document
 
-    async def delete_prefix(self, prefix_id: str) -> PrefixDocument:
+    async def delete_prefix(
+        self, prefix_id: str
+    ) -> PrefixDocument:
         """
         Delete Prefix
         """
@@ -160,7 +163,9 @@ class PrefixService:
         )
         return document
 
-    async def get_all_prefixes(self) -> List[PrefixDocument]:
+    async def get_all_prefixes(
+        self,
+    ) -> List[PrefixDocument]:
         """
         Get All Prefixes
         """
@@ -168,23 +173,4 @@ class PrefixService:
         documents = await PrefixDocument.find().to_list()
 
         self.logger.info("All prefixes found")
-        return documents
-
-    async def get_prefixes_by_ontology_id(
-        self, ontology_id: str
-    ) -> List[PrefixDocument]:
-        """
-        Get Prefixes by Ontology ID
-        """
-        self.logger.info(
-            f"Getting prefixes by ontology id {ontology_id}"
-        )
-        documents = await PrefixDocument.find(
-            PrefixDocument.ontology.id == ontology_id,  # type: ignore
-            fetch_links=True,
-        ).to_list()
-
-        self.logger.info(
-            f"Prefixes by ontology id {ontology_id} found"
-        )
         return documents

@@ -1,5 +1,6 @@
 import logging
 from typing import List
+
 from fastapi import HTTPException
 from kink import inject
 
@@ -72,7 +73,9 @@ class SourceService:
                 status_code=400,
             )
 
-    async def get_source_by_id(self, source_id: str) -> SourceDocument:
+    async def get_source_by_id(
+        self, source_id: str
+    ) -> SourceDocument:
         source = await SourceDocument.get(
             source_id, fetch_links=True
         )
@@ -87,13 +90,18 @@ class SourceService:
         sources = await SourceDocument.find({}).to_list()
         return sources
 
-    async def remove_source(self, source_id: str) -> SourceDocument:
-        source = await SourceDocument.get(source_id)
+    async def remove_source(
+        self, source_id: str
+    ) -> SourceDocument:
+        source = await SourceDocument.get(
+            source_id, fetch_links=True
+        )
         if source is None:
             raise HTTPException(
                 detail="Source not found",
                 status_code=404,
             )
+        await self.file_service.delete_file(source.file.id)  # type: ignore
         await SourceDocument.delete(source)
         return source
 

@@ -2,9 +2,12 @@ import logging
 from typing import List
 
 from beanie import DeleteRules
+from beanie.odm.fields import Link
 from fastapi import HTTPException
 from kink import inject
 
+from models.ontology_document import OntologyDocument
+from models.prefix_document import PrefixDocument
 from models.workspace_document import WorkspaceDocument
 from services.mapping_service import MappingService
 from services.ontology_service import OntologyService
@@ -144,6 +147,7 @@ class WorkspaceService:
             mapping_id
         )
 
+
         workspace.sources.remove(mapping.source)
 
         workspace.mappings.remove(mapping)  # type: ignore
@@ -257,6 +261,32 @@ class WorkspaceService:
         )
 
         return workspace
+
+    async def get_unassigned_prefixes(
+        self, workspace_id: str
+    ) -> list[PrefixDocument]:
+        workspace = await WorkspaceDocument.get(
+            workspace_id, fetch_links=True
+        )
+        if workspace is None:
+            raise HTTPException(
+                detail="Workspace not found",
+                status_code=404,
+            )
+
+        prefixes: List[PrefixDocument] = workspace.prefixes  # type: ignore
+
+        ontologies: List[OntologyDocument] = workspace.ontologies  # type: ignore
+
+        assigned_prefixes = [o.prefix for o in ontologies]  # type: ignore
+
+        unassigned_prefixes = [
+            p
+            for p in prefixes
+            if p not in assigned_prefixes
+        ]
+
+        return unassigned_prefixes
 
     async def add_ontology_to_workspace(
         self,

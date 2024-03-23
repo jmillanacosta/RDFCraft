@@ -16,7 +16,13 @@ export function ItemCard({
   children?: React.ReactNode;
 }) {
   return (
-    <Card>
+    <Card
+     sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+     }}
+    >
       <CardContent>
         <Typography variant='h5' component='h2'>
           {name}

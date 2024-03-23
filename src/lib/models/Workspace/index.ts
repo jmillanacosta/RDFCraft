@@ -1,6 +1,6 @@
 'use client';
 
-import { MappingModel } from '../MappingModel';
+import { MappingDocument } from '../MappingModel';
 import { OntologyModel } from '../OntologyModel';
 import { PrefixModel } from '../PrefixModel';
 import { SourceModel } from '../SourceModel';
@@ -16,11 +16,12 @@ import { SourceModel } from '../SourceModel';
  */
 
 export type WorkspaceModel = {
-  _id: string;
-  name: string;
-  description: string;
-  sources: SourceModel[];
-  prefixes: PrefixModel[];
-  ontologies: OntologyModel[];
-  mappings: MappingModel[];
+    _id: string;
+    id: string;
+    name: string;
+    description: string;
+    sources: SourceModel[];
+    prefixes: PrefixModel[];
+    ontologies: OntologyModel[];
+    mappings: MappingDocument[];
 };

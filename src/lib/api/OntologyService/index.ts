@@ -5,8 +5,9 @@ import {
   OntologyIndividualModel,
   OntologyPropertyDocument,
 } from '@/lib/models/OntologyIndexModel';
-import { ApiCallResponse, callApi } from '../ApiCall';
 import { OntologyModel } from '@/lib/models/OntologyModel';
+import { ApiCallResponse, callApi } from '../ApiCall';
+import { PrefixModel } from '@/lib/models/PrefixModel';
 
 class OntologyService {
   static async getOntology(
@@ -38,6 +39,14 @@ class OntologyService {
   ): Promise<ApiCallResponse<OntologyIndividualModel[]>> {
     return await callApi<OntologyIndividualModel[]>({
       endpoint: `/api/ontologies/${id}/individuals`,
+    });
+  }
+
+  static async getUnassignedPrefixes(
+    id: string,
+  ): Promise<ApiCallResponse<PrefixModel[]>> {
+    return await callApi<PrefixModel[]>({
+      endpoint: `/api/workspaces/${id}/prefix/unassigned`,
     });
   }
 }

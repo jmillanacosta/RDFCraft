@@ -13,13 +13,13 @@ from fastapi.security import OAuth2PasswordBearer
 from kink import di
 from pydantic import BaseModel
 
+from models.prefix_document import PrefixDocument
 from models.workspace_document import WorkspaceDocument
 from services.authentication_service import (
     AuthenticationService,
     JWTData,
 )
 from services.workspace_service import WorkspaceService
-
 
 AuthServiceDep = Annotated[
     AuthenticationService,
@@ -162,6 +162,17 @@ async def delete_prefix(
 ) -> WorkspaceDocument:
     return await workspace_service.delete_prefix_from_workspace(
         workspace_id, prefix_id
+    )
+
+
+@router.get("/{workspace_id}/prefix/unassigned")
+async def get_unassigned_prefixes(
+    workspace_id: str,
+    workspace_service: WorkspaceServiceDep,
+    auth: JWTData = Security(verify_token),
+) -> List[PrefixDocument]:
+    return await workspace_service.get_unassigned_prefixes(
+        workspace_id
     )
 
 

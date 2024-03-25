@@ -1,35 +1,35 @@
 .source_handle {
-    width: 30px;
-    height: 14px;
-    border-radius: 3px;
-    background-color: #784be8;
+  width: 30px;
+  height: 14px;
+  border-radius: 3px;
+  background-color: #784be8;
 }
 
 .literal_handle {
-    width: 30px;
-    height: 14px;
-    border-radius: 3px;
-    background-color: #ed902d;
+  width: 30px;
+  height: 14px;
+  border-radius: 3px;
+  background-color: #ed902d;
 }
 
 .input {
-    display: block;
-    width: 100%;
-    padding: 12px;
-    font-size: 15px;
-    font-family: monospace;
-    line-height: 19px;
-    letter-spacing: normal;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background: #eee;
-    transition: 0.2s box-shadow ease;
+  display: block;
+  width: 100%;
+  padding: 12px;
+  font-size: 15px;
+  font-family: monospace;
+  line-height: 19px;
+  letter-spacing: normal;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background: #eee;
+  transition: 0.2s box-shadow ease;
 }
 
 path.react-flow__edge-path {
-    stroke-width: 4;
+  stroke-width: 4;
 }
 
 path.react-flow__edge-path:hover {
-    stroke-width: 10;
+  stroke-width: 10;
 }

@@ -34,7 +34,7 @@ type UriRefNodeDataModel = {
 };
 
 type NodeModel = {
-    _id: string;
+    id: string;
     type: NodeTypes;
     position: PositionModel;
     width: number;
@@ -51,7 +51,7 @@ type EdgeDataModel = {
 };
 
 type EdgeModel = {
-    _id: string;
+    id: string;
     source: string;
     target: string;
     data: EdgeDataModel;
@@ -59,6 +59,7 @@ type EdgeModel = {
 
 type MappingModel = {
     _id: string;
+    id: string;
     nodes: NodeModel[];
     edges: EdgeModel[];
 };

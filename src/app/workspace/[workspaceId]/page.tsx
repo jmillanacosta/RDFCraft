@@ -1,5 +1,6 @@
 'use client';
 
+import Baseline from '@/components/general/Baseline';
 import DeleteDialog from '@/components/general/DeleteDialog';
 import WorkspaceAddMapping from '@/components/workspace_item/AddMappingDialog';
 import MappingItem from '@/components/workspace_item/MappingItem';
@@ -7,16 +8,10 @@ import WorkspaceItemAppBar from '@/components/workspace_item/WorkspaceItemAppBar
 import useLocalTheme from '@/lib/hooks/useLocalTheme';
 import useAuthStore from '@/lib/stores/AuthStore';
 import useWorkspaceItem from '@/lib/stores/WorkspaceItemStore';
-import {
-    Box,
-    CssBaseline,
-    Grid,
-    ThemeProvider,
-    Typography,
-} from '@mui/material';
+import { Box, Grid, Typography } from '@mui/material';
 import Error from 'next/error';
 import { useParams, useRouter } from 'next/navigation';
-import { SnackbarProvider, enqueueSnackbar } from 'notistack';
+import { enqueueSnackbar } from 'notistack';
 import { useEffect, useLayoutEffect, useState } from 'react';
 
 const WorkspacePage = () => {
@@ -62,115 +57,47 @@ const WorkspacePage = () => {
 
     if (params.workspaceId === undefined || params.workspaceId === null) {
         return (
-            <>
+            <Baseline>
                 <Error statusCode={500}>
                     <Typography variant='h1'>Workspace not found</Typography>
                 </Error>
-            </>
+            </Baseline>
         );
     }
 
     if (!workspace && status_code) {
         return (
-            <>
-                <SnackbarProvider />
+            <Baseline>
                 <Error statusCode={status_code}>
                     <Typography variant='h1'>Workspace not found</Typography>
                 </Error>
-            </>
+            </Baseline>
         );
     }
 
     if (workspace)
         return (
-            <>
-                <ThemeProvider theme={theme}>
-                    <CssBaseline />
-                    <SnackbarProvider />
-                    <WorkspaceAddMapping
-                        open={activeDialog === 'addMapping'}
-                        onClose={() => setActiveDialog(null)}
-                        loading={loading}
-                        onConfirm={async (name, description, file) => {
-                            await addMapping(name, description, file);
-                            setActiveDialog(null);
-                        }}
-                    />
-                    <DeleteDialog
-                        title='Delete mapping'
-                        description='Are you sure you want to delete this mapping?'
-                        open={activeDialog === 'deleteMapping'}
-                        onClose={() => setActiveDialog(null)}
-                        onConfirm={async () => {
-                            if (!toBeDeleted) return;
-                            await deleteMapping(toBeDeleted);
-                            setActiveDialog(null);
-                        }}
-                    />
-                    <Box
-                        color={theme.palette.text.primary}
-                        bgcolor={theme.palette.background.default}
-                        height='100vh'
-                        width='100vw'
-                        display='flex'
-                        flexDirection='column'
-                        alignItems='center'
-                    >
-                        <WorkspaceItemAppBar
-                            name={workspace.name || ''}
-                            openDialog={(dialog: 'addMapping') =>
-                                setActiveDialog(dialog)
-                            }
-                        />
-                        {loading && (
-                            <Typography variant='h6'>Loading...</Typography>
-                        )}
-                        <Grid container spacing={2} style={{ padding: 16 }}>
-                            {workspace.mappings.length === 0 ? (
-                                <Typography
-                                    variant='h6'
-                                    color='text.secondary'
-                                    sx={{ margin: 'auto' }}
-                                >
-                                    No mappings found
-                                </Typography>
-                            ) : (
-                                workspace.mappings.map((mapping) => (
-                                    <Grid
-                                        item
-                                        xs={12}
-                                        sm={6}
-                                        md={4}
-                                        lg={3}
-                                        key={mapping._id || mapping.id}
-                                    >
-                                        <MappingItem
-                                            workspaceID={
-                                                workspace._id || workspace.id
-                                            }
-                                            mapping={mapping}
-                                            onDelete={() => {
-                                                setActiveDialog(
-                                                    'deleteMapping',
-                                                );
-                                                setToBeDeleted(
-                                                    mapping._id || mapping.id,
-                                                );
-                                            }}
-                                        />
-                                    </Grid>
-                                ))
-                            )}
-                        </Grid>
-                    </Box>
-                </ThemeProvider>
-            </>
-        );
-
-    return (
-        <>
-            <ThemeProvider theme={theme}>
-                <CssBaseline />
+            <Baseline>
+                <WorkspaceAddMapping
+                    open={activeDialog === 'addMapping'}
+                    onClose={() => setActiveDialog(null)}
+                    loading={loading}
+                    onConfirm={async (name, description, file) => {
+                        await addMapping(name, description, file);
+                        setActiveDialog(null);
+                    }}
+                />
+                <DeleteDialog
+                    title='Delete mapping'
+                    description='Are you sure you want to delete this mapping?'
+                    open={activeDialog === 'deleteMapping'}
+                    onClose={() => setActiveDialog(null)}
+                    onConfirm={async () => {
+                        if (!toBeDeleted) return;
+                        await deleteMapping(toBeDeleted);
+                        setActiveDialog(null);
+                    }}
+                />
                 <Box
                     color={theme.palette.text.primary}
                     bgcolor={theme.palette.background.default}
@@ -181,13 +108,71 @@ const WorkspacePage = () => {
                     alignItems='center'
                 >
                     <WorkspaceItemAppBar
-                        name=''
-                        openDialog={(dialog) => setActiveDialog(dialog)}
+                        name={workspace.name || ''}
+                        openDialog={(dialog: 'addMapping') =>
+                            setActiveDialog(dialog)
+                        }
                     />
-                    <Typography variant='h6'>Loading...</Typography>
+                    {loading && (
+                        <Typography variant='h6'>Loading...</Typography>
+                    )}
+                    <Grid container spacing={2} style={{ padding: 16 }}>
+                        {workspace.mappings.length === 0 ? (
+                            <Typography
+                                variant='h6'
+                                color='text.secondary'
+                                sx={{ margin: 'auto' }}
+                            >
+                                No mappings found
+                            </Typography>
+                        ) : (
+                            workspace.mappings.map((mapping) => (
+                                <Grid
+                                    item
+                                    xs={12}
+                                    sm={6}
+                                    md={4}
+                                    lg={3}
+                                    key={mapping._id || mapping.id}
+                                >
+                                    <MappingItem
+                                        workspaceID={
+                                            workspace._id || workspace.id
+                                        }
+                                        mapping={mapping}
+                                        onDelete={() => {
+                                            setActiveDialog('deleteMapping');
+                                            setToBeDeleted(
+                                                mapping._id || mapping.id,
+                                            );
+                                        }}
+                                    />
+                                </Grid>
+                            ))
+                        )}
+                    </Grid>
                 </Box>
-            </ThemeProvider>
-        </>
+            </Baseline>
+        );
+
+    return (
+        <Baseline>
+            <Box
+                color={theme.palette.text.primary}
+                bgcolor={theme.palette.background.default}
+                height='100vh'
+                width='100vw'
+                display='flex'
+                flexDirection='column'
+                alignItems='center'
+            >
+                <WorkspaceItemAppBar
+                    name=''
+                    openDialog={(dialog) => setActiveDialog(dialog)}
+                />
+                <Typography variant='h6'>Loading...</Typography>
+            </Box>
+        </Baseline>
     );
 };
 

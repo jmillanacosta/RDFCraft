@@ -28,7 +28,7 @@ const MappingAppBar = (props: _MappingAppBarProps) => {
                 >
                     <ArrowBack />
                 </IconButton>
-                <Typography variant='h6'>Ontology: {props.name}</Typography>
+                <Typography variant='h6'>Mapping: {props.name}</Typography>
                 <div style={{ flexGrow: 1 }} />
             </Toolbar>
         </AppBar>

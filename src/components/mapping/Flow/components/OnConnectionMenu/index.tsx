@@ -61,8 +61,8 @@ export default function OnConnectionMenu({
   }, [target]);
 
   const possiblePredicates = usePossiblePropertiesConnection(
-    source?.data.rdf_type || '',
-    target?.data.rdf_type || null,
+    source?.data?.rdf_type || '',
+    target?.data?.rdf_type || null,
     Object.values(properties).flat() || [],
   );
 

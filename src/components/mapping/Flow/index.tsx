@@ -21,6 +21,7 @@ import useMappingStore from '@/lib/stores/MappingStore';
 import { useCallback, useState } from 'react';
 import 'reactflow/dist/style.css';
 import FlowContextMenu from './components/FlowContextMenu';
+import OnConnectionMenu from './components/OnConnectionMenu';
 import { nodeTypes } from './nodeTypes';
 import './style.css';
 
@@ -108,17 +109,17 @@ const Flow = () => {
           handleCloseContextMenu={() => setOpenDialog(null)}
           addNode={addNode}
         />
-        {/* <OnConnectionMenu
+        <OnConnectionMenu
           open={openDialog === 'onConnect' && anchorPosition !== null}
           anchorPosition={anchorPosition}
           enableSubmit={connectionStart !== null}
           onClose={() => setOpenDialog(null)}
-          source={connectionStart?.data}
+          source={connectionStart}
           target={null}
           onSubmit={(predicate, target) => {
             console.log('submit', predicate, target);
           }}
-        /> */}
+        />
         <ReactFlow
           attributionPosition='bottom-right'
           connectionMode={ConnectionMode.Loose}

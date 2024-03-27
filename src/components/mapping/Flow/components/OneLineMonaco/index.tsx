@@ -8,11 +8,13 @@ import { useRef } from 'react';
 
 const OneLineMonaco = ({
   value,
+  language = 'mapping',
   onChange,
   disabled,
   ...rest
 }: {
   value: string;
+  language?: string;
   onChange: (value: string | undefined) => void;
   disabled?: boolean;
   [key: string]: any;
@@ -41,12 +43,13 @@ const OneLineMonaco = ({
     <>
       <FormLabel>URI</FormLabel>
       <Editor
-        language='mapping'
+        language={language}
         theme='default'
         value={disabled ? '' : value}
         onChange={onChange}
         onMount={handleEditorDidMount}
         height={30}
+        width='100%'
         className='nodrag noscroll'
         options={{
           lineDecorationsWidth: 0,

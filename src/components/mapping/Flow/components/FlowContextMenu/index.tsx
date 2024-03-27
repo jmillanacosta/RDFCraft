@@ -9,7 +9,7 @@ const FlowContextMenu = ({
   open: boolean;
   contextMenuLocation: [number, number] | null;
   handleCloseContextMenu: () => void;
-  addNode: () => void;
+  addNode: (type: 'objectNode' | 'dataNode' | 'uriNode') => void;
 }) => {
   return (
     <Menu
@@ -25,7 +25,8 @@ const FlowContextMenu = ({
           : undefined
       }
     >
-      <MenuItem onClick={addNode}>Add Node</MenuItem>
+      <MenuItem onClick={() => addNode('objectNode')}>Add Object Node</MenuItem>
+      <MenuItem onClick={() => addNode('uriNode')}>Add URI Node</MenuItem>
     </Menu>
   );
 };

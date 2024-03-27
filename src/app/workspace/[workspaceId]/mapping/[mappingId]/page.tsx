@@ -38,6 +38,7 @@ const MappingPage = () => {
   const valueRefs = useMappingStore(
     state => state.mappingDocument?.source.refs,
   );
+  const extTerminologies = useOntologyStore(state => state.individual);
 
   const fetchOntology = useOntologyStore(state => state.fetchOntologyItems);
 
@@ -61,6 +62,7 @@ const MappingPage = () => {
       monaco,
       ontologies?.map(o => `${o.prefix.prefix}:`) || [],
       valueRefs || [],
+      Object.values(extTerminologies || {}).flat() || [],
     );
     monaco?.editor.defineTheme('default', {
       base: 'vs-dark',
@@ -70,6 +72,9 @@ const MappingPage = () => {
       rules: [
         { token: 'prefix', foreground: 'FFA500' }, // Orange for prefixes
         { token: 'ref', foreground: 'FF00FF' }, // Purple for references
+        { token: 'protocol', foreground: '00FF00' }, // Green for protocols
+        { token: 'domain', foreground: 'FF0000' }, // Red for domains
+        { token: 'path', foreground: '0000FF' }, // Blue for paths
       ],
     });
     monaco?.editor.setTheme('default');
@@ -77,7 +82,7 @@ const MappingPage = () => {
     return () => {
       dispose();
     };
-  }, [monaco, valueRefs, ontologies]);
+  }, [monaco, valueRefs, ontologies, extTerminologies]);
 
   if (loading) {
     return (

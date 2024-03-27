@@ -42,7 +42,7 @@ export default function OnConnectionMenu({
   > | null;
   onSubmit: (
     predicate: OntologyPropertyDocument,
-    target: OntologyClassDocument,
+    target: OntologyClassDocument | string | null,
   ) => void;
   enableSubmit: boolean;
   onClose: () => void;
@@ -55,6 +55,13 @@ export default function OnConnectionMenu({
     useState<OntologyPropertyDocument | null>(null);
 
   const [selectedClass, onSelectClass] = useState<string | null>(null);
+
+  useEffect(() => {
+    return () => {
+      onSelectPredicate(null);
+      onSelectClass(null);
+    };
+  }, [open]);
 
   useEffect(() => {
     onSelectClass(target?.data.rdf_type || null);
@@ -71,7 +78,10 @@ export default function OnConnectionMenu({
   );
 
   const submit = useCallback(
-    (predicate: OntologyPropertyDocument, target: OntologyClassDocument) => {
+    (
+      predicate: OntologyPropertyDocument,
+      target: OntologyClassDocument | string | null,
+    ) => {
       onSubmit(predicate, target);
       onClose();
     },
@@ -116,7 +126,7 @@ export default function OnConnectionMenu({
           </Grid>
 
           <Grid item xs={6}>
-            {possibleClasses !== null ? (
+            {possibleClasses !== null && target === null && (
               <Autocomplete
                 key={'class'}
                 value={selectedClass || null}
@@ -138,16 +148,16 @@ export default function OnConnectionMenu({
                   <TextField {...params} label='Class' variant='standard' />
                 )}
               />
-            ) : (
+            )}
+            {target !== null && (
               <TextField
                 label='Class'
-                variant='standard'
                 value={
-                  selectedClass !== null
-                    ? selectedClass.split('#')[1]
-                    : 'Please select a predicate first'
+                  target.type === 'uriNode'
+                    ? 'Uri Reference'
+                    : target.data.rdf_type
                 }
-                contentEditable={false}
+                disabled
               />
             )}
           </Grid>
@@ -165,14 +175,27 @@ export default function OnConnectionMenu({
             <Button
               variant='outlined'
               onClick={() => {
+                if (selectedPredicate) {
+                  submit(selectedPredicate, null);
+                }
+              }}
+              disabled={selectedPredicate === null}
+            >
+              <Typography>Add URI ref</Typography>
+            </Button>
+          </Grid>
+          <Grid item>
+            <Button
+              variant='outlined'
+              onClick={() => {
                 if (selectedPredicate && selectedClass) {
                   submit(
                     selectedPredicate,
-                    Object.values(classes)
+                    (Object.values(classes)
                       .flat()
                       .find(
                         c => c.full_uri === selectedClass,
-                      ) as OntologyClassDocument,
+                      ) as OntologyClassDocument) || selectedClass,
                   );
                 }
               }}

@@ -1,19 +1,19 @@
-import { LiteralNodeDataModel } from '@/lib/models/MappingModel';
+import { UriRefNodeDataModel } from '@/lib/models/MappingModel';
 import useMappingStore from '@/lib/stores/MappingStore';
-import { Box, TextField } from '@mui/material';
+import { Box } from '@mui/material';
 import { useState } from 'react';
 import { Handle, NodeResizer, Position } from 'reactflow';
 import useRefValidator from '../../hooks/useRefValidator';
 import OneLineMonaco from '../OneLineMonaco';
 
-export default function DataNode({
+export default function UriNode({
   id,
   selected,
   data,
 }: {
   id: string;
   selected: boolean;
-  data: LiteralNodeDataModel;
+  data: UriRefNodeDataModel;
 }) {
   const [valueError, setValueError] = useState<string | null>(null);
 
@@ -37,9 +37,9 @@ export default function DataNode({
           borderRadius: '50%',
         }}
         minWidth={300}
-        minHeight={200}
-        maxHeight={200}
-        maxWidth={500}
+        minHeight={150}
+        maxHeight={150}
+        maxWidth={1000}
       />
 
       <Handle
@@ -61,28 +61,12 @@ export default function DataNode({
         borderRadius={5}
         sx={{
           height: '100%',
+          minWidth: 300,
         }}
       >
-        <TextField
-          autoFocus
-          className='nodrag'
-          disabled
-          defaultValue={
-            data.rdf_type.includes('#')
-              ? data.rdf_type.split('#')[1]
-              : data.rdf_type
-          }
-          margin='dense'
-          id='valueType'
-          label='Value Type'
-          type='text'
-          fullWidth
-          variant='standard'
-        />
-
-        <Box height={10} />
         <OneLineMonaco
           value={data.pattern}
+          language='extTerminologies'
           onChange={value => {
             updateNodeData(id, { pattern: value });
           }}

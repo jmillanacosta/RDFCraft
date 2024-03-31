@@ -31,21 +31,14 @@ export default function ObjectNode({
   const valueRefs =
     useMappingStore(state => state.mappingDocument?.source.refs) || [];
 
-  const node = useMappingStore(state =>
-    state.nodes.find(node => node.id === id),
-  );
-
   const IRIError = useRefValidator(data.pattern, valueRefs);
 
-  // TODO: make this a hook
   const possibleClasses = usePossibleClasses(id);
 
   const value = useMemo(() => {
     const value = possibleClasses.find(cls => cls.full_uri === data.rdf_type);
     return value;
   }, [data.rdf_type, possibleClasses]);
-
-  const [uriOld, setUriOld] = useState<string>('');
 
   const changeLabel = useCallback(
     (label: string) => {
@@ -92,7 +85,6 @@ export default function ObjectNode({
         ...data,
         pattern: IRI,
       });
-      setUriOld(IRI);
     },
     [id, data, updateNodeData, blankNode],
   );
@@ -112,10 +104,7 @@ export default function ObjectNode({
           height: 15,
           borderRadius: '50%',
         }}
-        minWidth={300}
         minHeight={300}
-        maxHeight={300}
-        maxWidth={1000}
       />
       <Handle
         type='source'
@@ -175,9 +164,6 @@ export default function ObjectNode({
           }
           label='Is blank node'
         />
-        {
-          // Checkbox for is_blank_node
-        }
 
         <Box height={10} />
         <OneLineMonaco

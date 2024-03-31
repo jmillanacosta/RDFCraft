@@ -6,9 +6,9 @@ import ObjectNode from './components/ObjectNode';
 import UriNode from './components/UriNode';
 
 const nodeTypes = {
-  objectNode: ObjectNode,
-  dataNode: DataNode,
-  uriNode: UriNode,
+  object: ObjectNode,
+  literal: DataNode,
+  uriref: UriNode,
 };
 
 const edgeTypes = {

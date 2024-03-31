@@ -2,6 +2,7 @@
 
 import Baseline from '@/components/general/Baseline';
 import Flow from '@/components/mapping/Flow';
+import ImportExportDialog from '@/components/mapping/Flow/components/ImportExportDialog';
 import registerLanguage from '@/components/mapping/Flow/functions/registerLanguage';
 import MappingAppBar from '@/components/mapping/MappingAppBar';
 import useLocalTheme from '@/lib/hooks/useLocalTheme';
@@ -11,7 +12,8 @@ import useOntologyStore from '@/lib/stores/OntologyStore';
 import { useMonaco } from '@monaco-editor/react';
 import { Box, Typography } from '@mui/material';
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useLayoutEffect } from 'react';
+import { enqueueSnackbar } from 'notistack';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import { ReactFlowProvider } from 'reactflow';
 
 const MappingPage = () => {
@@ -27,20 +29,30 @@ const MappingPage = () => {
   }, [isAuthenticated, router, token]);
 
   const fetch = useMappingStore(state => state.fetch);
+  const save = useMappingStore(state => state.save);
+  const importMappingModel = useMappingStore(state => state.importMappingModel);
+  const error = useMappingStore(state => state.error);
   const workspace = useMappingStore(state => state.workspace);
   const mappingDocument = useMappingStore(state => state.mappingDocument);
   const workingCopy = useMappingStore(state => state.workingCopy);
-  const ontologies = useMappingStore(
-    state => state.workspace?.ontologies || [],
-  );
   const loading = useMappingStore(state => state.loading);
+  const isSaved = useMappingStore(state => state.isSaved);
   const monaco = useMonaco();
+
   const valueRefs = useMappingStore(
     state => state.mappingDocument?.source.refs,
   );
   const extTerminologies = useOntologyStore(state => state.individual);
 
   const fetchOntology = useOntologyStore(state => state.fetchOntologyItems);
+
+  const [openDialog, setOpenDialog] = useState<'importexport' | null>(null);
+
+  useEffect(() => {
+    if (error) {
+      enqueueSnackbar(error, { variant: 'error' });
+    }
+  }, [error]);
 
   useEffect(() => {
     if (!params.mappingId || !params.workspaceId) {
@@ -58,9 +70,12 @@ const MappingPage = () => {
   }, [workspace, fetchOntology, params.workspaceId]);
 
   useEffect(() => {
+    if (!monaco) {
+      return;
+    }
     const dispose = registerLanguage(
       monaco,
-      ontologies?.map(o => `${o.prefix.prefix}:`) || [],
+      workspace?.prefixes?.map(o => `${o.prefix}:`) || [],
       valueRefs || [],
       Object.values(extTerminologies || {}).flat() || [],
     );
@@ -82,7 +97,7 @@ const MappingPage = () => {
     return () => {
       dispose();
     };
-  }, [monaco, valueRefs, ontologies, extTerminologies]);
+  }, [monaco, valueRefs, workspace?.prefixes, extTerminologies]);
 
   if (loading) {
     return (
@@ -96,7 +111,13 @@ const MappingPage = () => {
           flexDirection='column'
           alignItems='center'
         >
-          <MappingAppBar name={mappingDocument?.name || ''} />
+          <MappingAppBar
+            name={mappingDocument?.name || ''}
+            isSaved={false}
+            onSave={() => {}}
+            onExport={() => {}}
+            onMappingComplete={() => {}}
+          />
           <Typography variant='h6'>Loading...</Typography>
         </Box>
       </Baseline>
@@ -106,7 +127,30 @@ const MappingPage = () => {
   return (
     <ReactFlowProvider>
       <Baseline>
-        <MappingAppBar name={mappingDocument?.name || ''} />
+        <MappingAppBar
+          name={mappingDocument?.name || ''}
+          isSaved={isSaved}
+          onSave={save}
+          onExport={() => {
+            setOpenDialog('importexport');
+          }}
+          onMappingComplete={() => {
+            enqueueSnackbar('Mapping completed', {
+              variant: 'success',
+            });
+          }}
+        />
+        <ImportExportDialog
+          open={openDialog === 'importexport'}
+          onClose={() => setOpenDialog(null)}
+          data={
+            workingCopy || {
+              nodes: [],
+              edges: [],
+            }
+          }
+          onImport={importMappingModel}
+        />
         <Flow />
       </Baseline>
     </ReactFlowProvider>

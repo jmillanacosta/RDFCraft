@@ -1,10 +1,13 @@
+import MappingService from '@/lib/api/MappingService';
 import WorkspaceService from '@/lib/api/WorkspaceService';
 import { ZustandActions } from '@/lib/global';
 import {
   EdgeDataModel,
+  EdgeModel,
   LiteralNodeDataModel,
   MappingDocument,
   MappingModel,
+  NodeModel,
   ObjectNodeDataModel,
   UriRefNodeDataModel,
 } from '@/lib/models/MappingModel';
@@ -12,6 +15,7 @@ import { WorkspaceModel } from '@/lib/models/Workspace';
 import {
   Edge,
   EdgeChange,
+  MarkerType,
   Node,
   NodeChange,
   OnEdgesChange,
@@ -42,6 +46,10 @@ const mappingModelToReactFlow = (
       position: node.position,
       width: node.width,
       height: node.height,
+      style: {
+        width: node.width,
+        height: node.height,
+      },
     };
   });
 
@@ -50,7 +58,10 @@ const mappingModelToReactFlow = (
       id: edge.id,
       source: edge.source,
       target: edge.target,
-      type: 'smoothstep',
+      type: 'floating',
+      markerEnd: {
+        type: MarkerType.ArrowClosed,
+      },
       data: edge.data,
     };
   });
@@ -69,13 +80,14 @@ type MappingState = {
     ObjectNodeDataModel | LiteralNodeDataModel | UriRefNodeDataModel
   >[];
   edges: Edge<EdgeDataModel>[];
+  isSaved: boolean;
   loading: boolean;
   error: string | null;
 };
 
 type MappingActions = {
   fetch: (workspaceId: string, mappingId: string) => void;
-  save: (mappingModel: MappingModel) => void;
+  save: () => void;
   onNodesChange: OnNodesChange;
   onEdgesChange: OnEdgesChange;
   updateNodeData: (
@@ -84,6 +96,7 @@ type MappingActions = {
       ObjectNodeDataModel | UriRefNodeDataModel | LiteralNodeDataModel
     >,
   ) => void;
+  importMappingModel: (model: Partial<MappingModel>) => void;
 };
 
 const defaultState: MappingState = {
@@ -94,6 +107,7 @@ const defaultState: MappingState = {
   edges: [],
   loading: false,
   error: null,
+  isSaved: false,
 };
 
 const functions: ZustandActions<MappingActions, MappingState> = (set, get) => ({
@@ -128,6 +142,7 @@ const functions: ZustandActions<MappingActions, MappingState> = (set, get) => ({
           nodes,
           edges,
           loading: false,
+          isSaved: true,
           error: null,
         });
         return;
@@ -140,11 +155,32 @@ const functions: ZustandActions<MappingActions, MappingState> = (set, get) => ({
       set({ error: 'An unexpected error occurred', loading: false });
     }
   },
-  save: async (mappingModel: MappingModel) => {
+  save: async () => {
     try {
-      // Save the mapping document
-      // Save the workspace
-      set({ loading: false });
+      const mappingModel: Partial<MappingModel> = {
+        nodes: get().nodes as NodeModel[],
+        edges: get().edges as EdgeModel[],
+      };
+      const response = await MappingService.saveMapping(
+        get().mappingDocument!._id || get().mappingDocument!.id,
+        mappingModel,
+      );
+      if (response.success) {
+        const { nodes, edges } = mappingModelToReactFlow(
+          response.data.current_mapping,
+        );
+        set({
+          workingCopy: response.data.current_mapping,
+          mappingDocument: response.data,
+          nodes,
+          edges,
+          isSaved: true,
+          loading: false,
+          error: null,
+        });
+      } else {
+        set({ error: response.message });
+      }
     } catch (error) {
       set({ error: 'An unexpected error occurred', loading: false });
     }
@@ -152,11 +188,13 @@ const functions: ZustandActions<MappingActions, MappingState> = (set, get) => ({
   onNodesChange: (changes: NodeChange[]) => {
     set({
       nodes: applyNodeChanges(changes, get().nodes),
+      isSaved: false,
     });
   },
   onEdgesChange: (changes: EdgeChange[]) => {
     set({
       edges: applyEdgeChanges(changes, get().edges),
+      isSaved: false,
     });
   },
   updateNodeData: (
@@ -165,17 +203,55 @@ const functions: ZustandActions<MappingActions, MappingState> = (set, get) => ({
       ObjectNodeDataModel | UriRefNodeDataModel | LiteralNodeDataModel
     >,
   ) => {
-    const nodes = get().nodes.map(node => {
-      if (node.id === nodeId) {
-        node.data = {
-          ...node.data,
-          ...data,
-        };
-      }
-      return node;
+    set({
+      nodes: get().nodes.map(node => {
+        if (node.id === nodeId) {
+          node.data = {
+            ...node.data,
+            ...data,
+          };
+        }
+        return node;
+      }),
+      isSaved: false,
+    });
+  },
+  importMappingModel: (model: Partial<MappingModel>) => {
+    const nodesChanges = model.nodes?.map(node => {
+      return {
+        type: 'add',
+        item: {
+          id: node.id,
+          type: node.type,
+          data: node.data,
+          position: node.position,
+          width: node.width,
+          height: node.height,
+          style: {
+            width: node.width,
+            height: node.height,
+          },
+        },
+      } as NodeChange;
+    });
+    const edgesChanges = model.edges?.map(edge => {
+      return {
+        type: 'add',
+        item: {
+          id: edge.id,
+          source: edge.source,
+          target: edge.target,
+          type: 'floating',
+          markerEnd: {
+            type: MarkerType.ArrowClosed,
+          },
+          data: edge.data,
+        },
+      } as EdgeChange;
     });
 
-    set({ nodes });
+    get().onNodesChange(nodesChanges || []);
+    get().onEdgesChange(edgesChanges || []);
   },
 });
 

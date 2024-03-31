@@ -117,6 +117,16 @@ class MappingService:
 
         mapping_model = MappingModel(**data)  # type: ignore
 
+        mapping_model = await MappingModel.insert_one(
+            mapping_model
+        )
+
+        if mapping_model is None:
+            raise HTTPException(
+                detail="Error creating mapping model",
+                status_code=500,
+            )
+
         document.mappings.append(mapping_model)  # type: ignore
 
         if len(document.mappings) > 50:

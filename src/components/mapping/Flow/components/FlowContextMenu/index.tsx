@@ -1,3 +1,4 @@
+import { NodeTypes } from '@/lib/models/MappingModel';
 import { Menu, MenuItem } from '@mui/material';
 
 const FlowContextMenu = ({
@@ -9,7 +10,7 @@ const FlowContextMenu = ({
   open: boolean;
   contextMenuLocation: [number, number] | null;
   handleCloseContextMenu: () => void;
-  addNode: (type: 'objectNode' | 'dataNode' | 'uriNode') => void;
+  addNode: (type: NodeTypes) => void;
 }) => {
   return (
     <Menu
@@ -25,8 +26,8 @@ const FlowContextMenu = ({
           : undefined
       }
     >
-      <MenuItem onClick={() => addNode('objectNode')}>Add Object Node</MenuItem>
-      <MenuItem onClick={() => addNode('uriNode')}>Add URI Node</MenuItem>
+      <MenuItem onClick={() => addNode('object')}>Add Object Node</MenuItem>
+      <MenuItem onClick={() => addNode('uriref')}>Add URI Node</MenuItem>
     </Menu>
   );
 };

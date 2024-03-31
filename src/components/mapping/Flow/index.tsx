@@ -1,7 +1,15 @@
 'use client';
 
-import { Delete } from '@mui/icons-material';
-import { Box, Typography } from '@mui/material';
+import { Delete, East, West } from '@mui/icons-material';
+import {
+  Box,
+  Card,
+  Grid,
+  IconButton,
+  TextField,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import ReactFlow, {
   Background,
   ConnectionMode,
@@ -14,6 +22,7 @@ import ReactFlow, {
   OnConnect,
   OnConnectEnd,
   OnConnectStart,
+  Panel,
   useReactFlow,
 } from 'reactflow';
 
@@ -21,6 +30,7 @@ import { v4 as uuid_v4 } from 'uuid';
 
 import {
   EdgeDataModel,
+  NodeTypes,
   ObjectNodeDataModel,
   UriRefNodeDataModel,
 } from '@/lib/models/MappingModel';
@@ -30,10 +40,11 @@ import {
 } from '@/lib/models/OntologyIndexModel';
 import useMappingStore from '@/lib/stores/MappingStore';
 import { enqueueSnackbar } from 'notistack';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import 'reactflow/dist/style.css';
 import FlowContextMenu from './components/FlowContextMenu';
 import OnConnectionMenu from './components/OnConnectionMenu';
+import useNodeSearch from './hooks/useNodeSearch';
 import { edgeTypes, nodeTypes } from './nodeTypes';
 import './style.css';
 
@@ -44,6 +55,28 @@ const Flow = () => {
   const edges = useMappingStore(state => state.edges);
   const onNodesChange = useMappingStore(state => state.onNodesChange);
   const onEdgesChange = useMappingStore(state => state.onEdgesChange);
+
+  const [searchText, setSearchText] = useState<string>('');
+
+  const {
+    searchResults,
+    nextNode,
+    previousNode,
+    nextButtonDisabled,
+    previousButtonDisabled,
+    currentNodeIndex,
+  } = useNodeSearch(searchText);
+
+  useEffect(() => {
+    const focusNode = () => {
+      if (searchResults.length === 0 || currentNodeIndex === null) return;
+      reactflow.fitView({
+        duration: 300,
+        nodes: [searchResults[currentNodeIndex]],
+      });
+    };
+    focusNode();
+  }, [searchResults, currentNodeIndex, reactflow]);
 
   const [openDialog, setOpenDialog] = useState<'menu' | 'onConnect' | null>(
     null,
@@ -107,7 +140,12 @@ const Flow = () => {
             label: predicate.label,
           },
         };
-        reactflow.addEdges([new_edge]);
+        onEdgesChange([
+          {
+            item: new_edge,
+            type: 'add',
+          },
+        ]);
         return;
       }
       if (target === null) {
@@ -118,7 +156,7 @@ const Flow = () => {
             x: anchorPosition![0],
             y: anchorPosition![1],
           },
-          type: 'uriNode',
+          type: 'uriref',
           data: {
             label: 'New URI Node',
             pattern: '',
@@ -139,8 +177,18 @@ const Flow = () => {
             label: predicate.label,
           },
         };
-        reactflow.addNodes([node]);
-        reactflow.addEdges([edge]);
+        onNodesChange([
+          {
+            item: node,
+            type: 'add',
+          },
+        ]);
+        onEdgesChange([
+          {
+            item: edge,
+            type: 'add',
+          },
+        ]);
         return;
       }
       const node: Node = {
@@ -151,7 +199,7 @@ const Flow = () => {
           x: anchorPosition![0],
           y: anchorPosition![1],
         },
-        type: typeof target === 'string' ? 'dataNode' : 'objectNode',
+        type: typeof target === 'string' ? 'literal' : 'object',
         data: {
           is_blank_node: false,
           label: 'New Object Node',
@@ -176,11 +224,26 @@ const Flow = () => {
           label: predicate.label,
         },
       };
-
-      reactflow.addNodes([node]);
-      reactflow.addEdges([edge]);
+      onNodesChange([
+        {
+          item: node,
+          type: 'add',
+        },
+      ]);
+      onEdgesChange([
+        {
+          item: edge,
+          type: 'add',
+        },
+      ]);
     },
-    [connectionStart, anchorPosition, reactflow, connectionTarget],
+    [
+      connectionStart,
+      anchorPosition,
+      connectionTarget,
+      onNodesChange,
+      onEdgesChange,
+    ],
   );
 
   const onConnect = useCallback<OnConnect>(
@@ -220,7 +283,7 @@ const Flow = () => {
   );
 
   const addNode = useCallback(
-    (type: 'objectNode' | 'dataNode' | 'uriNode') => {
+    (type: NodeTypes) => {
       var pos = reactflow.screenToFlowPosition({
         x: anchorPosition![0],
         y: anchorPosition![1],
@@ -243,12 +306,16 @@ const Flow = () => {
         width: 300,
         height: 300,
       };
-
-      reactflow.addNodes([new_node]);
+      onNodesChange([
+        {
+          item: new_node,
+          type: 'add',
+        },
+      ]);
 
       setAnchorPosition(null);
     },
-    [anchorPosition, reactflow],
+    [anchorPosition, reactflow, onNodesChange],
   );
 
   return (
@@ -276,6 +343,7 @@ const Flow = () => {
           edges={edges}
           nodeTypes={nodeTypes}
           edgeTypes={edgeTypes}
+          fitView
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnectStart={onConnectionStart}
@@ -294,16 +362,68 @@ const Flow = () => {
                   ),
                 );
                 const selectedEdges = edges.filter(edge => edge.selected);
-                reactflow.deleteElements({
-                  nodes: selectedNodes,
-                  edges: selectedNodeConnections.concat(selectedEdges),
-                });
+                const allEdgesChanges = [
+                  ...selectedNodeConnections,
+                  ...selectedEdges,
+                ];
+                // Delete duplicate edges
+                const uniqueEdges = allEdgesChanges.filter(
+                  (edge, index, self) =>
+                    index === self.findIndex(t => t.id === edge.id),
+                );
+                onEdgesChange(
+                  uniqueEdges.map(edge => ({
+                    type: 'remove',
+                    id: edge.id,
+                  })),
+                );
+                onNodesChange(
+                  selectedNodes.map(node => {
+                    return {
+                      type: 'remove',
+                      id: node.id,
+                    };
+                  }),
+                );
               }}
             >
               <Delete color='error' />
             </ControlButton>
           </Controls>
           <MiniMap pannable zoomable nodeColor='#784be8' />
+          <Panel position='top-left'>
+            <Card>
+              <Grid container>
+                <TextField
+                  variant='filled'
+                  label='Search'
+                  onChange={event => {
+                    setSearchText(event.target.value);
+                  }}
+                />
+                <Tooltip title='Previous'>
+                  <>
+                    <IconButton
+                      disabled={previousButtonDisabled()}
+                      onClick={previousNode}
+                    >
+                      <West />
+                    </IconButton>
+                  </>
+                </Tooltip>
+                <Tooltip title='Next'>
+                  <>
+                    <IconButton
+                      disabled={nextButtonDisabled()}
+                      onClick={nextNode}
+                    >
+                      <East />
+                    </IconButton>
+                  </>
+                </Tooltip>
+              </Grid>
+            </Card>
+          </Panel>
         </ReactFlow>
       </Box>
     </div>

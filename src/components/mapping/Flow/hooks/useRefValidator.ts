@@ -14,7 +14,7 @@ export default function useRefValidator(value: string, refs: string[]) {
             }
             matches?.forEach((match) => {
                 if (!refs.includes(match)) {
-                    setError(`Reference ${match} is not valid`);
+                    setError(`Reference '${match}' is not valid`);
                 }
             });
         };

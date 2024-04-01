@@ -1,0 +1,41 @@
+prefixes:
+  {% for prefix in prefixes %}
+  {{prefix.prefix}}: {{prefix.uri}}
+  {% endfor %}
+
+sources:
+  {% for source in sources_short %}
+  {{source.name}}: [{{source.access}}~{{source.reference_formulation}}]
+  {% endfor %}
+  {% for source in sources %}
+  {{source.name}}:
+    access: {{source.access}}
+    referenceFormulation: {{source.reference_formulation}}
+    iterator: {{source.iterator}}
+  {% endfor %}
+
+mappings:
+  {% for mapping in mappings %}
+  {{mapping.name}}:
+    source: {{mapping.source}}
+    {% if mapping.blanknode == false %}
+    s: {{mapping.s}}
+    {% else %}
+    s: null
+    {% endif %}
+    po:
+      {% for po in mapping.po_short %}
+      - [{{po.p}}, {{po.o}}]
+      {% endfor %}
+      {% for po in mapping.po_ref_data %}
+      - predicate: {{po.p}}
+        object:
+          value: {{po.value}}
+          {%if po.datatype%}
+          datatype: {{po.datatype}}
+          {%endif%}
+          {%if po.iri%}
+          type: iri
+          {%endif%}
+      {% endfor %}
+  {% endfor %}

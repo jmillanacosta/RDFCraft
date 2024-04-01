@@ -148,14 +148,14 @@ const Flow = () => {
         ]);
         return;
       }
+      const current_mouse_position = reactflow.screenToFlowPosition({
+        x: anchorPosition![0],
+        y: anchorPosition![1],
+      });
       if (target === null) {
         const node: Node<UriRefNodeDataModel> = {
           id: uuid_v4(),
-
-          position: {
-            x: anchorPosition![0],
-            y: anchorPosition![1],
-          },
+          position: current_mouse_position,
           type: 'uriref',
           data: {
             label: 'New URI Node',
@@ -195,10 +195,7 @@ const Flow = () => {
         id: uuid_v4(),
         width: 300,
         height: 300,
-        position: {
-          x: anchorPosition![0],
-          y: anchorPosition![1],
-        },
+        position: current_mouse_position,
         type: typeof target === 'string' ? 'literal' : 'object',
         data: {
           is_blank_node: false,

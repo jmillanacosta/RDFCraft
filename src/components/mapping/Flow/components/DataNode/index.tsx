@@ -1,6 +1,6 @@
 import { LiteralNodeDataModel } from '@/lib/models/MappingModel';
 import useMappingStore from '@/lib/stores/MappingStore';
-import { Box, TextField } from '@mui/material';
+import { Alert, Box, TextField } from '@mui/material';
 import { useState } from 'react';
 import { Handle, NodeResizer, Position } from 'reactflow';
 import useRefValidator from '../../hooks/useRefValidator';
@@ -81,6 +81,13 @@ export default function DataNode({
         />
 
         <Box height={10} />
+        <Alert
+          severity='warning'
+          variant='outlined'
+          sx={{ display: valueReferenceError ? 'block' : 'none' }}
+        >
+          {valueReferenceError}
+        </Alert>
         <OneLineMonaco
           value={data.pattern}
           onChange={value => {

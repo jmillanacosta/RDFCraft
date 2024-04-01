@@ -4,11 +4,12 @@ This file is used to bootstrap the application. It is called from the main
 
 import logging
 import logging.config
-from kink import di
-from pathlib import Path
-from dotenv import load_dotenv
 from os import getenv
+from pathlib import Path
+
 from beanie import init_beanie
+from dotenv import load_dotenv
+from kink import di
 from motor.motor_asyncio import AsyncIOMotorClient
 
 from models import all_documents
@@ -54,4 +55,7 @@ async def bootstrap():
     di["file_storage"] = Path(
         getenv("FILE_STORAGE") or "./file_storage"
     )
+    di["yarrrml_template_path"] = Path("./templates")
+    di["rmlmapper_path"] = Path("./bin/mapper.jar")
+    di["java_memory"] = getenv("JAVA_MEMORY") or "2G"
     logging.info("Bootstrap done")

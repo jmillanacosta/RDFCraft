@@ -147,10 +147,17 @@ class WorkspaceService:
             mapping_id
         )
 
+        workspace.sources = [
+            source
+            for source in workspace.sources
+            if source.id != mapping.source.id  # type: ignore
+        ]
 
-        workspace.sources.remove(mapping.source)
-
-        workspace.mappings.remove(mapping)  # type: ignore
+        workspace.mappings = [
+            m
+            for m in workspace.mappings
+            if m.id != mapping.id  # type: ignore
+        ]
 
         await self.mapping_service.delete_mapping(
             mapping_id

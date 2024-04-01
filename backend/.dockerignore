@@ -253,4 +253,6 @@ $RECYCLE.BIN/
 
 /temp
 /file_storage
+/mongo/data
 /bin
+/temp_storage

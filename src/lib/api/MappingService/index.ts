@@ -1,5 +1,6 @@
 'use client';
 
+import { CompleteMapping } from '@/lib/models/CompleteMappingModel';
 import { MappingDocument, MappingModel } from '@/lib/models/MappingModel';
 import { ApiCallResponse, callApi } from '../ApiCall';
 
@@ -12,6 +13,15 @@ class MappingService {
       endpoint: `/api/mappings/${mappingId}/save`,
       body: mapping,
       method: 'POST',
+    });
+  }
+  static async completeMapping(
+    workspaceId: string,
+    mappingId: string,
+  ): Promise<ApiCallResponse<CompleteMapping>> {
+    return await callApi<CompleteMapping>({
+      endpoint: `/api/complete-mapping/${workspaceId}/${mappingId}`,
+      method: 'GET',
     });
   }
 }

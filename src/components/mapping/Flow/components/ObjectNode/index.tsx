@@ -2,6 +2,7 @@
 
 import { ObjectNodeDataModel } from '@/lib/models/MappingModel';
 import {
+  Alert,
   Autocomplete,
   Box,
   Checkbox,
@@ -141,7 +142,7 @@ export default function ObjectNode({
         />
         <Box height={10} />
         <Autocomplete
-          options={possibleClasses}
+          options={possibleClasses.filter(cls => cls.is_deprecated === false)}
           groupBy={option =>
             ontologies?.find(
               o => o.id === option.ontology_id || o._id === option.ontology_id,
@@ -166,6 +167,13 @@ export default function ObjectNode({
         />
 
         <Box height={10} />
+        <Alert
+          severity='warning'
+          variant='outlined'
+          sx={{ display: IRIError ? 'block' : 'none' }}
+        >
+          {IRIError}
+        </Alert>
         <OneLineMonaco
           value={data.pattern}
           onChange={value => changeIRI(value || '')}

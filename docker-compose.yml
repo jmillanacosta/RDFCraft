@@ -2,8 +2,6 @@ version: '3'
 services:
   mongodb:
     image: mongo
-    ports:
-      - 27017:27017
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: root
@@ -14,6 +12,21 @@ services:
 
   backend:
     build: ./backend
+    environment:
+      - DEFAULT_MONGODB_DATABASE=mapping_db
+      - MONGODB_PORT=27017
+      - MONGODB_HOST=mongodb
+      - MONGODB_USERNAME=root
+      - MONGODB_PASSWORD=root
+      - temp_storage=/temp_storage
+      - FILE_STORAGE=/file_storage
+      - JAVA_MEMORY=2G
+      - JWT_SECRET=secret
+
+    volumes:
+      - ./file_storage:/file_storage
+      - ./temp_storage:/temp_storage
+
     depends_on:
       - nginx
 
@@ -25,7 +38,7 @@ services:
   nginx:
     image: nginx:alpine
     ports:
-      - 8080:8080
+      - 2020:2020
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
 

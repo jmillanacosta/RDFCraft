@@ -2,11 +2,12 @@ import asyncio
 import json
 import logging
 import logging.config
-from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from bootstrap import bootstrap
 
 import coloredlogs
+from fastapi import FastAPI
+
+from bootstrap import bootstrap
 
 
 @asynccontextmanager
@@ -18,14 +19,15 @@ async def setup(app: FastAPI):
 
 app = FastAPI(lifespan=setup)
 
-from routers.users import router as user_router
 from routers.authentication import router as auth_router
 from routers.authorization import router as authz_router
 from routers.files import router as file_router
-from routers.prefix import router as prefix_router
-from routers.ontology import router as ontology_router
-from routers.source import router as source_router
 from routers.mapping import router as mapping_router
+from routers.ontology import router as ontology_router
+from routers.prefix import router as prefix_router
+from routers.rml import router as rml_router
+from routers.source import router as source_router
+from routers.users import router as user_router
 from routers.workspace import router as workspace_router
 
 app.include_router(
@@ -59,6 +61,11 @@ app.include_router(
     workspace_router,
     prefix="/workspaces",
     tags=["workspaces"],
+)
+app.include_router(
+    rml_router,
+    prefix="/complete-mapping",
+    tags=["complete-mapping"],
 )
 
 

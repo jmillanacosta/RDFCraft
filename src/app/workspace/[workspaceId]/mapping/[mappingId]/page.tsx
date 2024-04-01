@@ -3,8 +3,10 @@
 import Baseline from '@/components/general/Baseline';
 import Flow from '@/components/mapping/Flow';
 import ImportExportDialog from '@/components/mapping/Flow/components/ImportExportDialog';
+import MappingCompleteDialog from '@/components/mapping/Flow/components/MappingCompleteDialog';
 import registerLanguage from '@/components/mapping/Flow/functions/registerLanguage';
 import MappingAppBar from '@/components/mapping/MappingAppBar';
+import MappingService from '@/lib/api/MappingService';
 import useLocalTheme from '@/lib/hooks/useLocalTheme';
 import useAuthStore from '@/lib/stores/AuthStore';
 import useMappingStore from '@/lib/stores/MappingStore';
@@ -46,7 +48,13 @@ const MappingPage = () => {
 
   const fetchOntology = useOntologyStore(state => state.fetchOntologyItems);
 
-  const [openDialog, setOpenDialog] = useState<'importexport' | null>(null);
+  const [openDialog, setOpenDialog] = useState<
+    'importexport' | 'complete' | null
+  >(null);
+
+  const [yarrrml, setYarrrml] = useState('');
+  const [rml, setRml] = useState('');
+  const [rdf, setRdf] = useState('');
 
   useEffect(() => {
     if (error) {
@@ -134,10 +142,23 @@ const MappingPage = () => {
           onExport={() => {
             setOpenDialog('importexport');
           }}
-          onMappingComplete={() => {
-            enqueueSnackbar('Mapping completed', {
-              variant: 'success',
-            });
+          onMappingComplete={async () => {
+            try {
+              const response = await MappingService.completeMapping(
+                params.workspaceId,
+                params.mappingId,
+              );
+              if (response.success) {
+                setYarrrml(response.data.yarrrml);
+                setRml(response.data.rml);
+                setRdf(response.data.rdf);
+                setOpenDialog('complete');
+              } else {
+                enqueueSnackbar(response.message, { variant: 'error' });
+              }
+            } catch (e) {
+              enqueueSnackbar(`${e}`, { variant: 'error' });
+            }
           }}
         />
         <ImportExportDialog
@@ -150,6 +171,15 @@ const MappingPage = () => {
             }
           }
           onImport={importMappingModel}
+        />
+        <MappingCompleteDialog
+          open={openDialog === 'complete'}
+          onClose={() => {
+            setOpenDialog(null);
+          }}
+          yarrrml={yarrrml}
+          rml={rml}
+          rdf={rdf}
         />
         <Flow />
       </Baseline>

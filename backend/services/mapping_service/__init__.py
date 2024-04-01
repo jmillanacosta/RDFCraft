@@ -1,5 +1,6 @@
 import logging
 
+from beanie import DeleteRules
 from fastapi import HTTPException
 from kink import inject
 
@@ -154,5 +155,7 @@ class MappingService:
         )
         for mapping in document.mappings:
             await MappingModel.delete(mapping)
-        await MappingDocument.delete(document)
+        await document.delete(
+            link_rule=DeleteRules.DELETE_LINKS
+        )  # type: ignore
         return document

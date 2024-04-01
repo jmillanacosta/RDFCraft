@@ -1,6 +1,6 @@
 import { UriRefNodeDataModel } from '@/lib/models/MappingModel';
 import useMappingStore from '@/lib/stores/MappingStore';
-import { Box } from '@mui/material';
+import { Alert, Box } from '@mui/material';
 import { useState } from 'react';
 import { Handle, NodeResizer, Position } from 'reactflow';
 import useRefValidator from '../../hooks/useRefValidator';
@@ -64,6 +64,13 @@ export default function UriNode({
           minWidth: 300,
         }}
       >
+        <Alert
+          severity='warning'
+          variant='outlined'
+          sx={{ display: valueReferenceError ? 'block' : 'none' }}
+        >
+          {valueReferenceError}
+        </Alert>
         <OneLineMonaco
           value={data.pattern}
           language='extTerminologies'

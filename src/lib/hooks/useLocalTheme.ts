@@ -10,14 +10,15 @@ const useLocalTheme = () => {
     () =>
       createTheme({
         palette: {
-          mode: prefersDarkMode ? 'dark' : 'light',
+          // mode: prefersDarkMode ? 'dark' : 'light',
+          mode: 'dark',
         },
       }),
-    [prefersDarkMode],
+    // [prefersDarkMode],
+    [],
   );
 
   return theme;
 };
-
 
 export default useLocalTheme;

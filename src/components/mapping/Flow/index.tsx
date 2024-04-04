@@ -240,6 +240,7 @@ const Flow = () => {
       connectionTarget,
       onNodesChange,
       onEdgesChange,
+      reactflow,
     ],
   );
 

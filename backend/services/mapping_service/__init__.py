@@ -25,6 +25,7 @@ class MappingService:
         description: str,
         file_name: str,
         file_extension: str,
+        json_path: str,
         bytes: bytes,
     ) -> MappingDocument:
         self.logger.info(
@@ -49,6 +50,7 @@ class MappingService:
             source=source,  # type: ignore
             mappings=[mapping],  # type: ignore
             current_mapping=mapping,  # type: ignore
+            json_path=json_path,
         )
 
         await MappingDocument.insert(mapping_document)

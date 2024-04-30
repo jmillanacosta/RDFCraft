@@ -109,6 +109,7 @@ async def create_mapping(
     description: str,
     workspace_service: WorkspaceServiceDep,
     file: UploadFile = File(...),
+    json_path: str = "",
     auth: JWTData = Security(verify_token),
 ) -> WorkspaceDocument:
     if file.filename is None:
@@ -124,6 +125,7 @@ async def create_mapping(
         description,
         file_name,
         file_extension,
+        json_path,
         file_bytes,
     )
 

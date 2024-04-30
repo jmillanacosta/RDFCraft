@@ -299,7 +299,7 @@ class YarrrmlService:
         if rml_file.exists():
             rml_file.unlink()
         rml_file.parent.mkdir(parents=True, exist_ok=True)
-        cmd = (
+        cmd_yarrrml = (
             f"yarrrml-parser -i {str(yarrrml_file.absolute())} -o"
             f" {str(rml_file.absolute())}"
         )
@@ -307,7 +307,7 @@ class YarrrmlService:
         self.logger.info(f"Executing YARRRML parser")
 
         result = subprocess.run(
-            cmd,
+            cmd_yarrrml,
             shell=True,
             capture_output=True,
             text=True,
@@ -330,7 +330,7 @@ class YarrrmlService:
         if rdf_file.exists():
             rdf_file.unlink()
 
-        cmd = (
+        cmd_rml = (
             f"java -Xmx{self.java_memory} -jar {self.rmlmapper_path} -m {rml_file} -o {rdf_file} -s"
             " turtle"
         )
@@ -338,7 +338,7 @@ class YarrrmlService:
         self.logger.info(f"Executing RML mapper")
 
         result = subprocess.run(
-            cmd,
+            cmd_rml,
             shell=True,
             capture_output=True,
             text=True,
@@ -356,6 +356,44 @@ class YarrrmlService:
 
         rdf_content = rdf_file.read_text()
         rml_content = rml_file.read_text()
+
+        if _source.source_type == SourceType.JSON:
+            self.logger.info(
+                "Recrating Yarrrml and RML for JSON source"
+            )
+            yarrrml_file.unlink()
+            rml_file.unlink()
+            # Change sources iterator
+            sources[0].iterator = mapping_document.json_path
+            rendered_template = template.render(
+                prefixes=prefixes,
+                mappings=all_mappings,
+                sources=sources,
+                sources_short=sources_short,
+            )
+
+            yarrrml_file.write_text(rendered_template)
+
+            self.logger.info(
+                f"Executing YARRRML parser for JSON source"
+            )
+
+            result = subprocess.run(
+                cmd_yarrrml,
+                shell=True,
+                capture_output=True,
+                text=True,
+            )
+
+            if result.returncode != 0:
+                self.logger.error(
+                    f"Error while executing YARRRML parser: {result.stderr}"
+                )
+                raise ValueError(
+                    f"Error while executing YARRRML parser: {result.stderr}"
+                )
+
+            rdf_content = rdf_file.read_text()
 
         return {
             "yarrrml": rendered_template,

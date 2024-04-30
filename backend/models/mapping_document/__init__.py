@@ -1,7 +1,9 @@
 from enum import Enum
 from typing import Union
+
 from beanie import Document, Link
 from pydantic import BaseModel
+
 from models.source_document import SourceDocument
 
 
@@ -83,6 +85,7 @@ class MappingModel(Document):
 class MappingDocument(Document):
     name: str
     source: Link[SourceDocument]
+    json_path: str = ""
     mappings: list[Link[MappingModel]]
     current_mapping: Link[
         MappingModel

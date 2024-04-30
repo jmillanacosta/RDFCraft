@@ -1,4 +1,5 @@
 from typing import Annotated
+
 from fastapi import (
     APIRouter,
     Depends,
@@ -8,9 +9,7 @@ from fastapi import (
     UploadFile,
 )
 from fastapi.responses import FileResponse
-from fastapi.security import (
-    OAuth2PasswordBearer,
-)
+from fastapi.security import OAuth2PasswordBearer
 from kink import di
 from pydantic import BaseModel
 
@@ -24,8 +23,6 @@ from services.authentication_service import (
     AuthenticationService,
     JWTData,
 )
-
-
 from services.file_service import FileService
 from services.mapping_service import MappingService
 
@@ -62,6 +59,7 @@ async def create_mapping(
     name: str,
     description: str,
     file: UploadFile = File(...),
+    json_path: str = "",
     auth: JWTData = Security(verify_token),
 ) -> MappingDocument:
     if file.filename is None:
@@ -76,6 +74,7 @@ async def create_mapping(
         description,
         file_name,
         file_extension,
+        json_path,
         file_bytes,
     )
     return mapping
@@ -132,5 +131,3 @@ async def delete_mapping(
 ) -> dict[str, str]:
     await mapping_service.delete_mapping(mapping_id)
     return {"status": "ok"}
-
-

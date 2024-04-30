@@ -336,6 +336,9 @@ const Flow = () => {
         />
         <ReactFlow
           attributionPosition='bottom-right'
+          onInit={instance => {
+            instance.fitView();
+          }}
           connectionMode={ConnectionMode.Loose}
           nodes={nodes}
           edges={edges}

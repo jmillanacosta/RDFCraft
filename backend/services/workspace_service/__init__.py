@@ -103,6 +103,7 @@ class WorkspaceService:
         description: str,
         file_name: str,
         file_extension: str,
+        json_path: str,
         bytes: bytes,
     ) -> WorkspaceDocument:
         workspace = await WorkspaceDocument.get(
@@ -119,6 +120,7 @@ class WorkspaceService:
             description,
             file_name,
             file_extension,
+            json_path,
             bytes,
         )
 

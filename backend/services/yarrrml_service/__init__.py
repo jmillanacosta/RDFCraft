@@ -344,7 +344,7 @@ class YarrrmlService:
             text=True,
         )
 
-        if result.returncode != 0:
+        if result.stderr:
             self.logger.error(
                 f"Error while executing RML mapper: {result.stderr}"
             )

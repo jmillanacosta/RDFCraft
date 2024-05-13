@@ -6,7 +6,6 @@ from typing import Optional, cast
 
 from jinja2 import Environment, FileSystemLoader
 from kink import inject
-
 from models.file_document import FileDocument
 from models.mapping_document import (
     LiteralNodeDataModel,
@@ -64,6 +63,17 @@ class _Mapping:
     source: str
     s: Optional[str] = None
     blanknode: Optional[bool] = None
+    po_short: list[_POShort] = field(default_factory=list)
+    po_ref_data: list[_PORefData] = field(
+        default_factory=list
+    )
+
+
+@dataclass
+class _UriRefMapping:
+    name: str
+    source: str
+    s: str
     po_short: list[_POShort] = field(default_factory=list)
     po_ref_data: list[_PORefData] = field(
         default_factory=list
@@ -163,33 +173,33 @@ class YarrrmlService:
             for node in current_mapping.nodes
         }
 
-        all_mappings: list[_Mapping] = []
+        all_mappings: list[_Mapping | _UriRefMapping] = []
 
         for node in current_mapping.nodes:
-            if (
-                node.type == NodeType.LITERAL
-                or node.type == NodeType.URIREF
-            ):
+            if node.type == NodeType.LITERAL:
                 continue
 
-            if not isinstance(
-                node.data, ObjectNodeDataModel
-            ):
+            edges = outgoing_edge_lookup.get(node.id, [])
+            po_short = []
+
+            if isinstance(node.data, LiteralNodeDataModel):
                 self.logger.error(
                     f"Wrong node data type for node {node.id}/ Type-data mismatch"
                 )
-                raise ValueError(
-                    "Wrong node data type for node {node.id}/ Type-data mismatch"
-                )
-            edges = outgoing_edge_lookup.get(node.id, [])
+                continue
 
-            data = cast(ObjectNodeDataModel, node.data)
-            po_short = [
-                _POShort(
-                    p="a",
-                    o=data.rdf_type,
-                )
-            ]
+            elif isinstance(node.data, UriRefNodeDataModel):
+                data = cast(UriRefNodeDataModel, node.data)
+
+            elif isinstance(node.data, ObjectNodeDataModel):
+                data = cast(ObjectNodeDataModel, node.data)
+                po_short = [
+                    _POShort(
+                        p="a",
+                        o=data.rdf_type,
+                    )
+                ]
+
             po_ref_data = []
 
             for edge in edges:
@@ -252,18 +262,30 @@ class YarrrmlService:
                             iri=True,
                         )
                     )
+            if isinstance(node.data, UriRefNodeDataModel):
+                mapping = _UriRefMapping(
+                    name=node.id,
+                    s=data.pattern,
+                    source=_source.name,
+                    po_ref_data=po_ref_data,
+                    po_short=po_short,
+                )
+                self.logger.info(f"Mapping: {mapping}")
 
-            mapping = _Mapping(
-                name=node.id,
-                source=_source.name,
-                s=data.pattern,
-                blanknode=data.is_blank_node,
-                po_ref_data=po_ref_data,
-                po_short=po_short,
-            )
-            self.logger.info(f"Mapping: {mapping}")
+                all_mappings.append(mapping)
+                continue
+            if isinstance(node.data, ObjectNodeDataModel):
+                mapping = _Mapping(
+                    name=node.id,
+                    source=_source.name,
+                    s=data.pattern,
+                    blanknode=data.is_blank_node,  # type: ignore
+                    po_ref_data=po_ref_data,
+                    po_short=po_short,
+                )
+                self.logger.info(f"Mapping: {mapping}")
 
-            all_mappings.append(mapping)
+                all_mappings.append(mapping)
 
         template = self.jinja_env.get_template(
             "mapping.yaml.j2"

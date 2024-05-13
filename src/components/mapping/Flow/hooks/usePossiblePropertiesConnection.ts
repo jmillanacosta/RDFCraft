@@ -8,8 +8,16 @@ const usePossiblePropertiesConnection = (
   properties: OntologyPropertyDocument[],
 ) => {
   return useMemo(() => {
-    if (!source) {
+    if (!source && !target) {
       return [];
+    }
+
+    if (!source) {
+      return properties.filter(property =>
+        property.property_range.find(
+          target === null ? () => true : range => range === target,
+        ),
+      );
     }
 
     return properties.filter(property => {

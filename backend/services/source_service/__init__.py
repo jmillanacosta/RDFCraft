@@ -4,11 +4,13 @@ from typing import List
 from fastapi import HTTPException
 from kink import inject
 
+from models import FileDocument
 from models.source_document import (
     SourceDocument,
     SourceType,
 )
 from services.file_service import FileService
+from utils.data_reader import DataReader
 from utils.schema_extractor import SchemaExtractor
 
 
@@ -18,10 +20,12 @@ class SourceService:
         self,
         file_service: FileService,
         schema_extractor: SchemaExtractor,
+        data_reader: DataReader,
     ):
         self.logger = logging.getLogger(__name__)
         self.file_service = file_service
         self.schema_extractor = schema_extractor
+        self.data_reader = data_reader
 
     async def create_source(
         self,
@@ -140,7 +144,7 @@ class SourceService:
         source_id: str,
         file_name: str,
         file_extension: str,
-        bytes: bytes,
+        file: bytes,
     ) -> SourceDocument:
         source = await SourceDocument.get(
             source_id, fetch_links=True
@@ -155,13 +159,33 @@ class SourceService:
             file_extension
         )
         source.file = await self.file_service.create_file(
-            file_name, file_extension, bytes  # type: ignore
+            file_name, file_extension, file  # type: ignore
         )
         source.refs = self.schema_extractor.extract_schema(
-            bytes, file_extension
+            file, file_extension
         )
 
         # Delete old file
         await self.file_service.delete_file(old_file_id)
         await SourceDocument.replace(source)
         return source
+
+    async def get_content(
+        self, source_id: str, count=5
+    ) -> bytes:
+        source = await SourceDocument.get(
+            source_id, fetch_links=True
+        )
+        if source is None:
+            raise HTTPException(
+                status_code=404,
+                detail="Source not found",
+            )
+
+        file: FileDocument = source.file
+
+        data = await self.data_reader.read_data(
+            file.path, source.source_type, count
+        )
+
+        return data

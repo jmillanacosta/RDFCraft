@@ -27,7 +27,8 @@ const usePossiblePropertiesConnection = (
       const targetConstraint = property.property_range.find(
         target === null ? () => true : range => range === target,
       );
-      return sourceConstraint && targetConstraint;
+      const deprecated = property.is_deprecated;
+      return sourceConstraint && targetConstraint && !deprecated;
     });
   }, [source, target, properties]);
 };

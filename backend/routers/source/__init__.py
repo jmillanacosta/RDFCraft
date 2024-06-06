@@ -1,4 +1,5 @@
 from typing import Annotated, List
+
 from fastapi import (
     APIRouter,
     Depends,
@@ -12,13 +13,13 @@ from fastapi.security import (
     OAuth2PasswordBearer,
 )
 from kink import di
+from starlette.responses import PlainTextResponse
 
 from models.source_document import SourceDocument
 from services.authentication_service import (
     AuthenticationService,
     JWTData,
 )
-
 from services.source_service import SourceService
 
 #### AUTH
@@ -145,4 +146,18 @@ async def update_source_file(
     file_bytes = await file.read()
     return await source_service.update_source_file(
         source_id, file_name, file_extension, file_bytes
+    )
+
+
+@router.get(
+    "/{source_id}/peek", response_class=PlainTextResponse
+)
+async def peek_source(
+    source_id: str,
+    source_service: SourceServiceDep,
+    auth: JWTData = Security(verify_token),
+    count: int = 10,
+) -> bytes:
+    return await source_service.get_content(
+        source_id, count
     )

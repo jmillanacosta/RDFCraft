@@ -1,0 +1,15 @@
+{
+    "name": "rdf-craft",
+    "version": "1.0.0",
+    "description": "RDF Craft",
+    "scripts": {
+        "frontend:prod": "cd app && npm run build && mv dist ../public",
+        "frontend:dev": "cd app && npm run dev",
+        "clean": "run-script-os",
+        "clean:default": "rm -rf dist 2>/dev/null; rm -rf gui 2>/dev/null; rm -rf build 2>/dev/null;",
+        "clean:windows": "if exist dist rd /S /Q dist & if exist build rd /S /Q build & if exist gui rd /S /Q gui"
+    },
+    "devDependencies": {
+        "run-script-os": "^1.1.6"
+    }
+}

@@ -1,6 +1,5 @@
 import json
 from pathlib import Path
-from typing import override
 
 from kink import inject
 
@@ -16,7 +15,6 @@ class JSONDataReader(IDataReader):
     def __init__(self):
         super().__init__(SourceType.JSON)
 
-    @override
     def read(self, path: Path, count: int) -> bytes:
         self.logger.info(f"Reading data from {path}")
         with open(path, "rb") as f:

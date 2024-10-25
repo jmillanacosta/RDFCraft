@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import override
 
 import pandas as pd
 from kink import inject
@@ -16,7 +15,6 @@ class CSVDataReader(IDataReader):
     def __init__(self):
         super().__init__(SourceType.CSV)
 
-    @override
     def read(self, path: Path, count: int) -> bytes:
         self.logger.info(f"Reading data from {path}")
         df = pd.read_csv(path)

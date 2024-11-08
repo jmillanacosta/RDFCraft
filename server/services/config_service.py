@@ -1,18 +1,9 @@
-from typing import Protocol
 
 from kink import inject
 
+from server.service_protocol.config_service_protocol import ConfigService
 from server.services.db_service import DBService
 from server.services.db_service.tables.config import Config
-
-
-class ConfigService(Protocol):
-
-    def get(self, key: str) -> str | None: ...
-
-    def set(self, key: str, value: str): ...
-
-    def delete(self, key: str): ...
 
 
 @inject(alias=ConfigService)

@@ -1,24 +1,12 @@
 from pathlib import Path
-from typing import Protocol
 
 from kink import inject
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
 
+from server.service_protocol.db_service_protocol import DBService
 from server.services.db_service.base import Base
-
-__all__ = [
-    "DBService",
-]
-
-
-class DBService(Protocol):
-    def get_engine(self) -> Engine: ...
-
-    def get_session(self) -> Session: ...
-
-    def dispose(self): ...
 
 
 @inject(alias=DBService)

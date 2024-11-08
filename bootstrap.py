@@ -7,10 +7,7 @@ from dotenv import load_dotenv
 from kink import di
 
 from server.services.config_service import ConfigService
-
-from server.services.db_service import (  # noqa # pylint: disable=unused-import # isort:skip
-    DBService,
-)
+from server.services.db_service import DBService
 
 
 async def bootstrap():

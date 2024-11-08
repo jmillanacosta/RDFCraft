@@ -8,9 +8,7 @@ from asgi_correlation_id.context import correlation_id
 from ddtrace.contrib.asgi.middleware import TraceMiddleware
 from fastapi import FastAPI, Request, Response
 from fastapi.staticfiles import StaticFiles
-from uvicorn.protocols.utils import (
-    get_path_with_query_string,
-)
+from uvicorn.protocols.utils import get_path_with_query_string
 
 from bootstrap import bootstrap, teardown
 
@@ -61,7 +59,8 @@ async def logging_middleware(
         http_version = request.scope["http_version"]
         # Recreate the Uvicorn access log format, but add all parameters as structured information
         access_logger.info(
-            f"""{client_host}:{client_port} - "{http_method} {url} HTTP/{http_version}" {status_code}""",
+            f"""{client_host}:{client_port} - "{http_method}
+                {url} HTTP/{http_version}" {status_code}""",
             http={
                 "url": str(request.url),
                 "status_code": status_code,

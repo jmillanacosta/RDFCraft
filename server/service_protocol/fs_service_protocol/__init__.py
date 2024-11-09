@@ -2,7 +2,7 @@
 from pathlib import Path
 from typing import Protocol
 
-from server.services.fs_service.models import Directory
+from server.service_protocol.fs_service_protocol.models import Directory
 
 
 class FSService(Protocol):
@@ -78,3 +78,9 @@ class FSService(Protocol):
         Check if a file or directory exists
         """
         ...
+
+
+__all__ = [
+    "FSService",
+    "Directory",
+]

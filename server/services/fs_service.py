@@ -1,13 +1,12 @@
 import logging
-from pathlib import Path
 import shutil
+from pathlib import Path
 
 from kink import inject
 
-
-from server.const.err_enums import FSServiceErrs
-from server.service_protocol.fs_service_protocol import FSService
-from server.services.fs_service.models import Directory
+from server.const.err_enums import ErrCodes
+from server.exceptions import ServerException
+from server.service_protocol.fs_service_protocol import Directory, FSService
 
 
 @inject(alias=FSService)
@@ -58,8 +57,9 @@ class _FSService:
         if not _path.exists():
             _path.mkdir(parents=True)
         else:
-            self.logger.error(f"Path \"{path}\" already exists")
-            raise ValueError(FSServiceErrs.DIR_EXISTS)
+            error_msg = f"Path \"{path}\" already exists"
+            self.logger.error(error_msg)
+            raise ServerException(error_msg, ErrCodes.DIR_EXISTS)
 
     def rm(self, path: Path) -> None:
         _path: Path = self._is_dir_and_exists(path)
@@ -70,12 +70,14 @@ class _FSService:
         _dest = self._check_path(dest)
 
         if not _src.exists():
-            self.logger.error(f"Source path \"{src}\" does not exist")
-            raise ValueError(FSServiceErrs.DOES_NOT_EXIST)
+            error_msg = f"Source path \"{src}\" does not exist"
+            self.logger.error(error_msg)
+            raise ServerException(error_msg, ErrCodes.DOES_NOT_EXIST)
 
         if _dest.exists():
-            self.logger.error(f"Destination path \"{dest}\" already exists")
-            raise ValueError(FSServiceErrs.DIR_EXISTS)
+            error_msg = f"Destination path \"{dest}\" already exists"
+            self.logger.error(error_msg)
+            raise ServerException(error_msg, ErrCodes.DIR_EXISTS)
 
         _src.rename(_dest)
 
@@ -84,12 +86,14 @@ class _FSService:
         _dest = self._check_path(dest)
 
         if not _src.exists():
-            self.logger.error(f"Source path \"{src}\" does not exist")
-            raise ValueError(FSServiceErrs.DOES_NOT_EXIST)
+            error_msg = f"Source path \"{src}\" does not exist"
+            self.logger.error(error_msg)
+            raise ServerException(error_msg, ErrCodes.DOES_NOT_EXIST)
 
         if _dest.exists():
-            self.logger.error(f"Destination path \"{dest}\" already exists")
-            raise ValueError(FSServiceErrs.DIR_EXISTS)
+            error_msg = f"Destination path \"{dest}\" already exists"
+            self.logger.error(error_msg)
+            raise ServerException(error_msg, ErrCodes.DIR_EXISTS)
 
         if _src.is_dir():
             shutil.copytree(_src, _dest)
@@ -102,8 +106,9 @@ class _FSService:
         if not _path.exists():
             _path.touch()
         else:
-            self.logger.error(f"Path \"{path}\" already exists")
-            raise ValueError(FSServiceErrs.FILE_EXISTS)
+            error_msg = f"Path \"{path}\" already exists"
+            self.logger.error(error_msg)
+            raise ServerException(error_msg, ErrCodes.FILE_EXISTS)
 
     def exists(self, path: Path) -> bool:
         _path = self._check_path(path)
@@ -114,32 +119,41 @@ class _FSService:
         "Check if path is within APP_DIR"
         _abs_path = path.resolve()
         if not _abs_path.is_absolute():
-            logging.error(f"Given path \"{path}\" is not absolute")
-            raise ValueError(FSServiceErrs.DANGEROUS_PATH)
+            error_msg = f"Given path \"{path}\" is not absolute"
+            self.logger.error(error_msg)
+            raise ServerException(error_msg, ErrCodes.DANGEROUS_PATH)
 
         if _abs_path.parts[:len(self._APP_DIR.parts)] != self._APP_DIR.parts:
-            logging.error(f"Given path \"{path}\" is not within APP_DIR which is \"{
-                          self._APP_DIR}\"")
-            raise ValueError(FSServiceErrs.DANGEROUS_PATH)
+            error_msg = f"Given path \"{
+                path}\" is not within APP_DIR which is \"{self._APP_DIR}\""
+            self.logger.error(error_msg)
+            raise ServerException(error_msg, ErrCodes.DANGEROUS_PATH)
 
         return _abs_path
 
     def _is_file_and_exists(self, path: Path):
         _path = self._check_path(path)
         if not _path.exists():
-            self.logger.error(f"Path \"{path}\" does not exist")
-            raise ValueError(FSServiceErrs.DOES_NOT_EXIST)
+            error_msg = f"Path \"{path}\" does not exist"
+            self.logger.error(error_msg)
+            raise ServerException(error_msg, ErrCodes.DOES_NOT_EXIST)
         if not _path.is_file():
-            self.logger.error(f"Path \"{path}\" is not a file")
-            raise ValueError(FSServiceErrs.NOT_A_FILE)
+            error_msg = f"Path \"{path}\" is not a file"
+            self.logger.error(error_msg)
+            raise ServerException(error_msg, ErrCodes.NOT_A_FILE)
         return _path
 
     def _is_dir_and_exists(self, path: Path):
         _path = self._check_path(path)
         if not _path.exists():
-            self.logger.error(f"Path \"{path}\" does not exist")
-            raise ValueError(FSServiceErrs.DOES_NOT_EXIST)
+            error_msg = f"Path \"{path}\" does not exist"
+            self.logger.error(error_msg)
+            raise ServerException(error_msg, ErrCodes.DOES_NOT_EXIST)
         if not _path.is_dir():
-            self.logger.error(f"Path \"{path}\" is not a directory")
-            raise ValueError(FSServiceErrs.NOT_A_DIR)
+            error_msg = f"Path \"{path}\" is not a directory"
+            self.logger.error(error_msg)
+            raise ServerException(error_msg, ErrCodes.NOT_A_DIR)
         return _path
+
+
+__all__ = ["FSService"]

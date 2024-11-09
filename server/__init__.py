@@ -1,21 +1,30 @@
+import logging
 import time
 from contextlib import asynccontextmanager
+from os import getenv
 from pathlib import Path
 
 import structlog
 from asgi_correlation_id import CorrelationIdMiddleware
 from asgi_correlation_id.context import correlation_id
 from ddtrace.contrib.asgi.middleware import TraceMiddleware
+from dotenv import load_dotenv
 from fastapi import FastAPI, Request, Response
 from fastapi.staticfiles import StaticFiles
 from uvicorn.protocols.utils import get_path_with_query_string
 
 from bootstrap import bootstrap, teardown
 
+load_dotenv()
+
+DEBUG = getenv("DEBUG")
+
+logger = logging.getLogger(__name__)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await bootstrap()
+    await bootstrap(app)
     try:
         yield
     finally:
@@ -23,6 +32,20 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+
+if DEBUG:
+    logger.info("Debug mode enabled, skipping window creation")
+    logger.info("Disabling CORS")
+    from fastapi.middleware.cors import CORSMiddleware
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+    logger.info("CORS disabled")
+
 
 access_logger = structlog.get_logger("api.access")
 

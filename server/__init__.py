@@ -11,7 +11,9 @@ from ddtrace.contrib.asgi.middleware import TraceMiddleware
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request, Response
 from fastapi.staticfiles import StaticFiles
-from uvicorn.protocols.utils import get_path_with_query_string
+from uvicorn.protocols.utils import (
+    get_path_with_query_string,
+)
 
 from bootstrap import bootstrap, teardown
 
@@ -32,19 +34,6 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
-
-if DEBUG:
-    logger.info("Debug mode enabled, skipping window creation")
-    logger.info("Disabling CORS")
-    from fastapi.middleware.cors import CORSMiddleware
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=["*"],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
-    logger.info("CORS disabled")
 
 
 access_logger = structlog.get_logger("api.access")
@@ -134,12 +123,30 @@ async def get_data():
     return {"message": "Hello from FastAPI!"}
 
 
-# Serve the React app
-current_dir = Path(__file__).parent.parent
-build_dir = current_dir / "public"
+if DEBUG:
+    logger.info(
+        "Debug mode enabled, skipping window creation"
+    )
+    logger.info("Disabling CORS")
+    from fastapi.middleware.cors import CORSMiddleware
 
-app.mount(
-    "/",
-    StaticFiles(directory=build_dir, html=True),
-    name="static",
-)
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+    logger.info("CORS disabled")
+
+
+if not DEBUG:
+    # Serve the React app
+    current_dir = Path(__file__).parent.parent
+    build_dir = current_dir / "public"
+
+    app.mount(
+        "/",
+        StaticFiles(directory=build_dir, html=True),
+        name="static",
+    )

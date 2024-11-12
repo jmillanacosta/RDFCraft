@@ -56,27 +56,19 @@ async def bootstrap(app: "FastAPI"):
     di[DBService].get_engine()
 
     from server.services.config_service import ConfigService
+
     di[ConfigService].set("system", di["SYSTEM"])
     di[ConfigService].set("arch", di["ARCH"])
     di[ConfigService].set("app_dir", str(di["APP_DIR"]))
 
     from server.services.fs_service import FSService
-    from server.services.workspace_metadata_service import \
-        WorkspaceMetadataService
+    from server.services.workspace_metadata_service import (
+        WorkspaceMetadataService,
+    )
 
     logger.info("Environment variables loaded")
 
     logger.info("Bootstrapping complete, creating window")
-
-    if not _debug:
-        webview.create_window(
-            "RDFCraft", "http://localhost:8000", width=1280, height=720
-        )
-        webview.start()
-
-    else:
-        logger.info("Debug mode enabled, skipping window creation")
-
 
 async def teardown():
     di[DBService].dispose()

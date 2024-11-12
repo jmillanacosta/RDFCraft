@@ -1,5 +1,4 @@
-
-from enum import StrEnum
+from enum import Enum
 
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
@@ -7,7 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from server.services.db_service.base import Base
 
 
-class WorkspaceType(StrEnum):
+class WorkspaceType(str, Enum):
     LOCAL = "local"
     REMOTE = "remote"
 
@@ -23,6 +22,7 @@ class WorkspaceMetadata(Base):
         - type - WorkspaceType
         - location - str - path to the workspace. File path for local workspaces, URL for remote workspaces.
     """
+
     __tablename__ = "workspace_metadata"
 
     uuid: Mapped[str] = mapped_column(

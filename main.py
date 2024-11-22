@@ -16,6 +16,8 @@ os.environ["DD_TRACE_ENABLED"] = os.getenv(
     "DD_TRACE_ENABLED", "false"
 )
 
+thread = None
+
 LOG_JSON_FORMAT = parse_obj_as(
     bool, os.getenv("LOG_JSON_FORMAT", False)
 )
@@ -34,6 +36,9 @@ def start_fastapi():
 
 
 def on_closing():
+    global thread
+    if thread:
+        thread.join(timeout=10)
     os._exit(0)
 
 

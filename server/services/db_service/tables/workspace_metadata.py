@@ -21,6 +21,7 @@ class WorkspaceMetadata(Base):
         - description - str
         - type - WorkspaceType
         - location - str - path to the workspace. File path for local workspaces, URL for remote workspaces.
+        - enabled_features - str - comma-separated list of enabled features
     """
 
     __tablename__ = "workspace_metadata"
@@ -32,6 +33,7 @@ class WorkspaceMetadata(Base):
     description: Mapped[str] = mapped_column(String)
     type: Mapped[WorkspaceType] = mapped_column(String)
     location: Mapped[str] = mapped_column(String)
+    enabled_features: Mapped[str] = mapped_column(String)
 
     def __repr__(self):
         return f"<WorkspaceMetadata(uuid={self.uuid}, name={self.name}, description={self.description}, type={self.type}, location={self.location})>"

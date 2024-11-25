@@ -1,16 +1,13 @@
 from kink import inject
 
-from server.service_protocols.config_service_protocol import (
-    ConfigService,
-)
 from server.services.core.sqlite_db_service import DBService
 from server.services.core.sqlite_db_service.tables.config import (
     Config,
 )
 
 
-@inject(alias=ConfigService)
-class _ConfigService:
+@inject
+class ConfigService:
     def __init__(self, db_service: DBService):
         self._db_service = db_service
 
@@ -28,3 +25,6 @@ class _ConfigService:
         with self._db_service.get_session() as session:
             session.delete(session.get(Config, key))
             session.commit()
+
+
+__all__ = ["ConfigService"]

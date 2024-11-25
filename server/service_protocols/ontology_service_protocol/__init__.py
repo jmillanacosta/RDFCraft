@@ -69,5 +69,3 @@ class OntologyServiceProtocol(Protocol):
             ontology_id (str): Ont
         """
         ...
-
-        

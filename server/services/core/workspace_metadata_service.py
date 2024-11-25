@@ -9,9 +9,6 @@ from server.exceptions import ServerException
 from server.service_protocols.db_service_protocol import (
     DBService,
 )
-from server.service_protocols.workspace_metadata_service_protocol import (
-    WorkspaceMetadataService,
-)
 from server.service_protocols.workspace_metadata_service_protocol.models import (
     WorkspaceMetadataModel,
 )
@@ -20,8 +17,8 @@ from server.services.core.sqlite_db_service.tables.workspace_metadata import (
 )
 
 
-@inject(alias=WorkspaceMetadataService)
-class _WorkspaceMetadataService:
+@inject
+class WorkspaceMetadataService:
     def __init__(self, db_service: DBService):
         self.logger = logging.getLogger(
             "rdfcraft.services.workspace_metadata_service"
@@ -129,4 +126,4 @@ class _WorkspaceMetadataService:
             )
 
 
-__all__ = ["_WorkspaceMetadataService"]
+__all__ = ["WorkspaceMetadataService"]

@@ -5,8 +5,8 @@ import webview
 from dotenv import load_dotenv
 from pydantic import parse_obj_as
 
-from server import app
 from server.logger import setup_logging
+from server.server import app
 
 load_dotenv()
 

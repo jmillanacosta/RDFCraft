@@ -5,20 +5,30 @@ from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
 
-from server.service_protocols.db_service_protocol import (
-    DBService,
-)
 from server.services.core.sqlite_db_service.base import Base
 
 
-@inject(alias=DBService)
-class _DBService:
-    def __init__(self, APP_DIR: Path):
-        self._db_path = APP_DIR / "db.sqlite3"
+@inject
+class DBService:
+    def __init__(
+        self,
+        APP_DIR: Path,
+    ):
+        self._db_path = f"sqlite:///{(APP_DIR / "data" / "db.sqlite").absolute()}"
         self._engine = create_engine(
-            f"sqlite:///{self._db_path}",
+            f"{self._db_path}",
         )
         Base.metadata.create_all(self._engine)
+
+    @classmethod
+    def from_connection_string(cls, connection_string: str):
+        db_service = cls.__new__(cls)
+        db_service._db_path = connection_string
+        db_service._engine = create_engine(
+            connection_string
+        )
+        Base.metadata.create_all(db_service._engine)
+        return db_service
 
     def get_engine(self) -> Engine:
         return self._engine
@@ -28,3 +38,6 @@ class _DBService:
 
     def dispose(self):
         self._engine.dispose()
+
+
+__all__ = ["DBService"]

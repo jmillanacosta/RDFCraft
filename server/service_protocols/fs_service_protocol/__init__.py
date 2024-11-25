@@ -1,0 +1,70 @@
+from typing import Protocol
+
+from server.service_protocols.fs_service_protocol.models import (
+    FileMetadata,
+)
+
+
+class FSServiceProtocol(Protocol):
+    def service_type(self) -> str:
+        """
+        Get service type
+
+        Returns:
+            str: service type
+        """
+        ...
+
+    def upload_file(
+        self,
+        name: str,
+        content: bytes,
+        uuid: str | None = None,
+    ) -> FileMetadata:
+        """
+        Upload a file
+
+        Args:
+            name (str): name of the file with extension
+            content (bytes): content of the file
+            uuid (str | None): UUID of the file, defaults to None. If None, a new UUID will be generated
+
+        Returns:
+            FileMetadata: metadata of the file
+        """
+        ...
+
+    def delete_file_with_uuid(self, uuid: str) -> None:
+        """
+        Delete a file with UUID
+
+        Args:
+            uuid (str): UUID of the file
+        """
+        ...
+
+    def download_file_with_uuid(self, uuid: str) -> bytes:
+        """
+        Download a file with UUID
+
+        Args:
+            uuid (str): UUID of the file
+
+        Returns:
+            bytes: content of the file
+        """
+        ...
+
+    def download_file_with_metadata(
+        self, metadata: FileMetadata
+    ) -> bytes:
+        """
+        Download a file with metadata
+
+        Args:
+            metadata (FileMetadata): metadata of the file
+
+        Returns:
+            bytes: content of the file
+        """
+        ...

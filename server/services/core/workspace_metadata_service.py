@@ -6,13 +6,16 @@ from sqlalchemy import Result, Row, Select, select
 
 from server.const.err_enums import ErrCodes
 from server.exceptions import ServerException
-from server.service_protocol.db_service_protocol import (
+from server.service_protocols.db_service_protocol import (
     DBService,
 )
-from server.service_protocol.workspace_metadata_service_protocol import (
+from server.service_protocols.workspace_metadata_service_protocol import (
     WorkspaceMetadataService,
 )
-from server.services.db_service.tables.workspace_metadata import (
+from server.service_protocols.workspace_metadata_service_protocol.models import (
+    WorkspaceMetadataModel,
+)
+from server.services.core.sqlite_db_service.tables.workspace_metadata import (
     WorkspaceMetadata,
 )
 
@@ -25,23 +28,27 @@ class _WorkspaceMetadataService:
         )
         self._db_service = db_service
 
-    def get_workspaces(self) -> list[WorkspaceMetadata]:
+    def get_workspaces(
+        self,
+    ) -> list[WorkspaceMetadataModel]:
         self.logger.info("Getting workspaces")
         with self._db_service.get_session() as session:
             res = session.query(WorkspaceMetadata).all()
             self.logger.info(
                 f"Fetched {len(res)} workspaces"
             )
-            return res
+            return list(
+                map(WorkspaceMetadataModel.from_table, res)
+            )
 
     def create_workspace_metadata(
-        self, workspace_metadata: WorkspaceMetadata
+        self, workspace_metadata: WorkspaceMetadataModel
     ) -> None:
         self.logger.info(
             f"Creating workspace metadata: {workspace_metadata}"
         )
         with self._db_service.get_session() as session:
-            session.add(workspace_metadata)
+            session.add(workspace_metadata.to_table())
             session.commit()
             self.logger.info(
                 f"Workspace metadata created: {workspace_metadata}"
@@ -50,7 +57,7 @@ class _WorkspaceMetadataService:
     def update_workspace_metadata(
         self,
         uuid: str,
-        workspace_metadata: WorkspaceMetadata,
+        workspace_metadata: WorkspaceMetadataModel,
     ) -> None:
         self.logger.info(
             f"Updating workspace metadata: {workspace_metadata}"
@@ -84,34 +91,41 @@ class _WorkspaceMetadataService:
                     err_msg,
                     ErrCodes.WORKSPACE_METADATA_ILLEGAL_UPDATE_OPERATION,
                 )
+            session.merge(workspace_metadata.to_table())
             session.commit()
             self.logger.info(
                 f"Workspace metadata updated: {workspace_metadata}"
             )
 
-    def delete_workspace_metadata(
-        self, workspace_metadata: WorkspaceMetadata
-    ) -> None:
+    def delete_workspace_metadata(self, uuid: str) -> None:
         self.logger.info(
-            f"Deleting workspace metadata: {workspace_metadata}"
+            f"Deleting workspace metadata: {uuid}"
         )
+
+        query: Select[Tuple[WorkspaceMetadata]] = (
+            select(WorkspaceMetadata)
+            .where(WorkspaceMetadata.uuid == uuid)
+            .limit(1)
+        )
+
         with self._db_service.get_session() as session:
-            item: WorkspaceMetadata | None = (
-                session.query(WorkspaceMetadata)
-                .filter_by(uuid=workspace_metadata.uuid)
-                .first()
+            res: Result[Tuple[WorkspaceMetadata]] = (
+                session.execute(query)
+            )
+            item: Row[Tuple[WorkspaceMetadata]] | None = (
+                res.one_or_none()
             )
             if item is None:
-                err_msg = f"Workspace metadata with uuid {workspace_metadata.uuid} not found"
+                err_msg = f"Workspace metadata with uuid {uuid} not found"
                 self.logger.error(err_msg)
                 raise ServerException(
                     err_msg,
                     ErrCodes.WORKSPACE_METADATA_NOT_FOUND,
                 )
-            session.delete(workspace_metadata)
+            session.delete(item)
             session.commit()
             self.logger.info(
-                f"Workspace metadata deleted: {workspace_metadata}"
+                f"Workspace metadata deleted: {uuid}"
             )
 
 

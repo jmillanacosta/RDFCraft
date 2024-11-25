@@ -5,8 +5,10 @@ from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
 
-from server.service_protocol.db_service_protocol import DBService
-from server.services.db_service.base import Base
+from server.service_protocols.db_service_protocol import (
+    DBService,
+)
+from server.services.core.sqlite_db_service.base import Base
 
 
 @inject(alias=DBService)

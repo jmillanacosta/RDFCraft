@@ -413,3 +413,4 @@ $RECYCLE.BIN/
 
 
 public/
+!server/services/local

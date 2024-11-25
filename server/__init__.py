@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await bootstrap(app)
+    await bootstrap()
     try:
         yield
     finally:

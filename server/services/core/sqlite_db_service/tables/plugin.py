@@ -1,7 +1,9 @@
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from server.services.db_service.base import Base
+from server.services.core.sqlite_db_service.base import (
+    Base,
+)
 
 
 class Plugin(Base):

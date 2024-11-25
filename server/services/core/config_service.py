@@ -1,9 +1,12 @@
-
 from kink import inject
 
-from server.service_protocol.config_service_protocol import ConfigService
-from server.services.db_service import DBService
-from server.services.db_service.tables.config import Config
+from server.service_protocols.config_service_protocol import (
+    ConfigService,
+)
+from server.services.core.sqlite_db_service import DBService
+from server.services.core.sqlite_db_service.tables.config import (
+    Config,
+)
 
 
 @inject(alias=ConfigService)

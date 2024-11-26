@@ -1,0 +1,91 @@
+@prefix : <http://example.org/ontology#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+:LivingThing rdf:type owl:Class ;
+    rdfs:label "Living Thing"@en ;
+    rdfs:label "Canlı Varlık"@tr ;
+    rdfs:comment "This class represents living things"@en ;
+    rdfs:comment "Bu sınıf canlı varlıkları temsil eder"@tr .
+
+:InanimateObject rdf:type owl:Class ;
+    rdfs:label "Inanimate Object"@en ;
+    rdfs:label "Cansız Varlık"@tr ;
+    rdfs:comment "This class represents inanimate objects"@en ;
+    rdfs:comment "Bu sınıf cansız varlıkları temsil eder"@tr .
+
+:Person rdf:type owl:Class ;
+    rdfs:label "Person"@en ;
+    rdfs:label "İnsan"@tr ;
+    rdfs:comment "This class represents persons"@en ;
+    rdfs:comment "Bu sınıf insanları temsil eder"@tr ;
+    rdfs:subClassOf :LivingThing .
+
+:Animal rdf:type owl:Class ;
+    rdfs:label "Animal"@en ;
+    rdfs:label "Hayvan"@tr ;
+    rdfs:comment "This class represents animals"@en ;
+    rdfs:comment "Bu sınıf hayvanları temsil eder"@tr ;
+    rdfs:subClassOf :LivingThing .
+
+:Car rdf:type owl:Class ;
+    rdfs:label "Car"@en ;
+    rdfs:label "Araba"@tr ;
+    rdfs:comment "This class represents cars"@en ;
+    rdfs:comment "Bu sınıf arabaları temsil eder"@tr ;
+    rdfs:subClassOf :InanimateObject .
+
+:House rdf:type owl:Class ;
+    rdfs:label "House"@en ;
+    rdfs:label "Ev"@tr ;
+    rdfs:comment "This class represents houses"@en ;
+    rdfs:comment "Bu sınıf evleri temsil eder"@tr ;
+    owl:deprecated true ;
+    rdfs:subClassOf :InanimateObject .
+
+:hasName rdf:type owl:DatatypeProperty ;
+    rdfs:label "has name"@en ;
+    rdfs:label "ismi var"@tr ;
+    rdfs:comment "This property represents the name of an entity"@en ;
+    rdfs:comment "Bu özellik bir varlığın ismini temsil eder"@tr ;
+    rdfs:domain :LivingThing ;
+    rdfs:range xsd:string .
+
+:hasAge rdf:type owl:DatatypeProperty ;
+    rdfs:label "has age"@en ;
+    rdfs:label "yaşı var"@tr ;
+    rdfs:comment "This property represents the age of an entity"@en ;
+    rdfs:comment "Bu özellik bir varlığın yaşını temsil eder"@tr ;
+    rdfs:domain :LivingThing, :InanimateObject ;
+    rdfs:range xsd:integer .
+
+:hasColor rdf:type owl:DatatypeProperty ;
+    rdfs:label "has color"@en ;
+    rdfs:label "rengi var"@tr ;
+    rdfs:comment "This property represents the color of an entity"@en ;
+    rdfs:comment "Bu özellik bir varlığın rengini temsil eder"@tr ;
+    rdfs:domain :InanimateObject ;
+    rdfs:range xsd:string .
+
+# Write owl individuals
+
+:John rdf:type :Person, owl:NamedIndividual ;
+    :hasName "John" ;
+    :hasAge 30 .
+
+:Rover rdf:type :Animal, owl:NamedIndividual ;
+    rdfs:label "Rover" ;
+    :hasName "Rover" ;
+    :hasAge 5 .
+
+:Toyota rdf:type :Car, owl:NamedIndividual ;
+    :hasName "Toyota" ;
+    :hasAge 3 ;
+    :hasColor "Red" .
+
+:WhiteHouse rdf:type :House, owl:NamedIndividual ;
+    :hasName "House1" ;
+    :hasAge 10 ;
+    :hasColor "White" .

@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import StrEnum
 
 from server.service_protocols.fs_service_protocol.models import (
@@ -6,7 +6,7 @@ from server.service_protocols.fs_service_protocol.models import (
 )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Literal:
     """
     A literal is a value that is not a URI, but a string, integer, etc.
@@ -18,8 +18,8 @@ class Literal:
     """
 
     value: str
-    datatype: str
-    language: str
+    datatype: str = ""
+    language: str = ""
 
 
 class NamedNodeType(StrEnum):
@@ -42,7 +42,7 @@ class PropertyType(StrEnum):
     ANNOTATION = "annotation"
 
 
-@dataclass
+@dataclass(kw_only=True)
 class NamedNode:
     """
     A named node is a node that has a URI.
@@ -63,13 +63,17 @@ class NamedNode:
     is_deprecated: bool
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Individual(NamedNode):
     """
     An individual is a named node that is an instance of a class.
+
+    Inherits from NamedNode.
     """
 
-    type: NamedNodeType = NamedNodeType.INDIVIDUAL
+    type: NamedNodeType = field(
+        default=NamedNodeType.INDIVIDUAL
+    )
 
     def __post_init__(self):
         if self.type != NamedNodeType.INDIVIDUAL:
@@ -78,12 +82,18 @@ class Individual(NamedNode):
             )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Class(NamedNode):
     """
     A class is a named node that is a class.
+
+    Inherits from NamedNode.
+
+    Attributes:
+        super_classes (list[str]): Full URIs of the super classes of the class
     """
 
+    super_classes: list[str]
     type: NamedNodeType = NamedNodeType.CLASS
 
     def __post_init__(self):
@@ -93,10 +103,12 @@ class Class(NamedNode):
             )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Property(NamedNode):
     """
     A property is a named node that is a property.
+
+    Inherits from NamedNode.
 
     Attributes:
         property_type (PropertyType): The type of the property
@@ -116,7 +128,7 @@ class Property(NamedNode):
             )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Ontology:
     """
     An ontology is a collection of named nodes.

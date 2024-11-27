@@ -1,0 +1,65 @@
+import axios, { AxiosInstance } from 'axios';
+import { ApiCallOptions, ApiCallResult } from './types';
+
+class ApiService {
+  private baseUrl: string;
+  private client: AxiosInstance;
+
+  private static instances: Record<string, ApiService> = {};
+
+  private constructor(baseUrl: string) {
+    this.baseUrl = baseUrl;
+    this.client = axios.create({
+      baseURL: baseUrl,
+    });
+  }
+
+  public static registerWithNamespace(
+    namespace: string,
+    baseUrl: string,
+  ): void {
+    if (!ApiService.instances[namespace]) {
+      ApiService.instances[namespace] = new ApiService(baseUrl);
+    }
+  }
+  public static getInstance(baseUrl: string): ApiService {
+    if (!ApiService.instances[baseUrl]) {
+      ApiService.instances[baseUrl] = new ApiService(baseUrl);
+    }
+
+    return ApiService.instances[baseUrl];
+  }
+
+  async callApi<T>(
+    endpoint: string,
+    options: ApiCallOptions<T>,
+  ): Promise<ApiCallResult<T>> {
+    try {
+      const response = await this.client.request({
+        url: endpoint,
+        method: options.method,
+        data: options.body,
+        headers: options.headers,
+        params: options.queryParams,
+        timeout: options.timeout,
+      });
+
+      return {
+        type: 'success',
+        data: options.parser(response.data),
+      } as ApiCallResult<T>;
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        return {
+          type: 'failure',
+          message: error.message,
+          status: error.response?.status || 500,
+        } as ApiCallResult<T>;
+      } else {
+        throw error;
+      }
+    }
+  }
+}
+
+export default ApiService;

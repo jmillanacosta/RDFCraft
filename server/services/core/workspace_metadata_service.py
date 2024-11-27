@@ -1,19 +1,19 @@
 import logging
 from typing import Tuple
+from uuid import uuid4
 
 from kink import inject
-from sqlalchemy import Result, Row, Select, select
+from sqlalchemy import Result, Row, Select, delete, select
 
 from server.const.err_enums import ErrCodes
 from server.exceptions import ServerException
-from server.service_protocols.db_service_protocol import (
-    DBService,
-)
 from server.service_protocols.workspace_metadata_service_protocol.models import (
     WorkspaceMetadataModel,
 )
+from server.services.core.sqlite_db_service import DBService
 from server.services.core.sqlite_db_service.tables.workspace_metadata import (
     WorkspaceMetadata,
+    WorkspaceType,
 )
 
 
@@ -23,7 +23,7 @@ class WorkspaceMetadataService:
         self.logger = logging.getLogger(
             "rdfcraft.services.workspace_metadata_service"
         )
-        self._db_service = db_service
+        self._db_service: DBService = db_service
 
     def get_workspaces(
         self,
@@ -39,11 +39,25 @@ class WorkspaceMetadataService:
             )
 
     def create_workspace_metadata(
-        self, workspace_metadata: WorkspaceMetadataModel
+        self,
+        name: str,
+        description: str,
+        type: WorkspaceType,
+        location: str,
     ) -> None:
         self.logger.info(
-            f"Creating workspace metadata: {workspace_metadata}"
+            f"Creating workspace metadata for {name}"
         )
+
+        workspace_metadata = WorkspaceMetadataModel(
+            uuid=uuid4().hex,
+            name=name,
+            description=description,
+            type=type,
+            location=location,
+            enabled_features=[],
+        )
+
         with self._db_service.get_session() as session:
             session.add(workspace_metadata.to_table())
             session.commit()
@@ -54,10 +68,11 @@ class WorkspaceMetadataService:
     def update_workspace_metadata(
         self,
         uuid: str,
-        workspace_metadata: WorkspaceMetadataModel,
+        name: str | None,
+        description: str | None,
     ) -> None:
         self.logger.info(
-            f"Updating workspace metadata: {workspace_metadata}"
+            f"Updating workspace metadata: {uuid}"
         )
         query: Select[Tuple[WorkspaceMetadata]] = (
             select(WorkspaceMetadata)
@@ -78,20 +93,13 @@ class WorkspaceMetadataService:
                     err_msg,
                     ErrCodes.WORKSPACE_METADATA_NOT_FOUND,
                 )
-            if (
-                workspace_metadata.uuid
-                and workspace_metadata.uuid != uuid
-            ):
-                err_msg = f"Cannot update workspace metadata uuid ({uuid} -> {workspace_metadata.uuid})"
-                self.logger.error(err_msg)
-                raise ServerException(
-                    err_msg,
-                    ErrCodes.WORKSPACE_METADATA_ILLEGAL_UPDATE_OPERATION,
-                )
-            session.merge(workspace_metadata.to_table())
+            if name is not None:
+                item.name = name
+            if description is not None:
+                item.description = description
             session.commit()
             self.logger.info(
-                f"Workspace metadata updated: {workspace_metadata}"
+                f"Workspace metadata updated: {uuid}"
             )
 
     def delete_workspace_metadata(self, uuid: str) -> None:
@@ -119,7 +127,11 @@ class WorkspaceMetadataService:
                     err_msg,
                     ErrCodes.WORKSPACE_METADATA_NOT_FOUND,
                 )
-            session.delete(item)
+            session.execute(
+                delete(WorkspaceMetadata).where(
+                    WorkspaceMetadata.uuid == uuid
+                )
+            )
             session.commit()
             self.logger.info(
                 f"Workspace metadata deleted: {uuid}"

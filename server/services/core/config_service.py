@@ -1,4 +1,5 @@
 from kink import inject
+from sqlalchemy import delete
 
 from server.services.core.sqlite_db_service import DBService
 from server.services.core.sqlite_db_service.tables.config import (
@@ -23,7 +24,12 @@ class ConfigService:
 
     def delete(self, key: str):
         with self._db_service.get_session() as session:
-            session.delete(session.get(Config, key))
+            item = session.get(Config, key)
+            if not item:
+                return
+            session.execute(
+                delete(Config).where(Config.key == key)
+            )
             session.commit()
 
 

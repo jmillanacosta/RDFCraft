@@ -2,7 +2,6 @@ import logging
 import platform
 from os import getenv
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 from dotenv import load_dotenv
 from kink import di
@@ -10,9 +9,6 @@ from kink import di
 from server.services.core.sqlite_db_service import (
     DBService,
 )
-
-if TYPE_CHECKING:
-    from fastapi import FastAPI
 
 
 async def bootstrap():

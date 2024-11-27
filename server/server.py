@@ -16,6 +16,9 @@ from uvicorn.protocols.utils import (
 )
 
 from bootstrap import bootstrap, teardown
+from server.routers.workspaces.workspaces import (
+    router as workspaces_router,
+)
 
 load_dotenv()
 
@@ -150,3 +153,10 @@ if not DEBUG:
         StaticFiles(directory=build_dir, html=True),
         name="static",
     )
+
+
+app.include_router(
+    workspaces_router,
+    prefix="/api/workspaces",
+    tags=["workspaces"],
+)

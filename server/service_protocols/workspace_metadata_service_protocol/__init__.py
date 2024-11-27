@@ -3,6 +3,9 @@ from typing import Protocol
 from server.service_protocols.workspace_metadata_service_protocol.models import (
     WorkspaceMetadataModel,
 )
+from server.services.core.sqlite_db_service.tables.workspace_metadata import (
+    WorkspaceType,
+)
 
 
 class WorkspaceMetadataService(Protocol):
@@ -22,7 +25,11 @@ class WorkspaceMetadataService(Protocol):
         ...
 
     def create_workspace_metadata(
-        self, workspace_metadata: WorkspaceMetadataModel
+        self,
+        name: str,
+        description: str,
+        type: WorkspaceType,
+        location: str,
     ) -> None:
         """
         Create workspace metadata
@@ -35,7 +42,8 @@ class WorkspaceMetadataService(Protocol):
     def update_workspace_metadata(
         self,
         uuid: str,
-        workspace_metadata: WorkspaceMetadataModel,
+        name: str,
+        description: str,
     ) -> None:
         """
         Update workspace metadata

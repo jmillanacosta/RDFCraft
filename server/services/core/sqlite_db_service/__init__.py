@@ -6,6 +6,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
 
 from server.services.core.sqlite_db_service.base import Base
+from server.services.core.sqlite_db_service.tables import *  # noqa: F403
 
 
 @inject
@@ -14,7 +15,9 @@ class DBService:
         self,
         APP_DIR: Path,
     ):
-        self._db_path = f"sqlite:///{(APP_DIR / "data" / "db.sqlite").absolute()}"
+        self._db_path = f"sqlite:///{(APP_DIR  / "db.sqlite").absolute()}"
+        if not APP_DIR.exists():
+            APP_DIR.mkdir()
         self._engine = create_engine(
             f"{self._db_path}",
         )

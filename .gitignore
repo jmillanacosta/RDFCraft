@@ -415,3 +415,4 @@ $RECYCLE.BIN/
 public/
 !server/services/local/
 !test/services/local/
+!app/src/lib/

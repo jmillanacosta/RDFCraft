@@ -1,9 +1,11 @@
-import { Button, Navbar, NonIdealState } from '@blueprintjs/core';
-import { useEffect, useState } from 'react';
+import { Button, ButtonGroup, Navbar, NonIdealState } from '@blueprintjs/core';
+import { useCallback, useEffect, useState } from 'react';
 import useWorkspacesPageState from './state';
 
 import CreateWorkspaceDialog from './components/CreateWorkspaceDialog';
 
+import { WorkspaceMetadata } from '../../lib/api/workspaces_api/types';
+import WorkspaceCardItem from './components/WorkspaceCardItem';
 import './styles.scss';
 
 const WorkspacesPage = () => {
@@ -12,12 +14,26 @@ const WorkspacesPage = () => {
   const error = useWorkspacesPageState(state => state.error);
   const pull = useWorkspacesPageState(state => state.refreshWorkspaces);
   const create = useWorkspacesPageState(state => state.createWorkspace);
+  const deleteWorkspace = useWorkspacesPageState(
+    state => state.deleteWorkspace,
+  );
 
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
     pull();
   }, [pull]);
+
+  const handleDelete = useCallback(
+    (workspace: WorkspaceMetadata) => {
+      deleteWorkspace(workspace);
+    },
+    [deleteWorkspace],
+  );
+
+  const handleOpen = useCallback((workspace: WorkspaceMetadata) => {
+    console.log('Opening workspace', workspace);
+  }, []);
 
   return (
     <div>
@@ -37,9 +53,17 @@ const WorkspacesPage = () => {
             {isLoading ? 'Loading...' : error ?? ''}
           </Navbar.Heading>
         </Navbar.Group>
+        <Navbar.Group align='right'>
+          <ButtonGroup>
+            <Button icon='refresh' onClick={pull} />
+            <Button icon='add' onClick={() => setOpen(true)}>
+              Create Workspace
+            </Button>
+          </ButtonGroup>
+        </Navbar.Group>
       </Navbar>
       <div className='workspaces-content'>
-        {workspaces.length === 0 && (
+        {workspaces.length === 0 && isLoading === false && (
           <div className='no-workspaces'>
             <NonIdealState
               icon='folder-open'
@@ -53,6 +77,18 @@ const WorkspacesPage = () => {
                 </Button>
               }
             />
+          </div>
+        )}
+        {workspaces.length > 0 && (
+          <div className='workspaces-list'>
+            {workspaces.map(workspace => (
+              <WorkspaceCardItem
+                key={workspace.uuid}
+                workspace={workspace}
+                onDelete={handleDelete}
+                onOpen={handleOpen}
+              />
+            ))}
           </div>
         )}
       </div>

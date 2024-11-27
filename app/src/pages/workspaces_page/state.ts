@@ -17,6 +17,7 @@ interface WorkspacesPageState {
 interface WorkspacesPageStateActions {
   createWorkspace: (workspace: CreateWorkspaceMetadata) => void;
   refreshWorkspaces: () => void;
+  deleteWorkspace: (workspace: WorkspaceMetadata) => void;
 }
 
 const defaultState: WorkspacesPageState = {
@@ -51,6 +52,23 @@ const functions: ZustandActions<
     WorkspacesApi.getWorkspaces()
       .then(workspaces => {
         set({ workspaces, error: null });
+      })
+      .catch(error => {
+        if (error instanceof Error) {
+          set({ error: error.message });
+        }
+      })
+      .finally(() => {
+        set({ isLoading: false });
+      });
+  },
+  deleteWorkspace(workspace) {
+    set({ isLoading: true });
+    WorkspacesApi.deleteWorkspace(workspace.uuid)
+      .then(result => {
+        if (result) {
+          get().refreshWorkspaces();
+        }
       })
       .catch(error => {
         if (error instanceof Error) {

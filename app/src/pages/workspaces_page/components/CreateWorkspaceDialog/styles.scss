@@ -1,1 +1,10 @@
 @import '@blueprintjs/core/lib/scss/variables';
+
+.form-content-do-not-fill {
+  // Give width with font size
+  width: 10rem;
+}
+
+.error-callout {
+  margin-bottom: 10px;
+}

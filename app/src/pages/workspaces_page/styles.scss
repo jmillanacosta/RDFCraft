@@ -14,6 +14,16 @@
   height: calc(100vh - #{$pt-navbar-height});
 }
 
+.workspaces-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: left;
+  align-items: flex-start;
+  flex-direction: row;
+  width: 100%;
+  padding: 20px;
+}
+
 .no-workspaces {
   display: flex;
   justify-content: center;

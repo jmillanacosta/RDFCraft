@@ -4,8 +4,8 @@ from kink import inject
 from rdflib import Graph, Literal
 from rdflib.query import ResultRow
 
-from server.service_protocols.ontology_service_protocol import (
-    models,
+from server.models import (
+    ontology,
 )
 
 
@@ -84,8 +84,8 @@ class OntologyIndexer:
 
     def _create_literal_from_rdflib_literal(
         self, rdflib_literal: Literal
-    ) -> models.Literal:
-        return models.Literal(
+    ) -> ontology.Literal:
+        return ontology.Literal(
             value=rdflib_literal.value,
             language=rdflib_literal.language or "en",
             datatype=rdflib_literal.datatype or "",
@@ -93,7 +93,7 @@ class OntologyIndexer:
 
     def get_classes(
         self, ontology_uri: str, g: Graph
-    ) -> list[models.Class]:
+    ) -> list[ontology.Class]:
         """
         Get classes from the ontology
 
@@ -182,9 +182,9 @@ class OntologyIndexer:
 
     def _create_class_models(
         self, ontology_uri: str, classes: dict
-    ) -> list[models.Class]:
+    ) -> list[ontology.Class]:
         return [
-            models.Class(
+            ontology.Class(
                 belongs_to=ontology_uri,
                 full_uri=str(class_uri),
                 label=class_data["label"],
@@ -197,7 +197,7 @@ class OntologyIndexer:
 
     def get_properties(
         self, ontology_uri: str, g: Graph
-    ) -> list[models.Property]:
+    ) -> list[ontology.Property]:
         """
         Get properties from the ontology
 
@@ -299,9 +299,9 @@ class OntologyIndexer:
 
     def _create_property_models(
         self, ontology_uri: str, properties: dict
-    ) -> list[models.Property]:
+    ) -> list[ontology.Property]:
         return [
-            models.Property(
+            ontology.Property(
                 belongs_to=str(ontology_uri),
                 full_uri=str(property_uri),
                 label=property_data["label"],
@@ -320,14 +320,14 @@ class OntologyIndexer:
 
     def _get_property_type(
         self, property_type: str
-    ) -> models.PropertyType:
+    ) -> ontology.PropertyType:
         match property_type:
             case "http://www.w3.org/2002/07/owl#ObjectProperty":
-                return models.PropertyType.OBJECT
+                return ontology.PropertyType.OBJECT
             case "http://www.w3.org/2002/07/owl#DatatypeProperty":
-                return models.PropertyType.DATATYPE
+                return ontology.PropertyType.DATATYPE
             case "http://www.w3.org/2002/07/owl#AnnotationProperty":
-                return models.PropertyType.ANNOTATION
+                return ontology.PropertyType.ANNOTATION
             case _:
                 raise ValueError(
                     f"Unknown property type: {property_type}"
@@ -335,7 +335,7 @@ class OntologyIndexer:
 
     def get_individuals(
         self, ontology_uri: str, g: Graph
-    ) -> list[models.Individual]:
+    ) -> list[ontology.Individual]:
         """
         Get individuals from the ontology
 
@@ -410,9 +410,9 @@ class OntologyIndexer:
 
     def _create_individual_models(
         self, ontology_uri: str, individuals: dict
-    ) -> list[models.Individual]:
+    ) -> list[ontology.Individual]:
         return [
-            models.Individual(
+            ontology.Individual(
                 belongs_to=ontology_uri,
                 full_uri=str(individual_uri),
                 label=individual_data["label"],

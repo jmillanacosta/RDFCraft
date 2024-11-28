@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from server.service_protocols.workspace_service_protocol.models import (
+from server.models.workspace import (
     WorkspaceModel,
 )
 

@@ -2,7 +2,7 @@ import unittest
 
 from rdflib import Graph
 
-from server.service_protocols.ontology_service_protocol.models import (
+from server.models.ontology import (
     Class,
 )
 from server.utils.ontology_indexer import OntologyIndexer

@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from server.service_protocols.workspace_metadata_service_protocol.models import (
+from server.models.workspace_metadata import (
     WorkspaceMetadataModel,
 )
 from server.services.core.sqlite_db_service.tables.workspace_metadata import (

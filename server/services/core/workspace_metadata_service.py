@@ -7,7 +7,7 @@ from sqlalchemy import Result, Row, Select, delete, select
 
 from server.const.err_enums import ErrCodes
 from server.exceptions import ServerException
-from server.service_protocols.workspace_metadata_service_protocol.models import (
+from server.models.workspace_metadata import (
     WorkspaceMetadataModel,
 )
 from server.services.core.sqlite_db_service import DBService

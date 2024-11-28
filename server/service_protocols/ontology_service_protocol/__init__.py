@@ -1,9 +1,9 @@
 from typing import Protocol
 
-from server.service_protocols.fs_service_protocol.models import (
+from server.models.file_metadata import (
     FileMetadata,
 )
-from server.service_protocols.ontology_service_protocol.models import (
+from server.models.ontology import (
     Ontology,
 )
 

@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from enum import StrEnum
 
-from server.service_protocols.fs_service_protocol.models import (
+from server.models.file_metadata import (
     FileMetadata,
 )
 

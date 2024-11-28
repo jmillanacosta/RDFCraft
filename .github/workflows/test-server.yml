@@ -1,0 +1,30 @@
+name: Python Tests and Ruff
+
+on: [push]
+
+jobs:
+  uv-example:
+    name: python
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: 'Set up Python'
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: '.python-version'
+
+      - name: Install dependencies
+        run: |
+          uv sync --all-extras --dev
+
+      - name: Run tests with coverage
+        run: |
+          uv run coverage run -m unittest discover -v -s ./test -p "*_test.py"
+
+      - name: Run Ruff
+        run: uv run ruff check --output-format=github .

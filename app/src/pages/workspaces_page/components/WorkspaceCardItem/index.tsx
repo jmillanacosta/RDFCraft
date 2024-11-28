@@ -22,11 +22,19 @@ const WorkspaceCardItem = ({
         {workspace.type.charAt(0).toUpperCase() + workspace.type.slice(1)}
       </p>
       <p>
-        <b>Description</b>: {workspace.description}
+        <b>Description</b>: <br />
+        {workspace.description}
       </p>
-      <p>
-        <b>Location</b> {workspace.location}
+      <p
+        style={
+          workspace.type === 'local'
+            ? { visibility: 'hidden' }
+            : { visibility: 'visible' }
+        }
+      >
+        <b>Connection String</b>: {workspace.location}
       </p>
+
       <Divider />
       <div className='workspace-card-actions'>
         <Button intent='danger' onClick={() => onDelete(workspace)}>

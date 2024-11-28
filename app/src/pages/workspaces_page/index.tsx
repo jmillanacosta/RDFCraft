@@ -4,6 +4,7 @@ import useWorkspacesPageState from './state';
 
 import CreateWorkspaceDialog from './components/CreateWorkspaceDialog';
 
+import DeleteAlert from '../../components/DeleteAlert';
 import { WorkspaceMetadata } from '../../lib/api/workspaces_api/types';
 import WorkspaceCardItem from './components/WorkspaceCardItem';
 import './styles.scss';
@@ -18,11 +19,15 @@ const WorkspacesPage = () => {
     state => state.deleteWorkspace,
   );
 
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState<'create' | 'delete' | null>(null);
 
   useEffect(() => {
     pull();
   }, [pull]);
+
+  const [toBeDeleted, setToBeDeleted] = useState<WorkspaceMetadata | null>(
+    null,
+  );
 
   const handleDelete = useCallback(
     (workspace: WorkspaceMetadata) => {
@@ -31,18 +36,35 @@ const WorkspacesPage = () => {
     [deleteWorkspace],
   );
 
+  const showDeleteAlert = useCallback((workspace: WorkspaceMetadata) => {
+    setToBeDeleted(workspace);
+    setOpen('delete');
+  }, []);
+
   const handleOpen = useCallback((workspace: WorkspaceMetadata) => {
     console.log('Opening workspace', workspace);
   }, []);
 
   return (
     <div>
+      <DeleteAlert
+        title='Delete Workspace'
+        message='Are you sure you want to delete this workspace?'
+        open={open === 'delete'}
+        onClose={() => setOpen(null)}
+        onConfirm={() => {
+          if (toBeDeleted) {
+            handleDelete(toBeDeleted);
+          }
+          setOpen(null);
+        }}
+      />
       <CreateWorkspaceDialog
-        open={open}
-        onClose={() => setOpen(false)}
+        open={open === 'create'}
+        onClose={() => setOpen(null)}
         onConfirm={data => {
           create(data);
-          setOpen(false);
+          setOpen(null);
         }}
       />
       <Navbar fixedToTop>
@@ -56,7 +78,7 @@ const WorkspacesPage = () => {
         <Navbar.Group align='right'>
           <ButtonGroup>
             <Button icon='refresh' onClick={pull} />
-            <Button icon='add' onClick={() => setOpen(true)}>
+            <Button icon='add' onClick={() => setOpen('create')}>
               Create Workspace
             </Button>
           </ButtonGroup>
@@ -72,7 +94,7 @@ const WorkspacesPage = () => {
               description='Create a workspace to get started'
               layout='vertical'
               action={
-                <Button intent='primary' onClick={() => setOpen(true)}>
+                <Button intent='primary' onClick={() => setOpen('create')}>
                   Create Workspace
                 </Button>
               }
@@ -85,7 +107,7 @@ const WorkspacesPage = () => {
               <WorkspaceCardItem
                 key={workspace.uuid}
                 workspace={workspace}
-                onDelete={handleDelete}
+                onDelete={showDeleteAlert}
                 onOpen={handleOpen}
               />
             ))}

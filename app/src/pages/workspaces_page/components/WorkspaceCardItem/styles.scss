@@ -1,15 +1,29 @@
 .workspace-card {
-  width: 100%;
+  flex: 1;
+  max-height: fit-content;
+  min-width: 100%;
 }
 
-@media only screen and (min-width: 768px) {
+h5 {
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+p {
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+@media screen and (min-width: 768px) {
   .workspace-card {
-    width: 25%;
+    min-width: calc(768px / 3 - 20px);
+    max-width: calc(768px / 3 - 20px);
   }
 }
 
 .workspace-card-actions {
   display: flex;
+  margin-top: auto;
   justify-content: right;
   & > *:not(:first-child) {
     margin-left: 10px;

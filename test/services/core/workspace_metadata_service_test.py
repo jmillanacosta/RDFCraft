@@ -5,7 +5,7 @@ from server.const.err_enums import ErrCodes
 from server.exceptions import ServerException
 from server.services.core.sqlite_db_service import DBService
 from server.services.core.sqlite_db_service.tables.workspace_metadata import (
-    WorkspaceMetadata,
+    WorkspaceMetadataTable,
     WorkspaceType,
 )
 from server.services.core.workspace_metadata_service import (
@@ -47,13 +47,13 @@ class TestWorkspaceMetadataService(unittest.TestCase):
 
         self.assertEqual(result, [])
         session_mock.query.assert_called_once_with(
-            WorkspaceMetadata
+            WorkspaceMetadataTable
         )
 
     def test_update_workspace_metadata(self):
         session_mock = MagicMock()
         self.db_service.get_session.return_value.__enter__.return_value = session_mock
-        session_mock.execute.return_value.one_or_none.return_value = WorkspaceMetadata(
+        session_mock.execute.return_value.one_or_none.return_value = WorkspaceMetadataTable(
             uuid="test-uuid"
         )
 
@@ -85,7 +85,7 @@ class TestWorkspaceMetadataService(unittest.TestCase):
     def test_delete_workspace_metadata(self):
         session_mock = MagicMock()
         self.db_service.get_session.return_value.__enter__.return_value = session_mock
-        session_mock.execute.return_value.one_or_none.return_value = WorkspaceMetadata(
+        session_mock.execute.return_value.one_or_none.return_value = WorkspaceMetadataTable(
             uuid="test-uuid"
         )
 

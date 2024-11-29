@@ -6,15 +6,6 @@ from server.models.file_metadata import (
 
 
 class FSServiceProtocol(Protocol):
-    def service_type(self) -> str:
-        """
-        Get service type
-
-        Returns:
-            str: service type
-        """
-        ...
-
     def upload_file(
         self,
         name: str,

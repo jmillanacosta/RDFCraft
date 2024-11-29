@@ -13,7 +13,7 @@ class WorkspaceType(str, Enum):
     REMOTE = "remote"
 
 
-class WorkspaceMetadata(Base):
+class WorkspaceMetadataTable(Base):
     """
     Table for workspace metadata.
 

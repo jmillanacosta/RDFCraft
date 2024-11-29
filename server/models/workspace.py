@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from server.models.workspace_metadata import (
-    WorkspaceMetadataModel,
+    WorkspaceMetadata,
 )
 
 
@@ -19,7 +19,7 @@ class WorkspaceModel:
         used_uri_patterns (list[str]): list of used URI patterns
     """
 
-    metadata: WorkspaceMetadataModel
+    metadata: WorkspaceMetadata
     sources: list[str]
     mappings: list[str]
     prefixes: dict[str, str]

@@ -6,7 +6,7 @@ from server.services.core.sqlite_db_service.base import (
 )
 
 
-class PluginUIElement(Base):
+class PluginUIElementTable(Base):
     """
     Table for plugin UI elements.
 

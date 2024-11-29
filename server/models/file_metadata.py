@@ -19,3 +19,18 @@ class FileMetadata:
     stem: str
     suffix: str
     hash: str
+
+    def to_table(self):
+        """
+        Convert to table representation
+
+        Returns:
+            dict: Table representation
+        """
+        return {
+            "uuid": self.uuid,
+            "name": self.name,
+            "stem": self.stem,
+            "suffix": self.suffix,
+            "hash": self.hash,
+        }

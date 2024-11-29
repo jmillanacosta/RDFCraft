@@ -157,6 +157,6 @@ if not DEBUG:
 
 app.include_router(
     workspaces_router,
-    prefix="/api/workspaces",
-    tags=["workspaces"],
+    prefix="/api/workspaces_metadata",
+    tags=["workspaces_metadata"],
 )

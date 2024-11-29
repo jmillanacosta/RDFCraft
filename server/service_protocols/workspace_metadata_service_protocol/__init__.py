@@ -1,7 +1,7 @@
 from typing import Protocol
 
 from server.models.workspace_metadata import (
-    WorkspaceMetadataModel,
+    WorkspaceMetadata,
 )
 from server.services.core.sqlite_db_service.tables.workspace_metadata import (
     WorkspaceType,
@@ -15,7 +15,7 @@ class WorkspaceMetadataService(Protocol):
 
     def get_workspaces(
         self,
-    ) -> list[WorkspaceMetadataModel]:
+    ) -> list[WorkspaceMetadata]:
         """
         Get all workspaces
 

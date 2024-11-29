@@ -8,11 +8,11 @@ from sqlalchemy import Result, Row, Select, delete, select
 from server.const.err_enums import ErrCodes
 from server.exceptions import ServerException
 from server.models.workspace_metadata import (
-    WorkspaceMetadataModel,
+    WorkspaceMetadata,
 )
 from server.services.core.sqlite_db_service import DBService
 from server.services.core.sqlite_db_service.tables.workspace_metadata import (
-    WorkspaceMetadata,
+    WorkspaceMetadataTable,
     WorkspaceType,
 )
 
@@ -27,15 +27,17 @@ class WorkspaceMetadataService:
 
     def get_workspaces(
         self,
-    ) -> list[WorkspaceMetadataModel]:
+    ) -> list[WorkspaceMetadata]:
         self.logger.info("Getting workspaces")
         with self._db_service.get_session() as session:
-            res = session.query(WorkspaceMetadata).all()
+            res = session.query(
+                WorkspaceMetadataTable
+            ).all()
             self.logger.info(
                 f"Fetched {len(res)} workspaces"
             )
             return list(
-                map(WorkspaceMetadataModel.from_table, res)
+                map(WorkspaceMetadata.from_table, res)
             )
 
     def create_workspace_metadata(
@@ -49,7 +51,7 @@ class WorkspaceMetadataService:
             f"Creating workspace metadata for {name}"
         )
 
-        workspace_metadata = WorkspaceMetadataModel(
+        workspace_metadata = WorkspaceMetadata(
             uuid=uuid4().hex,
             name=name,
             description=description,
@@ -74,18 +76,18 @@ class WorkspaceMetadataService:
         self.logger.info(
             f"Updating workspace metadata: {uuid}"
         )
-        query: Select[Tuple[WorkspaceMetadata]] = (
-            select(WorkspaceMetadata)
-            .where(WorkspaceMetadata.uuid == uuid)
+        query: Select[Tuple[WorkspaceMetadataTable]] = (
+            select(WorkspaceMetadataTable)
+            .where(WorkspaceMetadataTable.uuid == uuid)
             .limit(1)
         )
         with self._db_service.get_session() as session:
-            res: Result[Tuple[WorkspaceMetadata]] = (
+            res: Result[Tuple[WorkspaceMetadataTable]] = (
                 session.execute(query)
             )
-            item: Row[Tuple[WorkspaceMetadata]] | None = (
-                res.one_or_none()
-            )
+            item: (
+                Row[Tuple[WorkspaceMetadataTable]] | None
+            ) = res.one_or_none()
             if item is None:
                 err_msg = f"Workspace metadata with uuid {uuid} not found"
                 self.logger.error(err_msg)
@@ -107,19 +109,19 @@ class WorkspaceMetadataService:
             f"Deleting workspace metadata: {uuid}"
         )
 
-        query: Select[Tuple[WorkspaceMetadata]] = (
-            select(WorkspaceMetadata)
-            .where(WorkspaceMetadata.uuid == uuid)
+        query: Select[Tuple[WorkspaceMetadataTable]] = (
+            select(WorkspaceMetadataTable)
+            .where(WorkspaceMetadataTable.uuid == uuid)
             .limit(1)
         )
 
         with self._db_service.get_session() as session:
-            res: Result[Tuple[WorkspaceMetadata]] = (
+            res: Result[Tuple[WorkspaceMetadataTable]] = (
                 session.execute(query)
             )
-            item: Row[Tuple[WorkspaceMetadata]] | None = (
-                res.one_or_none()
-            )
+            item: (
+                Row[Tuple[WorkspaceMetadataTable]] | None
+            ) = res.one_or_none()
             if item is None:
                 err_msg = f"Workspace metadata with uuid {uuid} not found"
                 self.logger.error(err_msg)
@@ -128,8 +130,8 @@ class WorkspaceMetadataService:
                     ErrCodes.WORKSPACE_METADATA_NOT_FOUND,
                 )
             session.execute(
-                delete(WorkspaceMetadata).where(
-                    WorkspaceMetadata.uuid == uuid
+                delete(WorkspaceMetadataTable).where(
+                    WorkspaceMetadataTable.uuid == uuid
                 )
             )
             session.commit()

@@ -3,7 +3,7 @@ from sqlalchemy import delete
 
 from server.services.core.sqlite_db_service import DBService
 from server.services.core.sqlite_db_service.tables.config import (
-    Config,
+    ConfigTable,
 )
 
 
@@ -14,21 +14,25 @@ class ConfigService:
 
     def get(self, key: str) -> str | None:
         with self._db_service.get_session() as session:
-            result: Config | None = session.get(Config, key)
+            result: ConfigTable | None = session.get(
+                ConfigTable, key
+            )
             return result.value if result else None
 
     def set(self, key: str, value: str):
         with self._db_service.get_session() as session:
-            session.merge(Config(key=key, value=value))
+            session.merge(ConfigTable(key=key, value=value))
             session.commit()
 
     def delete(self, key: str):
         with self._db_service.get_session() as session:
-            item = session.get(Config, key)
+            item = session.get(ConfigTable, key)
             if not item:
                 return
             session.execute(
-                delete(Config).where(Config.key == key)
+                delete(ConfigTable).where(
+                    ConfigTable.key == key
+                )
             )
             session.commit()
 

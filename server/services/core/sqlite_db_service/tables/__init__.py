@@ -1,11 +1,11 @@
 from server.services.core.sqlite_db_service.tables.config import (
-    Config,
+    ConfigTable,
 )
 from server.services.core.sqlite_db_service.tables.workspace_metadata import (
-    WorkspaceMetadata,
+    WorkspaceMetadataTable,
 )
 
 __all__ = [
-    "Config",
-    "WorkspaceMetadata",
+    "ConfigTable",
+    "WorkspaceMetadataTable",
 ]

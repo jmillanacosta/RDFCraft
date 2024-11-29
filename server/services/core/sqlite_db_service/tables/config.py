@@ -6,7 +6,7 @@ from server.services.core.sqlite_db_service.base import (
 )
 
 
-class Config(Base):
+class ConfigTable(Base):
     __tablename__ = "config"
 
     key: Mapped[str] = mapped_column(

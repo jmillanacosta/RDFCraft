@@ -10,15 +10,6 @@ class WorkspaceServiceProtocol(Protocol):
     Service for workspace operations
     """
 
-    def service_type(self) -> str:
-        """
-        Get service type
-
-        Returns:
-            str: service type
-        """
-        ...
-
     def get_workspace(self, uuid: str) -> WorkspaceModel:
         """
         Get a workspace by UUID

@@ -1,13 +1,13 @@
 from dataclasses import dataclass
 
 from server.services.core.sqlite_db_service.tables.workspace_metadata import (
-    WorkspaceMetadata,
+    WorkspaceMetadataTable,
     WorkspaceType,
 )
 
 
 @dataclass
-class WorkspaceMetadataModel:
+class WorkspaceMetadata:
     """
     Model for workspace metadata
 
@@ -28,8 +28,10 @@ class WorkspaceMetadataModel:
     enabled_features: list[str]
 
     @staticmethod
-    def from_table(workspace_metadata: WorkspaceMetadata):
-        return WorkspaceMetadataModel(
+    def from_table(
+        workspace_metadata: WorkspaceMetadataTable,
+    ):
+        return WorkspaceMetadata(
             uuid=workspace_metadata.uuid,
             name=workspace_metadata.name,
             description=workspace_metadata.description,
@@ -41,7 +43,7 @@ class WorkspaceMetadataModel:
         )
 
     def to_table(self):
-        return WorkspaceMetadata(
+        return WorkspaceMetadataTable(
             uuid=self.uuid,
             name=self.name,
             description=self.description,

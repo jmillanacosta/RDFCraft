@@ -6,7 +6,7 @@ from server.services.core.sqlite_db_service.base import (
 )
 
 
-class Plugin(Base):
+class PluginTable(Base):
     """
     Table for plugin metadata.
 

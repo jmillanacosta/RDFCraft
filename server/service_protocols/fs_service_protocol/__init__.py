@@ -45,17 +45,3 @@ class FSServiceProtocol(Protocol):
             bytes: content of the file
         """
         ...
-
-    def download_file_with_metadata(
-        self, metadata: FileMetadata
-    ) -> bytes:
-        """
-        Download a file with metadata
-
-        Args:
-            metadata (FileMetadata): metadata of the file
-
-        Returns:
-            bytes: content of the file
-        """
-        ...

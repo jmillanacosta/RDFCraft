@@ -135,6 +135,7 @@ class Ontology:
 
     Attributes:
         uuid (str): The UUID of the ontology
+        file_uuid (str): The UUID of the file that the ontology is in
         name (str): The name of the ontology
         classes (list[Class]): The classes in the ontology
         individuals (list[Individual]): The individuals in the ontology
@@ -144,7 +145,7 @@ class Ontology:
     """
 
     uuid: str
-    file_metadata: FileMetadata
+    file_uuid: str
     name: str
     classes: list[Class]
     individuals: list[Individual]

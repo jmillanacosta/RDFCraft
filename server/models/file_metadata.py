@@ -1,5 +1,9 @@
 from dataclasses import dataclass
 
+from server.services.core.sqlite_db_service import (
+    FileMetadataTable,
+)
+
 
 @dataclass
 class FileMetadata:
@@ -27,10 +31,29 @@ class FileMetadata:
         Returns:
             dict: Table representation
         """
-        return {
-            "uuid": self.uuid,
-            "name": self.name,
-            "stem": self.stem,
-            "suffix": self.suffix,
-            "hash": self.hash,
-        }
+        return FileMetadataTable(
+            uuid=self.uuid,
+            name=self.name,
+            stem=self.stem,
+            suffix=self.suffix,
+            hash=self.hash,
+        )
+
+    @classmethod
+    def from_table(cls, table: FileMetadataTable):
+        """
+        Convert from table representation
+
+        Args:
+            table (dict): Table representation
+
+        Returns:
+            FileMetadata: File metadata
+        """
+        return cls(
+            uuid=table.uuid,
+            name=table.name,
+            stem=table.stem,
+            suffix=table.suffix,
+            hash=table.hash,
+        )

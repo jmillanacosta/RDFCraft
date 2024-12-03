@@ -1,10 +1,6 @@
 from dataclasses import dataclass, field
 from enum import StrEnum
 
-from server.models.file_metadata import (
-    FileMetadata,
-)
-
 
 @dataclass(kw_only=True)
 class Literal:
@@ -20,6 +16,27 @@ class Literal:
     value: str
     datatype: str = ""
     language: str = ""
+
+    def to_dict(self):
+        return {
+            "value": self.value,
+            "datatype": self.datatype,
+            "language": self.language,
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        if "value" not in data:
+            raise ValueError("value is required")
+        if "datatype" not in data:
+            data["datatype"] = ""
+        if "language" not in data:
+            data["language"] = ""
+        return cls(
+            value=data["value"],
+            datatype=data["datatype"],
+            language=data["language"],
+        )
 
 
 class NamedNodeType(StrEnum):
@@ -62,6 +79,49 @@ class NamedNode:
     description: list[Literal]
     is_deprecated: bool
 
+    def to_dict(self):
+        return {
+            "belongs_to": self.belongs_to,
+            "type": self.type,
+            "full_uri": self.full_uri,
+            "label": [
+                label.to_dict() for label in self.label
+            ],
+            "description": [
+                desc.to_dict() for desc in self.description
+            ],
+            "is_deprecated": self.is_deprecated,
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        if "belongs_to" not in data:
+            raise ValueError("belongs_to is required")
+        if "type" not in data:
+            raise ValueError("type is required")
+        if "full_uri" not in data:
+            raise ValueError("full_uri is required")
+        if "label" not in data:
+            raise ValueError("label is required")
+        if "description" not in data:
+            raise ValueError("description is required")
+        if "is_deprecated" not in data:
+            data["is_deprecated"] = False
+        return cls(
+            belongs_to=data["belongs_to"],
+            type=data["type"],
+            full_uri=data["full_uri"],
+            label=[
+                Literal.from_dict(label)
+                for label in data["label"]
+            ],
+            description=[
+                Literal.from_dict(desc)
+                for desc in data["description"]
+            ],
+            is_deprecated=data["is_deprecated"],
+        )
+
 
 @dataclass(kw_only=True)
 class Individual(NamedNode):
@@ -80,6 +140,29 @@ class Individual(NamedNode):
             raise ValueError(
                 f"Individual must have type {NamedNodeType.INDIVIDUAL}"
             )
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "type": self.type,
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        return cls(
+            belongs_to=data["belongs_to"],
+            type=data["type"],
+            full_uri=data["full_uri"],
+            label=[
+                Literal.from_dict(label)
+                for label in data["label"]
+            ],
+            description=[
+                Literal.from_dict(desc)
+                for desc in data["description"]
+            ],
+            is_deprecated=data["is_deprecated"],
+        )
 
 
 @dataclass(kw_only=True)
@@ -101,6 +184,30 @@ class Class(NamedNode):
             raise ValueError(
                 f"Class must have type {NamedNodeType.CLASS}"
             )
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "super_classes": self.super_classes,
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        return cls(
+            belongs_to=data["belongs_to"],
+            type=data["type"],
+            full_uri=data["full_uri"],
+            label=[
+                Literal.from_dict(label)
+                for label in data["label"]
+            ],
+            description=[
+                Literal.from_dict(desc)
+                for desc in data["description"]
+            ],
+            is_deprecated=data["is_deprecated"],
+            super_classes=data["super_classes"],
+        )
 
 
 @dataclass(kw_only=True)
@@ -127,6 +234,34 @@ class Property(NamedNode):
                 f"Property must have type {NamedNodeType.PROPERTY}"
             )
 
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "property_type": self.property_type,
+            "range": self.range,
+            "domain": self.domain,
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        return cls(
+            belongs_to=data["belongs_to"],
+            type=data["type"],
+            full_uri=data["full_uri"],
+            label=[
+                Literal.from_dict(label)
+                for label in data["label"]
+            ],
+            description=[
+                Literal.from_dict(desc)
+                for desc in data["description"]
+            ],
+            is_deprecated=data["is_deprecated"],
+            property_type=data["property_type"],
+            range=data["range"],
+            domain=data["domain"],
+        )
+
 
 @dataclass(kw_only=True)
 class Ontology:
@@ -151,3 +286,47 @@ class Ontology:
     individuals: list[Individual]
     properties: list[Property]
     all_named_nodes: list[NamedNode]
+
+    def to_dict(self):
+        return {
+            "uuid": self.uuid,
+            "file_uuid": self.file_uuid,
+            "name": self.name,
+            "classes": [
+                cls.to_dict() for cls in self.classes
+            ],
+            "individuals": [
+                ind.to_dict() for ind in self.individuals
+            ],
+            "properties": [
+                prop.to_dict() for prop in self.properties
+            ],
+            "all_named_nodes": [
+                node.to_dict()
+                for node in self.all_named_nodes
+            ],
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        return cls(
+            uuid=data["uuid"],
+            file_uuid=data["file_uuid"],
+            name=data["name"],
+            classes=[
+                Class.from_dict(cls)
+                for cls in data["classes"]
+            ],
+            individuals=[
+                Individual.from_dict(ind)
+                for ind in data["individuals"]
+            ],
+            properties=[
+                Property.from_dict(prop)
+                for prop in data["properties"]
+            ],
+            all_named_nodes=[
+                NamedNode.from_dict(node)
+                for node in data["all_named_nodes"]
+            ],
+        )

@@ -1,4 +1,5 @@
 import unittest
+from pathlib import Path
 
 from rdflib import Graph
 
@@ -6,6 +7,7 @@ from server.models.ontology import (
     Class,
 )
 from server.utils.ontology_indexer import OntologyIndexer
+from server.utils.rdf_loader import RDFLoader
 
 """
 @prefix : <http://example.org/ontology#> .
@@ -65,10 +67,10 @@ class TestOntologyIndexer(unittest.TestCase):
     def setUp(self):
         self.indexer = OntologyIndexer()
         self.graph = Graph()
-        self.graph.parse(
-            "test/test_assets/test_ontology.ttl",
-            format="ttl",
-        )
+        self.bytes = Path(
+            "test/test_assets/test_ontology.ttl"
+        ).read_bytes()
+        self.graph = RDFLoader.load_rdf_bytes(self.bytes)
         self.ontology_uri = "http://example.org/ontology"
 
     def tearDown(self) -> None:

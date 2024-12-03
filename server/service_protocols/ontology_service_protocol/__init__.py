@@ -34,14 +34,14 @@ class OntologyServiceProtocol(Protocol):
         ...
 
     def create_ontology(
-        self, name: str, file_metadata: FileMetadata
+        self, name: str, content: bytes
     ) -> Ontology:
         """
         Create an ontology
 
         Parameters:
             name (str): Ontology name
-            file_metadata (FileMetadata): Ontology file metadata
+            content (bytes): Ontology content
         """
         ...
 

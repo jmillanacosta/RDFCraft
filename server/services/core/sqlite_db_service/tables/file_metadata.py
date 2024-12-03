@@ -1,4 +1,4 @@
-from sqlalchemy import ForeignKey, String
+from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from server.services.core.sqlite_db_service.base import (

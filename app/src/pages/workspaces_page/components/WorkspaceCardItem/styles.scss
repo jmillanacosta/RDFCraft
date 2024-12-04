@@ -1,7 +1,6 @@
 .workspace-card {
-  flex: 1;
+  width: calc(25% - 10px);
   max-height: fit-content;
-  min-width: 100%;
 }
 
 h5 {
@@ -14,10 +13,13 @@ p {
   overflow: hidden;
 }
 
-@media screen and (min-width: 768px) {
-  .workspace-card {
-    min-width: calc(768px / 3 - 20px);
-    max-width: calc(768px / 3 - 20px);
+@media (max-width: 768px) {
+  .workspace-card.bp5-card.bp5-elevation-2 {
+    width: calc(100% - 10px);
+  }
+  .workspaces-list {
+    flex-wrap: wrap;
+    justify-content: space-between;
   }
 }
 
@@ -28,5 +30,4 @@ p {
   & > *:not(:first-child) {
     margin-left: 10px;
   }
-  margin-top: 10px;
 }

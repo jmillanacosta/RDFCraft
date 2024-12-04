@@ -14,3 +14,4 @@ class OntologyTable(Base):
     )
     name: Mapped[str] = mapped_column(String)
     json_file_uuid: Mapped[str] = mapped_column(String)
+    ontology_file_uuid: Mapped[str] = mapped_column(String)

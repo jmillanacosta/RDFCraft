@@ -17,15 +17,14 @@
 .workspaces-list {
   display: flex;
   gap: 10px;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  align-content: flex-start;
-  flex-direction: column;
-  width: 100%;
   padding: 10px;
+
+  flex-wrap: wrap;
+  align-content: flex-start;
+  width: 100%;
 }
 
-@media only screen and (min-width: 768px) {
+@media (max-width: 768px) {
   .workspaces-list {
     flex-direction: row;
   }

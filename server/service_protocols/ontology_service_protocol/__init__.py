@@ -34,7 +34,7 @@ class OntologyServiceProtocol(Protocol):
         ...
 
     def create_ontology(
-        self, name: str, content: bytes
+        self, name: str, base_uri: str, content: bytes
     ) -> Ontology:
         """
         Create an ontology

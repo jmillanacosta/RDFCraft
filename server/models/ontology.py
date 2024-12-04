@@ -275,7 +275,6 @@ class Ontology:
         classes (list[Class]): The classes in the ontology
         individuals (list[Individual]): The individuals in the ontology
         properties (list[Property]): The properties in the ontology
-        all_named_nodes (list[NamedNode]): All named nodes in the ontology
 
     """
 
@@ -285,7 +284,6 @@ class Ontology:
     classes: list[Class]
     individuals: list[Individual]
     properties: list[Property]
-    all_named_nodes: list[NamedNode]
 
     def to_dict(self):
         return {
@@ -300,10 +298,6 @@ class Ontology:
             ],
             "properties": [
                 prop.to_dict() for prop in self.properties
-            ],
-            "all_named_nodes": [
-                node.to_dict()
-                for node in self.all_named_nodes
             ],
         }
 
@@ -324,9 +318,5 @@ class Ontology:
             properties=[
                 Property.from_dict(prop)
                 for prop in data["properties"]
-            ],
-            all_named_nodes=[
-                NamedNode.from_dict(node)
-                for node in data["all_named_nodes"]
             ],
         )

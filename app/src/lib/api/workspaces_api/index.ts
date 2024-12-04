@@ -8,7 +8,7 @@ class WorkspacesApi {
 
   public static async getWorkspaces(): Promise<WorkspaceMetadata[]> {
     const result = await this.getApiClient().callApi<WorkspaceMetadata[]>(
-      '/workspaces',
+      '/workspaces_metadata/',
       {
         method: 'GET',
         parser: data => data as WorkspaceMetadata[],
@@ -27,11 +27,14 @@ class WorkspacesApi {
   public static async createWorkspace(
     workspace: CreateWorkspaceMetadata,
   ): Promise<boolean> {
-    const result = await this.getApiClient().callApi<boolean>('/workspaces', {
-      method: 'POST',
-      body: workspace,
-      parser: () => true,
-    });
+    const result = await this.getApiClient().callApi<boolean>(
+      '/workspaces_metadata/',
+      {
+        method: 'POST',
+        body: workspace,
+        parser: () => true,
+      },
+    );
 
     if (result.type === 'success') {
       return result.data;
@@ -44,7 +47,7 @@ class WorkspacesApi {
 
   public static async deleteWorkspace(uuid: string): Promise<boolean> {
     const result = await this.getApiClient().callApi<boolean>(
-      `/workspaces/${uuid}`,
+      `/workspaces_metadata/${uuid}`,
       {
         method: 'DELETE',
         parser: () => true,

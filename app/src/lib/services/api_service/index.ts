@@ -2,14 +2,15 @@ import axios, { AxiosInstance } from 'axios';
 import { ApiCallOptions, ApiCallResult } from './types';
 
 class ApiService {
-  private baseUrl: string;
-  private client: AxiosInstance;
+  // @ts-expect-error - private
+  private readonly _baseUrl: string;
+  private readonly _client: AxiosInstance;
 
   private static instances: Record<string, ApiService> = {};
 
   private constructor(baseUrl: string) {
-    this.baseUrl = baseUrl;
-    this.client = axios.create({
+    this._baseUrl = baseUrl;
+    this._client = axios.create({
       baseURL: baseUrl,
     });
   }
@@ -35,7 +36,7 @@ class ApiService {
     options: ApiCallOptions<T>,
   ): Promise<ApiCallResult<T>> {
     try {
-      const response = await this.client.request({
+      const response = await this._client.request({
         url: endpoint,
         method: options.method,
         data: options.body,

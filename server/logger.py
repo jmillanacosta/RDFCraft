@@ -141,9 +141,9 @@ def setup_logging(
             )
             return
 
-        root_logger.error(
-            "Uncaught exception",
-            exc_info=(exc_type, exc_value, exc_traceback),
-        )
+        # root_logger.error(
+        #     "Uncaught exception",
+        #     exc_info=(exc_type, exc_value, exc_traceback),
+        # )
 
     sys.excepthook = handle_exception

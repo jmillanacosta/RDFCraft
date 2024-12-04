@@ -38,7 +38,7 @@ def start_fastapi():
 def on_closing():
     global thread
     if thread:
-        thread.join(timeout=10)
+        thread.join(timeout=0)
     os._exit(0)
 
 
@@ -58,6 +58,6 @@ if __name__ == "__main__":
             resizable=True,
         )
         window.events.closing += on_closing
+        webview._settings["debug"] = True
         webview.start()
-        # Send kill signal to server thread
-        thread.join()
+        

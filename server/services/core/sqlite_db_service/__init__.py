@@ -15,7 +15,7 @@ class DBService:
         self,
         APP_DIR: Path,
     ):
-        self._db_path = f"sqlite:///{(APP_DIR  / "db.sqlite").absolute()}"
+        self._db_path = f"sqlite:///{(APP_DIR / 'db.sqlite').absolute()}"
         if not APP_DIR.exists():
             APP_DIR.mkdir()
         self._engine = create_engine(

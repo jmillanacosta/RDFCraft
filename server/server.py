@@ -126,22 +126,23 @@ async def get_data():
     return {"message": "Hello from FastAPI!"}
 
 
-if DEBUG:
-    logger.info(
-        "Debug mode enabled, skipping window creation"
-    )
-    logger.info("Disabling CORS")
-    from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.cors import CORSMiddleware
 
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=["*"],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
-    logger.info("CORS disabled")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+logger.info("CORS disabled")
 
+
+app.include_router(
+    workspaces_router,
+    prefix="/api/workspaces_metadata",
+    tags=["workspaces_metadata"],
+)
 
 if not DEBUG:
     # Serve the React app
@@ -153,10 +154,3 @@ if not DEBUG:
         StaticFiles(directory=build_dir, html=True),
         name="static",
     )
-
-
-app.include_router(
-    workspaces_router,
-    prefix="/api/workspaces_metadata",
-    tags=["workspaces_metadata"],
-)

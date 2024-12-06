@@ -272,6 +272,8 @@ class Ontology:
         uuid (str): The UUID of the ontology
         file_uuid (str): The UUID of the file that the ontology is in
         name (str): The name of the ontology
+        description (str): The description of the ontology
+        base_uri (str): The base URI of the ontology
         classes (list[Class]): The classes in the ontology
         individuals (list[Individual]): The individuals in the ontology
         properties (list[Property]): The properties in the ontology
@@ -281,6 +283,8 @@ class Ontology:
     uuid: str
     file_uuid: str
     name: str
+    description: str
+    base_uri: str
     classes: list[Class]
     individuals: list[Individual]
     properties: list[Property]
@@ -290,6 +294,8 @@ class Ontology:
             "uuid": self.uuid,
             "file_uuid": self.file_uuid,
             "name": self.name,
+            "description": self.description,
+            "base_uri": self.base_uri,
             "classes": [
                 cls.to_dict() for cls in self.classes
             ],
@@ -307,6 +313,8 @@ class Ontology:
             uuid=data["uuid"],
             file_uuid=data["file_uuid"],
             name=data["name"],
+            description=data["description"],
+            base_uri=data["base_uri"],
             classes=[
                 Class.from_dict(cls)
                 for cls in data["classes"]

@@ -28,6 +28,7 @@ class OntologyIndexer:
     WHERE {{
         ?class a ?type .
         FILTER (?type = owl:Class || ?type = rdfs:Class)
+        FILTER (!isBlank(?class))
         OPTIONAL {{ ?class rdfs:label ?label }}
         OPTIONAL {{ ?class rdfs:comment ?description }}
         OPTIONAL {{ ?class owl:deprecated ?isDeprecated }}
@@ -39,6 +40,7 @@ class OntologyIndexer:
     SELECT DISTINCT ?superClass
     WHERE {{
         <___class_uri___> rdfs:subClassOf* ?superClass .
+        FILTER (!isBlank(?superClass)) .
     }}
     """
 
@@ -48,6 +50,7 @@ class OntologyIndexer:
     WHERE {{
         ?property a ?propertyType .
         FILTER (?propertyType = owl:ObjectProperty || ?propertyType = owl:DatatypeProperty || ?propertyType = owl:AnnotationProperty)
+        FILTER (!isBlank(?property))
         OPTIONAL {{ ?property rdfs:label ?label }}
         OPTIONAL {{ ?property rdfs:comment ?description }}
         OPTIONAL {{ ?property owl:deprecated ?isDeprecated }}
@@ -59,6 +62,7 @@ class OntologyIndexer:
     SELECT DISTINCT ?range
     WHERE {{
         <___property_uri___> rdfs:range ?range .
+        FILTER (!isBlank(?range)) .
     }}
     """
 
@@ -68,6 +72,7 @@ class OntologyIndexer:
     SELECT DISTINCT ?domain
     WHERE {{
         <___property_uri___> rdfs:domain ?domain .
+        FILTER (!isBlank(?domain)) .
     }}
     """
 
@@ -76,6 +81,7 @@ class OntologyIndexer:
     SELECT DISTINCT ?individual ?label ?description ?isDeprecated
     WHERE {{
         ?individual a owl:NamedIndividual .
+        FILTER (!isBlank(?individual))
         OPTIONAL {{ ?individual rdfs:label ?label }}
         OPTIONAL {{ ?individual rdfs:comment ?description }}
         OPTIONAL {{ ?individual owl:deprecated ?isDeprecated }}

@@ -10,6 +10,9 @@ from server.exceptions import ServerException
 from server.models.workspace_metadata import (
     WorkspaceMetadata,
 )
+from server.service_protocols.workspace_metadata_service_protocol import (
+    WorkspaceMetadataServiceProtocol,
+)
 from server.services.core.sqlite_db_service import DBService
 from server.services.core.sqlite_db_service.tables.workspace_metadata import (
     WorkspaceMetadataTable,
@@ -17,13 +20,45 @@ from server.services.core.sqlite_db_service.tables.workspace_metadata import (
 )
 
 
-@inject
-class WorkspaceMetadataService:
+@inject(alias=WorkspaceMetadataServiceProtocol)
+class WorkspaceMetadataService(
+    WorkspaceMetadataServiceProtocol
+):
     def __init__(self, db_service: DBService):
         self.logger = logging.getLogger(
             "rdfcraft.services.workspace_metadata_service"
         )
         self._db_service: DBService = db_service
+
+    def get_workspace_metadata(
+        self,
+        uuid: str,
+    ) -> WorkspaceMetadata:
+        self.logger.info(
+            f"Getting workspace metadata: {uuid}"
+        )
+        query: Select[Tuple[WorkspaceMetadataTable]] = (
+            select(WorkspaceMetadataTable)
+            .where(WorkspaceMetadataTable.uuid == uuid)
+            .limit(1)
+        )
+        with self._db_service.get_session() as session:
+            res: Result[Tuple[WorkspaceMetadataTable]] = (
+                session.execute(query)
+            )
+            item: (
+                Row[Tuple[WorkspaceMetadataTable]] | None
+            ) = res.one_or_none()
+            if item is None:
+                err_msg = f"Workspace metadata with uuid {uuid} not found"
+                self.logger.error(err_msg)
+                raise ServerException(
+                    err_msg,
+                    ErrCodes.WORKSPACE_METADATA_NOT_FOUND,
+                )
+            return WorkspaceMetadata.from_table(
+                item.tuple()[0]
+            )
 
     def get_workspaces(
         self,
@@ -46,17 +81,20 @@ class WorkspaceMetadataService:
         description: str,
         type: WorkspaceType,
         location: str,
-    ) -> None:
+    ) -> WorkspaceMetadata:
         self.logger.info(
             f"Creating workspace metadata for {name}"
         )
 
+        _uuid = uuid4().hex
         workspace_metadata = WorkspaceMetadata(
-            uuid=uuid4().hex,
+            uuid=_uuid,
             name=name,
             description=description,
             type=type,
-            location=location,
+            location=_uuid
+            if location is None or location == ""
+            else location,
             enabled_features=[],
         )
 
@@ -66,6 +104,7 @@ class WorkspaceMetadataService:
             self.logger.info(
                 f"Workspace metadata created: {workspace_metadata}"
             )
+            return workspace_metadata
 
     def update_workspace_metadata(
         self,

@@ -1,7 +1,8 @@
-from typing import Protocol
+from abc import ABC, abstractmethod
 
 
-class ConfigService(Protocol):
+class ConfigServiceProtocol(ABC):
+    @abstractmethod
     def get(self, key: str) -> str | None:
         """
         Get a value from the config
@@ -14,6 +15,7 @@ class ConfigService(Protocol):
         """
         ...
 
+    @abstractmethod
     def set(self, key: str, value: str):
         """
         Set a value in the config
@@ -24,6 +26,7 @@ class ConfigService(Protocol):
         """
         ...
 
+    @abstractmethod
     def delete(self, key: str):
         """
         Delete a value from the config

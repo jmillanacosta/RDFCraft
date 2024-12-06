@@ -1,4 +1,4 @@
-from typing import Protocol
+from abc import ABC, abstractmethod
 
 from server.models.file_metadata import (
     FileMetadata,
@@ -8,11 +8,12 @@ from server.models.ontology import (
 )
 
 
-class OntologyServiceProtocol(Protocol):
+class OntologyServiceProtocol(ABC):
     """
     Ontology service protocol
     """
 
+    @abstractmethod
     def get_ontology(self, ontology_id: str) -> Ontology:
         """
         Get ontology by id
@@ -22,6 +23,7 @@ class OntologyServiceProtocol(Protocol):
         """
         ...
 
+    @abstractmethod
     def get_ontologies(
         self, ids: list[str]
     ) -> list[Ontology]:
@@ -33,8 +35,13 @@ class OntologyServiceProtocol(Protocol):
         """
         ...
 
+    @abstractmethod
     def create_ontology(
-        self, name: str, base_uri: str, content: bytes
+        self,
+        name: str,
+        description: str,
+        base_uri: str,
+        content: bytes,
     ) -> Ontology:
         """
         Create an ontology
@@ -45,6 +52,7 @@ class OntologyServiceProtocol(Protocol):
         """
         ...
 
+    @abstractmethod
     def update_ontology(
         self,
         ontology_id: str,
@@ -61,6 +69,7 @@ class OntologyServiceProtocol(Protocol):
         """
         ...
 
+    @abstractmethod
     def delete_ontology(self, ontology_id: str) -> None:
         """
         Delete an ontology

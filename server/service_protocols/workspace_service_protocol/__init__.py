@@ -1,27 +1,31 @@
-from typing import Protocol
+from abc import ABC, abstractmethod
 
 from server.models.workspace import (
     WorkspaceModel,
 )
 
 
-class WorkspaceServiceProtocol(Protocol):
+class WorkspaceServiceProtocol(ABC):
     """
     Service for workspace operations
     """
 
-    def get_workspace(self, uuid: str) -> WorkspaceModel:
+    @abstractmethod
+    def get_workspace(
+        self, location: str
+    ) -> WorkspaceModel:
         """
-        Get a workspace by UUID
+        Get a workspace by location
 
         Args:
-            uuid (str): UUID of the workspace
+            location (str): location of the workspace
 
         Returns:
             WorkspaceModel: workspace
         """
         ...
 
+    @abstractmethod
     def create_workspace(
         self, workspace: WorkspaceModel
     ) -> None:
@@ -33,6 +37,7 @@ class WorkspaceServiceProtocol(Protocol):
         """
         ...
 
+    @abstractmethod
     def update_workspace(
         self, workspace: WorkspaceModel
     ) -> None:
@@ -44,11 +49,12 @@ class WorkspaceServiceProtocol(Protocol):
         """
         ...
 
-    def delete_workspace(self, uuid: str) -> None:
+    @abstractmethod
+    def delete_workspace(self, location: str) -> None:
         """
         Delete a workspace
 
         Args:
-            uuid (str): UUID of the workspace
+            location (str): location of the workspace
         """
         ...

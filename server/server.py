@@ -140,8 +140,8 @@ logger.info("CORS disabled")
 
 app.include_router(
     workspaces_router,
-    prefix="/api/workspaces_metadata",
-    tags=["workspaces_metadata"],
+    prefix="/api/workspaces",
+    tags=["workspaces"],
 )
 
 if not DEBUG:

@@ -2,22 +2,7 @@ import logging
 import sys
 
 import structlog
-from ddtrace import tracer
 from structlog.types import EventDict, Processor
-
-
-# https://github.com/hynek/structlog/issues/35#issuecomment-591321744
-def rename_event_key(
-    _, __, event_dict: EventDict
-) -> EventDict:
-    """
-    Log entries keep the text message in the `event` field, but Datadog
-    uses the `message` field. This processor moves the value from one field to
-    the other.
-    See https://github.com/hynek/structlog/issues/35#issuecomment-591321744
-    """
-    event_dict["message"] = event_dict.pop("event")
-    return event_dict
 
 
 def drop_color_message_key(
@@ -31,24 +16,6 @@ def drop_color_message_key(
     return event_dict
 
 
-def tracer_injection(
-    _, __, event_dict: EventDict
-) -> EventDict:
-    # get correlation ids from current tracer context
-    span = tracer.current_span()
-    trace_id, span_id = (
-        (span.trace_id, span.span_id)
-        if span
-        else (None, None)
-    )
-
-    # add ids to structlog event dictionary
-    event_dict["dd.trace_id"] = str(trace_id or 0)
-    event_dict["dd.span_id"] = str(span_id or 0)
-
-    return event_dict
-
-
 def setup_logging(
     json_logs: bool = False, log_level: str = "INFO"
 ):
@@ -57,13 +24,11 @@ def setup_logging(
     )
 
     shared_processors: list[Processor] = [
-        structlog.contextvars.merge_contextvars,
         structlog.stdlib.add_logger_name,
         structlog.stdlib.add_log_level,
         structlog.stdlib.PositionalArgumentsFormatter(),
         structlog.stdlib.ExtraAdder(),
         drop_color_message_key,
-        tracer_injection,
         timestamper,
         structlog.processors.StackInfoRenderer(),
     ]
@@ -71,7 +36,6 @@ def setup_logging(
     if json_logs:
         # We rename the `event` key to `message` only in JSON logs, as Datadog looks for the
         # `message` key but the pretty ConsoleRenderer looks for `event`
-        shared_processors.append(rename_event_key)
         # Format the exception only for JSON logs, as we want to pretty-print them when
         # using the ConsoleRenderer
         shared_processors.append(
@@ -141,9 +105,9 @@ def setup_logging(
             )
             return
 
-        # root_logger.error(
-        #     "Uncaught exception",
-        #     exc_info=(exc_type, exc_value, exc_traceback),
-        # )
+        root_logger.error(
+            "Uncaught exception",
+            exc_info=(exc_type, exc_value, exc_traceback),
+        )
 
     sys.excepthook = handle_exception

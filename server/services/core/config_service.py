@@ -1,14 +1,17 @@
 from kink import inject
 from sqlalchemy import delete
 
+from server.service_protocols.config_service_protocol import (
+    ConfigServiceProtocol,
+)
 from server.services.core.sqlite_db_service import DBService
 from server.services.core.sqlite_db_service.tables.config import (
     ConfigTable,
 )
 
 
-@inject
-class ConfigService:
+@inject(alias=ConfigServiceProtocol)
+class ConfigService(ConfigServiceProtocol):
     def __init__(self, db_service: DBService):
         self._db_service = db_service
 

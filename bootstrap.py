@@ -6,6 +6,9 @@ from pathlib import Path
 from dotenv import load_dotenv
 from kink import di
 
+from server.services.core.config_service import (
+    ConfigServiceProtocol,
+)
 from server.services.core.sqlite_db_service import (
     DBService,
 )
@@ -47,21 +50,17 @@ async def bootstrap():
     logger.info(f"System: {di['SYSTEM']}")
     logger.info(f"Architecture: {di['ARCH']}")
 
-    logger.info("Starting core services...")
+    logger.info("Initializing services")
+
+    import server.services  # noqa: F401 Reason: For DI to register services, they need to be imported
 
     # This is a hack to ensure that the DBService is initialized
     di[DBService].get_engine()
 
-    from server.services.core.config_service import (
-        ConfigService,
-    )
-
-    di[ConfigService].set("system", di["SYSTEM"])
-    di[ConfigService].set("arch", di["ARCH"])
-    di[ConfigService].set("app_dir", str(di["APP_DIR"]))
-
-    from server.services.core.workspace_metadata_service import (
-        WorkspaceMetadataService,  # noqa
+    di[ConfigServiceProtocol].set("system", di["SYSTEM"])
+    di[ConfigServiceProtocol].set("arch", di["ARCH"])
+    di[ConfigServiceProtocol].set(
+        "app_dir", str(di["APP_DIR"])
     )
 
     logger.info("Environment variables loaded")

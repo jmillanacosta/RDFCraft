@@ -5,7 +5,7 @@ from typing import Tuple
 from uuid import uuid4
 
 from kink import inject
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.engine.row import Row
 
 from server.const.err_enums import ErrCodes
@@ -13,12 +13,13 @@ from server.exceptions import ServerException
 from server.models.file_metadata import FileMetadataTable
 from server.service_protocols.fs_service_protocol import (
     FileMetadata,
+    FSServiceProtocol,
 )
 from server.services.core.sqlite_db_service import DBService
 
 
-@inject
-class LocalFSService:
+@inject(alias=FSServiceProtocol)
+class LocalFSService(FSServiceProtocol):
     def __init__(
         self, APP_DIR: Path, db_service: DBService
     ):
@@ -36,10 +37,13 @@ class LocalFSService:
         name: str,
         content: bytes,
         uuid: str | None = None,
+        allow_overwrite: bool = False,
     ) -> FileMetadata:
         self.logger.info(f"Uploading file {name}")
         with self._db_service.get_session() as session:
-            file_uuid = uuid if uuid else str(uuid4())
+            file_uuid = (
+                uuid if uuid is not None else uuid4().hex
+            )
             file_path = self._FILE_DIR / file_uuid
             stem, suffix = (
                 name.rsplit(".", 1)
@@ -47,7 +51,13 @@ class LocalFSService:
                 else (name, "")
             )
             file_hash = sha1(content).hexdigest()
-            file_path.write_bytes(content)
+            if file_path.exists():
+                if not allow_overwrite:
+                    raise ServerException(
+                        f"File with UUID {file_uuid} already exists",
+                        code=ErrCodes.FILE_EXISTS,
+                    )
+                file_path.unlink()
             model = FileMetadata(
                 uuid=file_uuid,
                 name=name,
@@ -55,14 +65,23 @@ class LocalFSService:
                 suffix=suffix,
                 hash=file_hash,
             )
-            session.add(model.to_table())
-            session.commit()
+            session.merge(model.to_table())
+            try:
+                file_path.write_bytes(content)
+            except Exception:
+                session.rollback()
+            else:
+                session.commit()
             return model
 
     def delete_file_with_uuid(self, uuid: str) -> None:
         self.logger.info(f"Deleting file with UUID {uuid}")
 
-        query = select(FileMetadata).filter(
+        query = select(FileMetadataTable).filter(
+            FileMetadataTable.uuid == uuid
+        )
+
+        delete_query = delete(FileMetadataTable).filter(
             FileMetadataTable.uuid == uuid
         )
 
@@ -83,7 +102,7 @@ class LocalFSService:
                     code=ErrCodes.FILE_NOT_FOUND,
                 )
             file_path.unlink()
-            session.delete(res)
+            session.execute(delete_query)
             session.commit()
 
     def download_file_with_uuid(self, uuid: str) -> bytes:

@@ -5,12 +5,15 @@ from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
 
+from server.service_protocols.db_service_protocol import (
+    DBServiceProtocol,
+)
 from server.services.core.sqlite_db_service.base import Base
 from server.services.core.sqlite_db_service.tables import *  # noqa: F403
 
 
-@inject
-class DBService:
+@inject(alias=DBServiceProtocol)
+class DBService(DBServiceProtocol):
     def __init__(
         self,
         APP_DIR: Path,
@@ -28,7 +31,7 @@ class DBService:
         db_service = cls.__new__(cls)
         db_service._db_path = connection_string
         db_service._engine = create_engine(
-            connection_string
+            connection_string,
         )
         Base.metadata.create_all(db_service._engine)
         return db_service

@@ -8,6 +8,7 @@ class ErrCodes(Enum):
     # FS Service
     FILE_NOT_FOUND = 0
     FILE_CORRUPTED = 1
+    FILE_EXISTS = 2
 
     # Workspace Metadata Service
     WORKSPACE_METADATA_NOT_FOUND = 20
@@ -16,3 +17,11 @@ class ErrCodes(Enum):
 
     # Ontology Service
     ONTOLOGY_NOT_FOUND = 40
+
+    # Workspace Service
+    WORKSPACE_NOT_FOUND = 60
+    PREFIX_NOT_FOUND = 61
+    PREFIX_EXISTS = 62
+
+    # DB Service
+    DB_ERROR = 80

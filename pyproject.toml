@@ -5,7 +5,7 @@ description = "A Python project for RDF crafting"
 authors = [
     { name = "Ensar Emir EROL", email = "ensar.erol@maastrichtuniversity.nl" }
 ]
-requires-python = "==3.11.10"
+requires-python = "==3.11.*"
 
 dependencies = [
     "annotated-types==0.7.0",

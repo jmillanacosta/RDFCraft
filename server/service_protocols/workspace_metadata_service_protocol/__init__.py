@@ -1,4 +1,4 @@
-from typing import Protocol
+from abc import ABC, abstractmethod
 
 from server.models.workspace_metadata import (
     WorkspaceMetadata,
@@ -8,11 +8,28 @@ from server.services.core.sqlite_db_service.tables.workspace_metadata import (
 )
 
 
-class WorkspaceMetadataService(Protocol):
+class WorkspaceMetadataServiceProtocol(ABC):
     """
     Service for metadata of workspaces
     """
 
+    @abstractmethod
+    def get_workspace_metadata(
+        self,
+        uuid: str,
+    ) -> WorkspaceMetadata:
+        """
+        Get workspace metadata
+
+        Args:
+            uuid (str): UUID of the workspace
+
+        Returns:
+            WorkspaceMetadataModel: workspace metadata
+        """
+        ...
+
+    @abstractmethod
     def get_workspaces(
         self,
     ) -> list[WorkspaceMetadata]:
@@ -24,13 +41,14 @@ class WorkspaceMetadataService(Protocol):
         """
         ...
 
+    @abstractmethod
     def create_workspace_metadata(
         self,
         name: str,
         description: str,
         type: WorkspaceType,
         location: str,
-    ) -> None:
+    ) -> WorkspaceMetadata:
         """
         Create workspace metadata
 
@@ -39,6 +57,7 @@ class WorkspaceMetadataService(Protocol):
         """
         ...
 
+    @abstractmethod
     def update_workspace_metadata(
         self,
         uuid: str,
@@ -54,6 +73,7 @@ class WorkspaceMetadataService(Protocol):
         """
         ...
 
+    @abstractmethod
     def delete_workspace_metadata(self, uuid: str) -> None:
         """
         Delete workspace metadata

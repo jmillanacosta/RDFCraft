@@ -31,9 +31,9 @@ class ApiService {
     return ApiService.instances[baseUrl];
   }
 
-  async callApi<T>(
+  async callApi<T, D = unknown>(
     endpoint: string,
-    options: ApiCallOptions<T>,
+    options: ApiCallOptions<T, D>,
   ): Promise<ApiCallResult<T>> {
     try {
       const response = await this._client.request({

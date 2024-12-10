@@ -9,13 +9,13 @@ interface ApiCallFailure {
   status: number;
 }
 
-interface ApiCallOptions<T> {
+interface ApiCallOptions<T, D = unknown> {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE';
   body?: object | string | FormData | null;
   headers?: Record<string, string>;
   queryParams?: Record<string, string>;
   isFormData?: boolean;
-  parser: (data: unknown) => T;
+  parser: (data: D) => T;
   timeout?: number;
 }
 

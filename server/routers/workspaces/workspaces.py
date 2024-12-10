@@ -15,17 +15,23 @@ from server.facades.workspace.delete_workspace_facade import (
 from server.facades.workspace.get_workspaces_facade import (
     GetWorkspacesFacade,
 )
-from server.facades.workspace.ontology.create_ontology_in_workspace import (
+from server.facades.workspace.ontology.create_ontology_in_workspace_facade import (
     CreateOntologyInWorkspaceFacade,
 )
-from server.facades.workspace.ontology.delete_ontology_from_workspace import (
+from server.facades.workspace.ontology.delete_ontology_from_workspace_facade import (
     DeleteOntologyFromWorkspaceFacade,
+)
+from server.facades.workspace.ontology.get_ontologies_in_workspace_facade import (
+    GetOntologyInWorkspaceFacade,
 )
 from server.facades.workspace.prefix.create_prefix_in_workspace_facade import (
     CreatePrefixInWorkspaceFacade,
 )
 from server.facades.workspace.prefix.delete_prefix_from_workspace_facade import (
     DeletePrefixFromWorkspaceFacade,
+)
+from server.facades.workspace.prefix.get_prefixes_in_workspace_facade import (
+    GetPrefixInWorkspaceFacade,
 )
 from server.models.workspace import WorkspaceModel
 from server.routers.models import BasicResponse
@@ -53,6 +59,11 @@ GetWorkspacesFacadeDep = Annotated[
     Depends(lambda: di[GetWorkspacesFacade]),
 ]
 
+GetPrefixInWorkspaceFacadeDep = Annotated[
+    GetPrefixInWorkspaceFacade,
+    Depends(lambda: di[GetPrefixInWorkspaceFacade]),
+]
+
 CreatePrefixInWorkspaceDep = Annotated[
     CreatePrefixInWorkspaceFacade,
     Depends(lambda: di[CreatePrefixInWorkspaceFacade]),
@@ -61,6 +72,11 @@ CreatePrefixInWorkspaceDep = Annotated[
 DeletePrefixFromWorkspaceDep = Annotated[
     DeletePrefixFromWorkspaceFacade,
     Depends(lambda: di[DeletePrefixFromWorkspaceFacade]),
+]
+
+GetOntologyInWorkspaceFacadeDep = Annotated[
+    GetOntologyInWorkspaceFacade,
+    Depends(lambda: di[GetOntologyInWorkspaceFacade]),
 ]
 
 CreateOntologyInWorkspaceDep = Annotated[
@@ -170,6 +186,38 @@ async def delete_workspace(
     )
 
 
+@router.get("/{workspace_id}/prefix")
+async def get_prefixes(
+    workspace_id: str,
+    get_prefix_in_workspace_facade: GetPrefixInWorkspaceFacadeDep,
+) -> dict[str, str]:
+    facade_response = (
+        get_prefix_in_workspace_facade.execute(
+            workspace_id=workspace_id,
+        )
+    )
+
+    if (
+        facade_response.status // 100 == 2
+        and facade_response.data
+    ):
+        return facade_response.data
+
+    if facade_response.data is None:
+        raise HTTPException(
+            status_code=404,
+            detail={
+                "status": 404,
+                "message": "Workspace not found",
+            },
+        )
+
+    raise HTTPException(
+        status_code=facade_response.status,
+        detail=facade_response.to_dict(),
+    )
+
+
 @router.post("/{workspace_id}/prefix", status_code=201)
 async def create_prefix(
     workspace_id: str,
@@ -211,6 +259,38 @@ async def delete_prefix(
     if facade_response.status // 100 == 2:
         return BasicResponse(
             message=facade_response.message,
+        )
+
+    raise HTTPException(
+        status_code=facade_response.status,
+        detail=facade_response.to_dict(),
+    )
+
+
+@router.get("/{workspace_id}/ontology")
+async def get_ontologies(
+    workspace_id: str,
+    get_ontology_in_workspace_facade: GetOntologyInWorkspaceFacadeDep,
+) -> list[dict[str, str]]:
+    facade_response = (
+        get_ontology_in_workspace_facade.execute(
+            workspace_id=workspace_id,
+        )
+    )
+
+    if (
+        facade_response.status // 100 == 2
+        and facade_response.data
+    ):
+        return facade_response.data
+
+    if facade_response.data is None:
+        raise HTTPException(
+            status_code=404,
+            detail={
+                "status": 404,
+                "message": "Workspace not found",
+            },
         )
 
     raise HTTPException(

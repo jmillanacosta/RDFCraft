@@ -4,8 +4,11 @@ import useWorkspacesPageState from './state';
 
 import CreateWorkspaceDialog from './components/CreateWorkspaceDialog';
 
+import { useNavigate } from 'react-router-dom';
 import DeleteAlert from '../../components/DeleteAlert';
-import { WorkspaceMetadata } from '../../lib/api/workspaces_api/types';
+import toast from '../../consts/toast';
+import useErrorToast from '../../hooks/useErrorToast';
+import { Workspace } from '../../lib/api/workspaces_api/types';
 import WorkspaceCardItem from './components/WorkspaceCardItem';
 import './styles.scss';
 
@@ -15,6 +18,7 @@ const WorkspacesPage = () => {
   const error = useWorkspacesPageState(state => state.error);
   const pull = useWorkspacesPageState(state => state.refreshWorkspaces);
   const create = useWorkspacesPageState(state => state.createWorkspace);
+  const navigate = useNavigate();
   const deleteWorkspace = useWorkspacesPageState(
     state => state.deleteWorkspace,
   );
@@ -25,25 +29,32 @@ const WorkspacesPage = () => {
     pull();
   }, [pull]);
 
-  const [toBeDeleted, setToBeDeleted] = useState<WorkspaceMetadata | null>(
-    null,
-  );
+  useErrorToast(error);
+
+  const [toBeDeleted, setToBeDeleted] = useState<Workspace | null>(null);
 
   const handleDelete = useCallback(
-    (workspace: WorkspaceMetadata) => {
+    (workspace: Workspace) => {
       deleteWorkspace(workspace);
+      toast.show({
+        message: 'Workspace deleted successfully',
+        intent: 'success',
+      });
     },
     [deleteWorkspace],
   );
 
-  const showDeleteAlert = useCallback((workspace: WorkspaceMetadata) => {
+  const showDeleteAlert = useCallback((workspace: Workspace) => {
     setToBeDeleted(workspace);
     setOpen('delete');
   }, []);
 
-  const handleOpen = useCallback((workspace: WorkspaceMetadata) => {
-    console.log('Opening workspace', workspace);
-  }, []);
+  const handleOpen = useCallback(
+    (workspace: Workspace) => {
+      navigate(`/workspaces/${workspace.uuid}`);
+    },
+    [navigate],
+  );
 
   return (
     <div>
@@ -65,6 +76,10 @@ const WorkspacesPage = () => {
         onConfirm={data => {
           create(data);
           setOpen(null);
+          toast.show({
+            message: 'Workspace created successfully',
+            intent: 'success',
+          });
         }}
       />
       <Navbar fixedToTop>

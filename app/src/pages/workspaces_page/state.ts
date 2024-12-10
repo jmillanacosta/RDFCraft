@@ -1,6 +1,6 @@
 import {
   CreateWorkspaceMetadata,
-  WorkspaceMetadata,
+  Workspace,
 } from '../../lib/api/workspaces_api/types';
 
 import { create } from 'zustand';
@@ -9,7 +9,7 @@ import WorkspacesApi from '../../lib/api/workspaces_api';
 import { ZustandActions } from '../../utils/zustand';
 
 interface WorkspacesPageState {
-  workspaces: WorkspaceMetadata[];
+  workspaces: Workspace[];
   isLoading: boolean;
   error: string | null;
 }
@@ -17,7 +17,7 @@ interface WorkspacesPageState {
 interface WorkspacesPageStateActions {
   createWorkspace: (workspace: CreateWorkspaceMetadata) => void;
   refreshWorkspaces: () => void;
-  deleteWorkspace: (workspace: WorkspaceMetadata) => void;
+  deleteWorkspace: (workspace: Workspace) => void;
 }
 
 const defaultState: WorkspacesPageState = {

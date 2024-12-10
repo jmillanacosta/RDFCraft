@@ -1,17 +1,17 @@
 import ApiService from '../../services/api_service';
-import { CreateWorkspaceMetadata, WorkspaceMetadata } from './types';
+import { CreateWorkspaceMetadata, Workspace } from './types';
 
 class WorkspacesApi {
   private static getApiClient(): ApiService {
     return ApiService.getInstance('default');
   }
 
-  public static async getWorkspaces(): Promise<WorkspaceMetadata[]> {
-    const result = await this.getApiClient().callApi<WorkspaceMetadata[]>(
-      '/workspaces_metadata/',
+  public static async getWorkspaces(): Promise<Workspace[]> {
+    const result = await this.getApiClient().callApi<Workspace[]>(
+      '/workspaces/',
       {
         method: 'GET',
-        parser: data => data as WorkspaceMetadata[],
+        parser: data => data as Workspace[],
       },
     );
 
@@ -24,17 +24,32 @@ class WorkspacesApi {
     );
   }
 
+  public static async getWorkspace(uuid: string): Promise<Workspace> {
+    const result = await this.getApiClient().callApi<Workspace>(
+      `/workspaces/${uuid}`,
+      {
+        method: 'GET',
+        parser: data => data as Workspace,
+      },
+    );
+
+    if (result.type === 'success') {
+      return result.data;
+    }
+
+    throw new Error(
+      `Failed to get workspace: ${result.message} (status: ${result.status})`,
+    );
+  }
+
   public static async createWorkspace(
     workspace: CreateWorkspaceMetadata,
   ): Promise<boolean> {
-    const result = await this.getApiClient().callApi<boolean>(
-      '/workspaces_metadata/',
-      {
-        method: 'POST',
-        body: workspace,
-        parser: () => true,
-      },
-    );
+    const result = await this.getApiClient().callApi<boolean>('/workspaces/', {
+      method: 'POST',
+      body: workspace,
+      parser: () => true,
+    });
 
     if (result.type === 'success') {
       return result.data;
@@ -47,7 +62,7 @@ class WorkspacesApi {
 
   public static async deleteWorkspace(uuid: string): Promise<boolean> {
     const result = await this.getApiClient().callApi<boolean>(
-      `/workspaces_metadata/${uuid}`,
+      `/workspaces/${uuid}`,
       {
         method: 'DELETE',
         parser: () => true,

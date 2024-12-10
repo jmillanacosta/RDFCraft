@@ -4,11 +4,16 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import WorkspacesPage from './pages/workspaces_page';
 
 import './index.scss';
+import WorkspacePage from './pages/workspace_page';
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <WorkspacesPage />,
+  },
+  {
+    path: '/workspaces/:uuid',
+    element: <WorkspacePage />,
   },
 ]);
 

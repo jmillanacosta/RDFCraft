@@ -1,12 +1,12 @@
 import { Button, Card, Divider, Elevation, H5 } from '@blueprintjs/core';
-import { WorkspaceMetadata } from '../../../../lib/api/workspaces_api/types';
+import { Workspace } from '../../../../lib/api/workspaces_api/types';
 
 import './styles.scss';
 
 interface WorkspaceCardItemProps {
-  workspace: WorkspaceMetadata;
-  onDelete: (workspace: WorkspaceMetadata) => void;
-  onOpen: (workspace: WorkspaceMetadata) => void;
+  workspace: Workspace;
+  onDelete: (workspace: Workspace) => void;
+  onOpen: (workspace: Workspace) => void;
 }
 
 const WorkspaceCardItem = ({

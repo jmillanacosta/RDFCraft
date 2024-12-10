@@ -1,0 +1,8 @@
+@use '@blueprintjs/core/lib/scss/variables' as bp-vars;
+
+.workspace-page {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+}

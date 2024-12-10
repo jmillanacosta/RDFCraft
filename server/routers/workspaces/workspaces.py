@@ -91,6 +91,42 @@ async def get_workspaces(
     )
 
 
+@router.get("/{workspace_id}")
+async def get_workspace(
+    workspace_id: str,
+    get_workspaces_facade: GetWorkspacesFacadeDep,
+) -> WorkspaceModel:
+    facade_response: FacadeResponse = (
+        get_workspaces_facade.execute(
+            uuid=workspace_id,
+        )
+    )
+
+    if (
+        facade_response.status // 100 == 2
+        and facade_response.data
+        and len(facade_response.data) == 1
+    ):
+        return facade_response.data[0]
+
+    if (
+        facade_response.data is None
+        or len(facade_response.data) == 0
+    ):
+        raise HTTPException(
+            status_code=404,
+            detail={
+                "status": 404,
+                "message": "Workspace not found",
+            },
+        )
+
+    raise HTTPException(
+        status_code=facade_response.status,
+        detail=facade_response.to_dict(),
+    )
+
+
 @router.post("/", status_code=201)
 async def create_workspace(
     input: CreateWorkspaceInput,

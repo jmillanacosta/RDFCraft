@@ -10,6 +10,7 @@ from asgi_correlation_id.context import correlation_id
 from ddtrace.contrib.asgi.middleware import TraceMiddleware
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request, Response
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from uvicorn.protocols.utils import (
     get_path_with_query_string,
@@ -125,8 +126,6 @@ if tracing_middleware is not None:
 async def get_data():
     return {"message": "Hello from FastAPI!"}
 
-
-from fastapi.middleware.cors import CORSMiddleware
 
 app.add_middleware(
     CORSMiddleware,

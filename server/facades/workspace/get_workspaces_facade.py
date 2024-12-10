@@ -28,6 +28,7 @@ class GetWorkspacesFacade(BaseFacade):
     @BaseFacade.error_wrapper
     def execute(
         self,
+        uuid: str | None = None,
     ) -> FacadeResponse:
         self.logger.info(
             "Retrieving all workspace metadata"
@@ -35,6 +36,13 @@ class GetWorkspacesFacade(BaseFacade):
         all_workspace_metadata = (
             self.workspace_metadata_service.get_workspaces()
         )
+
+        if uuid:
+            all_workspace_metadata = [
+                metadata
+                for metadata in all_workspace_metadata
+                if metadata.uuid == uuid
+            ]
 
         all_workspaces = [
             self.workspace_service.get_workspace(

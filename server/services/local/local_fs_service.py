@@ -1,4 +1,5 @@
 import logging
+import threading
 from hashlib import sha1
 from pathlib import Path
 from typing import Tuple
@@ -26,6 +27,7 @@ class LocalFSService(FSServiceProtocol):
         self.logger = logging.getLogger(__name__)
         self._FILE_DIR = APP_DIR / "files"
         self._db_service = db_service
+        self.mutexes: dict[str, threading.Lock] = {}
         if not self._FILE_DIR.exists():
             self.logger.info(
                 f"File directory {self._FILE_DIR} does not exist. Creating..."
@@ -44,34 +46,37 @@ class LocalFSService(FSServiceProtocol):
             file_uuid = (
                 uuid if uuid is not None else uuid4().hex
             )
-            file_path = self._FILE_DIR / file_uuid
-            stem, suffix = (
-                name.rsplit(".", 1)
-                if "." in name
-                else (name, "")
-            )
-            file_hash = sha1(content).hexdigest()
-            if file_path.exists():
-                if not allow_overwrite:
-                    raise ServerException(
-                        f"File with UUID {file_uuid} already exists",
-                        code=ErrCodes.FILE_EXISTS,
-                    )
-                file_path.unlink()
-            model = FileMetadata(
-                uuid=file_uuid,
-                name=name,
-                stem=stem,
-                suffix=suffix,
-                hash=file_hash,
-            )
-            session.merge(model.to_table())
-            try:
-                file_path.write_bytes(content)
-            except Exception:
-                session.rollback()
-            else:
-                session.commit()
+            if file_uuid not in self.mutexes:
+                self.mutexes[file_uuid] = threading.Lock()
+            with self.mutexes[file_uuid]:
+                file_path = self._FILE_DIR / file_uuid
+                stem, suffix = (
+                    name.rsplit(".", 1)
+                    if "." in name
+                    else (name, "")
+                )
+                file_hash = sha1(content).hexdigest()
+                if file_path.exists():
+                    if not allow_overwrite:
+                        raise ServerException(
+                            f"File with UUID {file_uuid} already exists",
+                            code=ErrCodes.FILE_EXISTS,
+                        )
+                    file_path.unlink()
+                model = FileMetadata(
+                    uuid=file_uuid,
+                    name=name,
+                    stem=stem,
+                    suffix=suffix,
+                    hash=file_hash,
+                )
+                session.merge(model.to_table())
+                try:
+                    file_path.write_bytes(content)
+                except Exception:
+                    session.rollback()
+                else:
+                    session.commit()
             return model
 
     def delete_file_with_uuid(self, uuid: str) -> None:

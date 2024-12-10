@@ -1,0 +1,29 @@
+.card-item {
+  width: calc(25% - 10px);
+  max-height: fit-content;
+}
+
+h5 {
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+p {
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .card-item.bp5-card.bp5-elevation-2 {
+    width: calc(100% - 10px);
+  }
+}
+
+.card-item-actions {
+  display: flex;
+  margin-top: auto;
+  justify-content: right;
+  & > *:not(:first-child) {
+    margin-left: 10px;
+  }
+}

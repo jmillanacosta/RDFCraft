@@ -99,6 +99,7 @@ const WorkspacesPage = () => {
           </ButtonGroup>
         </Navbar.Group>
       </Navbar>
+
       <div className='workspaces-content'>
         {workspaces.length === 0 && isLoading === false && (
           <div className='no-workspaces'>
@@ -117,7 +118,7 @@ const WorkspacesPage = () => {
           </div>
         )}
         {workspaces.length > 0 && (
-          <div className='workspaces-list'>
+          <div className='card-grid-4'>
             {workspaces.map(workspace => (
               <WorkspaceCardItem
                 key={workspace.uuid}

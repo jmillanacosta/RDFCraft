@@ -1,6 +1,7 @@
-import { Button, Card, Divider, Elevation, H5 } from '@blueprintjs/core';
 import { Workspace } from '../../../../lib/api/workspaces_api/types';
 
+import { Button } from '@blueprintjs/core';
+import CardItem from '../../../../components/CardItem';
 import './styles.scss';
 
 interface WorkspaceCardItemProps {
@@ -15,36 +16,40 @@ const WorkspaceCardItem = ({
   onOpen,
 }: WorkspaceCardItemProps) => {
   return (
-    <Card className='workspace-card' elevation={Elevation.TWO}>
-      <H5>{workspace.name}</H5>
-      <p>
-        <b>Type</b>:{' '}
-        {workspace.type.charAt(0).toUpperCase() + workspace.type.slice(1)}
-      </p>
-      <p>
-        <b>Description</b>: <br />
-        {workspace.description}
-      </p>
-      <p
-        style={
-          workspace.type === 'local'
-            ? { visibility: 'hidden' }
-            : { visibility: 'visible' }
-        }
-      >
-        <b>Connection String</b>: {workspace.location}
-      </p>
-
-      <Divider />
-      <div className='workspace-card-actions'>
-        <Button intent='danger' onClick={() => onDelete(workspace)}>
-          Delete
-        </Button>
-        <Button intent='primary' onClick={() => onOpen(workspace)}>
-          Open
-        </Button>
-      </div>
-    </Card>
+    <CardItem
+      title={workspace.name}
+      description={
+        <>
+          <p>
+            <b>Type</b>:{' '}
+            {workspace.type.charAt(0).toUpperCase() + workspace.type.slice(1)}
+          </p>
+          <p>
+            <b>Description</b>: <br />
+            {workspace.description}
+          </p>
+          <p
+            style={
+              workspace.type === 'local'
+                ? { visibility: 'hidden' }
+                : { visibility: 'visible' }
+            }
+          >
+            <b>Connection String</b>: {workspace.location}
+          </p>
+        </>
+      }
+      actions={
+        <>
+          <Button intent='danger' onClick={() => onDelete(workspace)}>
+            Delete
+          </Button>
+          <Button intent='primary' onClick={() => onOpen(workspace)}>
+            Open
+          </Button>
+        </>
+      }
+    />
   );
 };
 

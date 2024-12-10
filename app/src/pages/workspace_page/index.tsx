@@ -45,7 +45,14 @@ const WorkspacePage = () => {
         <Navbar.Group align='right'>
           <ButtonGroup>
             <Button icon='add-to-artifact'>Create New Mapping</Button>
-            <Button icon='search-around'>Ontologies and Prefixes</Button>
+            <Button
+              icon='search-around'
+              onClick={() => {
+                navigation('ontologies');
+              }}
+            >
+              Ontologies
+            </Button>
           </ButtonGroup>
         </Navbar.Group>
       </Navbar>

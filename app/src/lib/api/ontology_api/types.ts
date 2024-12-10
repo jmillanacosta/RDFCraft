@@ -64,7 +64,7 @@ interface Ontology {
   fileUuid: string;
   name: string;
   description: string;
-  baseUri: string;
+  base_uri: string;
   classes: OntologyClass[];
   individuals: Individual[];
   properties: Property[];

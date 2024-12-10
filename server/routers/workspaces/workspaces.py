@@ -197,20 +197,8 @@ async def get_prefixes(
         )
     )
 
-    if (
-        facade_response.status // 100 == 2
-        and facade_response.data
-    ):
-        return facade_response.data
-
-    if facade_response.data is None:
-        raise HTTPException(
-            status_code=404,
-            detail={
-                "status": 404,
-                "message": "Workspace not found",
-            },
-        )
+    if facade_response.status // 100 == 2:
+        return facade_response.data or {}
 
     raise HTTPException(
         status_code=facade_response.status,
@@ -271,27 +259,15 @@ async def delete_prefix(
 async def get_ontologies(
     workspace_id: str,
     get_ontology_in_workspace_facade: GetOntologyInWorkspaceFacadeDep,
-) -> list[dict[str, str]]:
+) -> list[dict]:
     facade_response = (
         get_ontology_in_workspace_facade.execute(
             workspace_id=workspace_id,
         )
     )
 
-    if (
-        facade_response.status // 100 == 2
-        and facade_response.data
-    ):
-        return facade_response.data
-
-    if facade_response.data is None:
-        raise HTTPException(
-            status_code=404,
-            detail={
-                "status": 404,
-                "message": "Workspace not found",
-            },
-        )
+    if facade_response.status // 100 == 2:
+        return facade_response.data or []
 
     raise HTTPException(
         status_code=facade_response.status,

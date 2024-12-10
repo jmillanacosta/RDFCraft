@@ -55,5 +55,8 @@ class GetOntologyInWorkspaceFacade(BaseFacade):
         return FacadeResponse(
             status=200,
             message="Ontologies retrieved",
-            data=ontologies,
+            data=[
+                ontology.to_dict()
+                for ontology in ontologies
+            ],
         )

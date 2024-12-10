@@ -7,3 +7,27 @@
 .bp5-dark {
   background-color: #293742;
 }
+
+.card-grid-4 {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .card-grid-4 {
+    flex-direction: row;
+  }
+}
+
+.error-callout {
+  margin-bottom: 10px;
+}
+
+.form-content-do-not-fill {
+  // Give width with font size
+  width: 10rem;
+}

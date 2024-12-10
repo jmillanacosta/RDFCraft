@@ -134,7 +134,8 @@ class LocalOntologyService(OntologyServiceProtocol):
             with self.db_service.get_session() as session:
                 result = session.execute(query).all()
 
-                for ontology_table in result:
+                for row in result:
+                    ontology_table = row[0]
                     file_bytes = self.fs_service.download_file_with_uuid(
                         ontology_table.json_file_uuid
                     )

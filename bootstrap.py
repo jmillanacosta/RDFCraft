@@ -17,7 +17,7 @@ from server.services.core.sqlite_db_service import (
 async def bootstrap():
     logger = logging.getLogger(__name__)
     logging.getLogger("sqlalchemy.engine").setLevel(
-        logging.INFO
+        logging.ERROR
     )
     logger.info("Bootstrapping...")
     load_dotenv()

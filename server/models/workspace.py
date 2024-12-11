@@ -17,7 +17,6 @@ class WorkspaceModel:
         type (WorkspaceType): type of the workspace
         location (str): location of the workspace
         enabled_features (list[str]): list of enabled features
-        sources (list[str]): ids of sources
         mappings (list[str]): ids of mappings
         ontologies (list[str]): ids of ontologies
         prefixes (dict[str, str]): prefixes
@@ -30,7 +29,6 @@ class WorkspaceModel:
     type: WorkspaceType
     location: str
     enabled_features: list[str]
-    sources: list[str]
     mappings: list[str]
     prefixes: dict[str, str]
     ontologies: list[str]
@@ -65,7 +63,6 @@ class WorkspaceModel:
             type=type,
             location=location,
             enabled_features=[],
-            sources=[],
             mappings=[],
             prefixes={},
             ontologies=[],
@@ -86,7 +83,6 @@ class WorkspaceModel:
             "type": self.type.value,
             "location": self.location,
             "enabled_features": self.enabled_features,
-            "sources": self.sources,
             "mappings": self.mappings,
             "prefixes": self.prefixes,
             "ontologies": self.ontologies,
@@ -111,7 +107,6 @@ class WorkspaceModel:
             type=WorkspaceType(data["type"]),
             location=data["location"],
             enabled_features=data["enabled_features"],
-            sources=data["sources"],
             mappings=data["mappings"],
             prefixes=data["prefixes"],
             ontologies=data["ontologies"],
@@ -125,7 +120,6 @@ class WorkspaceModel:
         type: WorkspaceType | None = None,
         location: str | None = None,
         enabled_features: list[str] | None = None,
-        sources: list[str] | None = None,
         mappings: list[str] | None = None,
         prefixes: dict[str, str] | None = None,
         ontologies: list[str] | None = None,
@@ -140,7 +134,6 @@ class WorkspaceModel:
             type (WorkspaceType): type of the workspace
             location (str): location of the workspace
             enabled_features (list[str]): list of enabled features
-            sources (list[str]): ids of sources
             mappings (list[str]): ids of mappings
             prefixes (dict[str, str]): prefixes
             ontologies (list[str]): ids of ontologies
@@ -163,9 +156,6 @@ class WorkspaceModel:
             enabled_features=enabled_features
             if enabled_features is not None
             else self.enabled_features,
-            sources=sources
-            if sources is not None
-            else self.sources,
             mappings=mappings
             if mappings is not None
             else self.mappings,

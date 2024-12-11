@@ -25,3 +25,11 @@ class ErrCodes(Enum):
 
     # DB Service
     DB_ERROR = 80
+
+    # Source Service
+    SOURCE_NOT_FOUND = 100
+    UNSUPPORTED_FILE_TYPE = 101
+    JSON_PATH_DATA_NOT_FOUND = 102
+    JSON_PATH_DATA_NOT_UNIQUE = 103
+    JSON_PATH_NOT_ARRAY = 104
+    JSON_PATH_NOT_PROVIDED = 105

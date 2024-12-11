@@ -33,7 +33,6 @@ const defaultState: OntologiesPageState = {
 const functions: ZustandActions<
   OntologiesPageStateActions,
   OntologiesPageState
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
 > = (set, get) => ({
   refreshOntologies(workspaceUuid: string) {
     set({ isLoading: 'Loading ontologies...' });
@@ -60,7 +59,7 @@ const functions: ZustandActions<
       data.file,
     )
       .then(() => {
-        set({ error: null });
+        get().refreshOntologies(workspaceUuid);
       })
       .catch(error => {
         if (error instanceof Error) {
@@ -75,7 +74,7 @@ const functions: ZustandActions<
     set({ isLoading: 'Deleting ontology...' });
     OntologyApi.deleteOntologyInWorkspace(workspaceUuid, ontologyUuid)
       .then(() => {
-        set({ error: null });
+        get().refreshOntologies(workspaceUuid);
       })
       .catch(error => {
         if (error instanceof Error) {

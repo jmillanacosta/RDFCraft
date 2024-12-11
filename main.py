@@ -10,7 +10,7 @@ from server.server import app
 
 load_dotenv()
 
-DEBUG = os.getenv("DEBUG")
+DEBUG = os.getenv("DEBUG", False)
 
 os.environ["DD_TRACE_ENABLED"] = os.getenv(
     "DD_TRACE_ENABLED", "false"
@@ -60,4 +60,3 @@ if __name__ == "__main__":
         window.events.closing += on_closing
         webview._settings["debug"] = True
         webview.start()
-        

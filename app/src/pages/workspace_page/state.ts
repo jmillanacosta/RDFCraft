@@ -24,8 +24,7 @@ const defaultState: WorkspacePageState = {
 const functions: ZustandActions<
   WorkspacePageStateActions,
   WorkspacePageState
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-> = (set, get) => ({
+> = set => ({
   loadWorkspace(uuid) {
     set({ isLoading: 'Loading workspace...' });
     WorkspacesApi.getWorkspace(uuid)

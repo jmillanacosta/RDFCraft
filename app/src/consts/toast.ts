@@ -1,6 +1,6 @@
 import { OverlayToaster } from '@blueprintjs/core';
 
-const toast = await OverlayToaster.createAsync({
+const toast = OverlayToaster.create({
   position: 'top',
 });
 

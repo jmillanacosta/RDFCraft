@@ -3,7 +3,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Button, ButtonGroup, Navbar, NonIdealState } from '@blueprintjs/core';
 import { useEffect, useState } from 'react';
 import DeleteAlert from '../../components/DeleteAlert';
-import toast from '../../consts/toast';
 import useErrorToast from '../../hooks/useErrorToast';
 import { Ontology } from '../../lib/api/ontology_api/types';
 import AddOntologyDialog from './components/AddOntologyDialog';
@@ -65,10 +64,6 @@ const OntologiesPage = () => {
             try {
               createOntology(uuid, data);
               refreshOntologies(uuid);
-              toast.show({
-                message: 'Ontology created',
-                intent: 'success',
-              });
             } catch {
               /* empty */
             }
@@ -97,7 +92,7 @@ const OntologiesPage = () => {
         <Navbar.Group align='right'>
           <ButtonGroup>
             <Button icon='add' onClick={() => setOpen('create')}>
-              Add new Ontology
+              Add Ontology
             </Button>
           </ButtonGroup>
         </Navbar.Group>
@@ -120,11 +115,11 @@ const OntologiesPage = () => {
             }
           />
         )}
-        <div className='card-grid-4'>
-          {ontologies &&
-            ontologies.length > 0 &&
-            ontologies.map(ontology => (
+        {ontologies && ontologies.length > 0 && (
+          <div className='card-grid-4'>
+            {ontologies.map(ontology => (
               <OntologyCardItem
+                key={ontology.uuid}
                 ontology={ontology}
                 onDelete={handleDelete}
                 onOpen={ontology => {
@@ -132,7 +127,8 @@ const OntologiesPage = () => {
                 }}
               />
             ))}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

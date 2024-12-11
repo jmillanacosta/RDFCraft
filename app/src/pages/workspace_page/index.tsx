@@ -53,6 +53,14 @@ const WorkspacePage = () => {
             >
               Ontologies
             </Button>
+            <Button
+              icon='link'
+              onClick={() => {
+                navigation('prefixes');
+              }}
+            >
+              Prefixes
+            </Button>
           </ButtonGroup>
         </Navbar.Group>
       </Navbar>

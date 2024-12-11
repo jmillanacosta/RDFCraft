@@ -5,6 +5,7 @@ import WorkspacesPage from './pages/workspaces_page';
 
 import './index.scss';
 import OntologiesPage from './pages/ontologies_page';
+import PrefixPage from './pages/prefixes_page';
 import WorkspacePage from './pages/workspace_page';
 
 const router = createBrowserRouter([
@@ -19,6 +20,10 @@ const router = createBrowserRouter([
   {
     path: '/workspaces/:uuid/ontologies',
     element: <OntologiesPage />,
+  },
+  {
+    path: '/workspaces/:uuid/prefixes',
+    element: <PrefixPage />,
   },
 ]);
 

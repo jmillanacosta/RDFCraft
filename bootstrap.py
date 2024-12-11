@@ -23,7 +23,7 @@ async def bootstrap():
     load_dotenv()
     logger.info("Loading environment variables")
 
-    _debug = getenv("DEBUG")
+    _debug = getenv("DEBUG", False)
 
     if _debug:
         logger.setLevel(logging.DEBUG)

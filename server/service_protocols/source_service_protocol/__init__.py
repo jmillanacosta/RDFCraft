@@ -31,7 +31,10 @@ class SourceServiceProtocol(ABC):
 
     @abstractmethod
     def create_source(
-        self, type: SourceType, content: bytes
+        self,
+        type: SourceType,
+        content: bytes,
+        extra: dict = {},
     ) -> str:
         """
         Create a new source

@@ -193,11 +193,15 @@ class MappingGraph:
 
     Attributes:
         uuid (str): The UUID of the graph
+        name (str): The name of the graph
+        description (str): The description of the graph
         nodes (list[MappingNode]): The nodes in the graph
         edges (list[MappingEdge]): The edges in the graph
     """
 
     uuid: str
+    name: str
+    description: str
     source_id: str
     nodes: list[
         MappingNode | MappingLiteral | MappingURIRef
@@ -207,6 +211,8 @@ class MappingGraph:
     def to_dict(self):
         return {
             "uuid": self.uuid,
+            "name": self.name,
+            "description": self.description,
             "source_id": self.source_id,
             "nodes": [
                 node.to_dict() for node in self.nodes
@@ -220,6 +226,10 @@ class MappingGraph:
     def from_dict(cls, data):
         if "uuid" not in data:
             raise ValueError("uuid is required")
+        if "name" not in data:
+            raise ValueError("name is required")
+        if "description" not in data:
+            raise ValueError("description is required")
         if "source_id" not in data:
             raise ValueError("source_id is required")
         if "nodes" not in data:
@@ -228,6 +238,8 @@ class MappingGraph:
             raise ValueError("edges is required")
         return cls(
             uuid=data["uuid"],
+            name=data["name"],
+            description=data["description"],
             source_id=data["source_id"],
             nodes=[
                 MappingNode.from_dict(node)

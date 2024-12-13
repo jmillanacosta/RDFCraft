@@ -8,6 +8,9 @@ from server.services.core.workspace_metadata_service import (
 from server.services.local.local_fs_service import (
     LocalFSService,
 )
+from server.services.local.local_mapping_service import (
+    LocalMappingService,
+)
 from server.services.local.local_ontology_service import (
     LocalOntologyService,
 )
@@ -26,4 +29,5 @@ __all__ = [
     "LocalFSService",
     "LocalOntologyService",
     "LocalSourceService",
+    "LocalMappingService",
 ]

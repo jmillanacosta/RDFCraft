@@ -4,6 +4,7 @@ from pydantic import (
     HttpUrl,
 )
 
+from server.models.source import SourceType
 from server.services.core.sqlite_db_service.tables.workspace_metadata import (
     WorkspaceType,
 )
@@ -31,3 +32,11 @@ class CreateOntologyInput(BaseModel):
     description: str
     base_uri: HttpUrl
     content: Base64UrlStr
+
+
+class CreateMappingInput(BaseModel):
+    name: str
+    description: str
+    content: Base64UrlStr
+    source_type: SourceType
+    extra: dict = {}

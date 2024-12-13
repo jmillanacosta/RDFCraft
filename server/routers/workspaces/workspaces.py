@@ -15,6 +15,18 @@ from server.facades.workspace.delete_workspace_facade import (
 from server.facades.workspace.get_workspaces_facade import (
     GetWorkspacesFacade,
 )
+from server.facades.workspace.mapping.create_mapping_in_workspace_facade import (
+    CreateMappingInWorkspaceFacade,
+)
+from server.facades.workspace.mapping.delete_mapping_from_workspace_facade import (
+    DeleteMappingFromWorkspaceFacade,
+)
+from server.facades.workspace.mapping.get_mappings_in_workspace_facade import (
+    GetMappingsInWorkspaceFacade,
+)
+from server.facades.workspace.mapping.update_mapping_facade import (
+    UpdateMappingFacade,
+)
 from server.facades.workspace.ontology.create_ontology_in_workspace_facade import (
     CreateOntologyInWorkspaceFacade,
 )
@@ -33,9 +45,11 @@ from server.facades.workspace.prefix.delete_prefix_from_workspace_facade import 
 from server.facades.workspace.prefix.get_prefixes_in_workspace_facade import (
     GetPrefixInWorkspaceFacade,
 )
+from server.models.mapping import MappingGraph
 from server.models.workspace import WorkspaceModel
 from server.routers.models import BasicResponse
 from server.routers.workspaces.models import (
+    CreateMappingInput,
     CreateOntologyInput,
     CreatePrefixInput,
     CreateWorkspaceInput,
@@ -87,6 +101,26 @@ CreateOntologyInWorkspaceDep = Annotated[
 DeleteOntologyFromWorkspaceDep = Annotated[
     DeleteOntologyFromWorkspaceFacade,
     Depends(lambda: di[DeleteOntologyFromWorkspaceFacade]),
+]
+
+CreateMappingInWorkspaceDep = Annotated[
+    CreateMappingInWorkspaceFacade,
+    Depends(lambda: di[CreateMappingInWorkspaceFacade]),
+]
+
+DeleteMappingFromWorkspaceDep = Annotated[
+    DeleteMappingFromWorkspaceFacade,
+    Depends(lambda: di[DeleteMappingFromWorkspaceFacade]),
+]
+
+GetMappingsInWorkspaceDep = Annotated[
+    GetMappingsInWorkspaceFacade,
+    Depends(lambda: di[GetMappingsInWorkspaceFacade]),
+]
+
+UpdateMappingDep = Annotated[
+    UpdateMappingFacade,
+    Depends(lambda: di[UpdateMappingFacade]),
 ]
 
 
@@ -313,6 +347,100 @@ async def delete_ontology(
             workspace_id=workspace_id,
             ontology_id=ontology_id,
         )
+    )
+
+    if facade_response.status // 100 == 2:
+        return BasicResponse(
+            message=facade_response.message,
+        )
+
+    raise HTTPException(
+        status_code=facade_response.status,
+        detail=facade_response.to_dict(),
+    )
+
+
+@router.get("/{workspace_id}/mapping")
+async def get_mappings(
+    workspace_id: str,
+    get_mappings_in_workspace_facade: GetMappingsInWorkspaceDep,
+) -> list[MappingGraph]:
+    facade_response = (
+        get_mappings_in_workspace_facade.execute(
+            workspace_id=workspace_id,
+        )
+    )
+
+    if facade_response.status // 100 == 2:
+        return facade_response.data or []
+
+    raise HTTPException(
+        status_code=facade_response.status,
+        detail=facade_response.to_dict(),
+    )
+
+
+@router.post("/{workspace_id}/mapping", status_code=201)
+async def create_mapping(
+    workspace_id: str,
+    data: CreateMappingInput,
+    create_mapping_in_workspace_facade: CreateMappingInWorkspaceDep,
+) -> BasicResponse:
+    facade_response = (
+        create_mapping_in_workspace_facade.execute(
+            workspace_id=workspace_id,
+            name=data.name,
+            description=data.description,
+            source_content=data.content.encode(),
+            source_type=data.source_type,
+            extra=data.extra,
+        )
+    )
+
+    if facade_response.status // 100 == 2:
+        return BasicResponse(
+            message=facade_response.message,
+        )
+
+    raise HTTPException(
+        status_code=facade_response.status,
+        detail=facade_response.to_dict(),
+    )
+
+
+@router.delete("/{workspace_id}/mapping/{mapping_id}")
+async def delete_mapping(
+    workspace_id: str,
+    mapping_id: str,
+    delete_mapping_from_workspace_facade: DeleteMappingFromWorkspaceDep,
+) -> BasicResponse:
+    facade_response = (
+        delete_mapping_from_workspace_facade.execute(
+            workspace_id=workspace_id,
+            mapping_id=mapping_id,
+        )
+    )
+
+    if facade_response.status // 100 == 2:
+        return BasicResponse(
+            message=facade_response.message,
+        )
+
+    raise HTTPException(
+        status_code=facade_response.status,
+        detail=facade_response.to_dict(),
+    )
+
+
+@router.put("/{workspace_id}/mapping/{mapping_id}")
+async def update_mapping(
+    mapping_id: str,
+    data: MappingGraph,
+    update_mapping_facade: UpdateMappingDep,
+) -> BasicResponse:
+    facade_response = update_mapping_facade.execute(
+        mapping_id=mapping_id,
+        mapping_graph=data,
     )
 
     if facade_response.status // 100 == 2:

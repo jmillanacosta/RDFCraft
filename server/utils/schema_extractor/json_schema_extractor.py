@@ -2,7 +2,8 @@ import json
 from io import BytesIO
 
 from kink import inject
-from utils.schema_extractor.i_schema_extractor import (
+
+from server.utils.schema_extractor.i_schema_extractor import (
     ISchemaExtractor,
 )
 
@@ -11,7 +12,7 @@ from utils.schema_extractor.i_schema_extractor import (
 class JSONSchemaExtractor(ISchemaExtractor):
     def __init__(
         self,
-        temp_storage: str,
+        TEMP_DIR: str,
     ):
         super().__init__("JSON Schema Extractor", ["json"])
 

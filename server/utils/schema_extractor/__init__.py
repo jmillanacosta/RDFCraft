@@ -1,12 +1,12 @@
 from kink import inject
 
-from utils.schema_extractor.i_schema_extractor import (
+from server.utils.schema_extractor.i_schema_extractor import (
     ISchemaExtractor,
 )
-from utils.schema_extractor.json_schema_extractor import (
+from server.utils.schema_extractor.json_schema_extractor import (
     JSONSchemaExtractor,  # noqa: F401
 )
-from utils.schema_extractor.tabular_schema_extractor import (
+from server.utils.schema_extractor.tabular_schema_extractor import (
     TabularSchemaExtractor,  # noqa: F401
 )
 

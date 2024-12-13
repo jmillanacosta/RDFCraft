@@ -46,6 +46,7 @@ from server.facades.workspace.prefix.get_prefixes_in_workspace_facade import (
     GetPrefixInWorkspaceFacade,
 )
 from server.models.mapping import MappingGraph
+from server.models.ontology import Ontology
 from server.models.workspace import WorkspaceModel
 from server.routers.models import BasicResponse
 from server.routers.workspaces.models import (
@@ -293,7 +294,7 @@ async def delete_prefix(
 async def get_ontologies(
     workspace_id: str,
     get_ontology_in_workspace_facade: GetOntologyInWorkspaceFacadeDep,
-) -> list[dict]:
+) -> list[Ontology]:
     facade_response = (
         get_ontology_in_workspace_facade.execute(
             workspace_id=workspace_id,

@@ -12,18 +12,14 @@ const PrefixCardItem = ({ prefix, onDelete }: PrefixCardItemProps) => {
     <CardItem
       title={prefix.prefix}
       description={
-        <>
-          <p>
-            <b>URI</b>: {prefix.uri}
-          </p>
-        </>
+        <p>
+          <b>URI</b>: {prefix.uri}
+        </p>
       }
       actions={
-        <>
-          <Button intent='danger' onClick={() => onDelete(prefix)}>
-            Delete
-          </Button>
-        </>
+        <Button intent='danger' onClick={() => onDelete(prefix)}>
+          Delete
+        </Button>
       }
     />
   );

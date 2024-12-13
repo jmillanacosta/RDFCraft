@@ -43,6 +43,8 @@ async def bootstrap():
         f"Application directory set to {di['APP_DIR']}"
     )
 
+    di["TEMP_DIR"] = di["APP_DIR"] / "temp"
+
     # Detecting system and architecture for later use
     di["SYSTEM"] = platform.system()
     di["ARCH"] = platform.machine()

@@ -2,21 +2,34 @@ import { Workspace } from '../../lib/api/workspaces_api/types';
 
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
+import MappingService from '../../lib/api/mapping_service';
+import { MappingGraph } from '../../lib/api/mapping_service/types';
 import WorkspacesApi from '../../lib/api/workspaces_api';
 import { ZustandActions } from '../../utils/zustand';
 
 interface WorkspacePageState {
   workspace: Workspace | null;
+  mappingGraphs: MappingGraph[];
   isLoading: string | null; // If the value is null, it means that the data is not being loaded, otherwise it will contain the loading message
   error: string | null;
 }
 
 interface WorkspacePageStateActions {
-  loadWorkspace: (uuid: string) => void;
+  loadWorkspace: (uuid: string) => Promise<void>;
+  createMapping: (
+    workspaceUuid: string,
+    name: string,
+    description: string,
+    content: File,
+    sourceType: 'csv' | 'json',
+    extra: Record<string, unknown>,
+  ) => Promise<void>;
+  deleteMapping: (workspaceUuid: string, mappingUuid: string) => Promise<void>;
 }
 
 const defaultState: WorkspacePageState = {
   workspace: null,
+  mappingGraphs: [],
   isLoading: null,
   error: null,
 };
@@ -25,20 +38,66 @@ const functions: ZustandActions<
   WorkspacePageStateActions,
   WorkspacePageState
 > = set => ({
-  loadWorkspace(uuid) {
+  async loadWorkspace(uuid) {
     set({ isLoading: 'Loading workspace...' });
-    WorkspacesApi.getWorkspace(uuid)
-      .then(workspace => {
-        set({ workspace, error: null });
-      })
-      .catch(error => {
-        if (error instanceof Error) {
-          set({ error: error.message });
-        }
-      })
-      .finally(() => {
-        set({ isLoading: null });
-      });
+    try {
+      const workspacePromise = WorkspacesApi.getWorkspace(uuid);
+      const mappingGraphsPromise = await MappingService.getMappingsInWorkspace(
+        uuid,
+      );
+      // Wait for all the promises to resolve
+      const [workspace, mappingGraphs] = await Promise.all([
+        workspacePromise,
+        mappingGraphsPromise,
+      ]);
+      set({ workspace, mappingGraphs, error: null });
+    } catch (error) {
+      if (error instanceof Error) {
+        set({ error: error.message });
+      }
+    } finally {
+      set({ isLoading: null });
+    }
+  },
+  async createMapping(
+    workspaceUuid,
+    name,
+    description,
+    content,
+    sourceType,
+    extra,
+  ) {
+    set({ isLoading: 'Creating mapping...' });
+    try {
+      await MappingService.createMappingInWorkspace(
+        workspaceUuid,
+        name,
+        description,
+        content,
+        sourceType,
+        extra,
+      );
+      await this.loadWorkspace(workspaceUuid);
+    } catch (error) {
+      if (error instanceof Error) {
+        set({ error: error.message });
+      }
+    } finally {
+      set({ isLoading: null, error: null });
+    }
+  },
+  async deleteMapping(workspaceUuid, mappingUuid) {
+    set({ isLoading: 'Deleting mapping...' });
+    try {
+      await MappingService.deleteMappingInWorkspace(workspaceUuid, mappingUuid);
+      await this.loadWorkspace(workspaceUuid);
+    } catch (error) {
+      if (error instanceof Error) {
+        set({ error: error.message });
+      }
+    } finally {
+      set({ isLoading: null, error: null });
+    }
   },
 });
 

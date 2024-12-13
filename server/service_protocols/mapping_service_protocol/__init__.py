@@ -58,13 +58,3 @@ class MappingServiceProtocol(ABC):
             None
         """
         pass
-
-    @abstractmethod
-    def list_mappings(self) -> list[str]:
-        """
-        List all mappings
-
-        Returns:
-            list[str]: List of mapping IDs
-        """
-        pass

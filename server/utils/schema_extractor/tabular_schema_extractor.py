@@ -1,9 +1,9 @@
 from io import BytesIO
-from kink import inject
 
 import pandas as pd
+from kink import inject
 
-from utils.schema_extractor.i_schema_extractor import (
+from server.utils.schema_extractor.i_schema_extractor import (
     ISchemaExtractor,
 )
 
@@ -12,7 +12,7 @@ from utils.schema_extractor.i_schema_extractor import (
 class TabularSchemaExtractor(ISchemaExtractor):
     def __init__(
         self,
-        temp_storage: str,
+        TEMP_DIR: str,
     ):
         super().__init__(
             "Tabular Schema Extractor",

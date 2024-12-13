@@ -19,6 +19,10 @@ class LocalWorkspaceService(
         self.logger = logging.getLogger(__name__)
         self._fs_service: LocalFSService = fs_service
 
+        self.logger.info(
+            "LocalWorkspaceService initialized"
+        )
+
     def get_workspace(
         self, location: str
     ) -> WorkspaceModel:

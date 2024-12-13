@@ -40,6 +40,8 @@ class LocalOntologyService(OntologyServiceProtocol):
         self.fs_service: FSServiceProtocol = fs_service
         self.db_service: DBService = db_service
 
+        self.logger.info("LocalOntologyService initialized")
+
     def _get_from_ontology_table(
         self, ontology_id: str
     ) -> OntologyTable | None:

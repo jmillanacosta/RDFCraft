@@ -28,6 +28,8 @@ class LocalSourceService(SourceServiceProtocol):
         self.fs_service = fs_service
         self.logger = logging.getLogger(__name__)
 
+        self.logger.info("LocalSourceService initialized")
+
     def get_source(self, source_id: str) -> Source:
         self.logger.info(f"Getting source {source_id}")
 

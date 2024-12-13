@@ -30,6 +30,10 @@ class WorkspaceMetadataService(
         )
         self._db_service: DBService = db_service
 
+        self.logger.info(
+            "WorkspaceMetadataService initialized"
+        )
+
     def get_workspace_metadata(
         self,
         uuid: str,

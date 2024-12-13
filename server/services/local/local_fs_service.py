@@ -34,6 +34,10 @@ class LocalFSService(FSServiceProtocol):
             )
             self._FILE_DIR.mkdir()
 
+        self.logger.info(
+            f"LocalFSService initialized with file directory {self._FILE_DIR}"
+        )
+
     def upload_file(
         self,
         name: str,

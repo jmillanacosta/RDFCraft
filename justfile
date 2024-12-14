@@ -14,10 +14,23 @@ package-mac: install-dev
     @echo "Packaging for macOS..."
     rm -rf build dist public
     npm run frontend:prod
+    uv sync
     uv run nuitka \
     --standalone \
     --output-dir=dist \
     --include-data-dir=public=public \
     --macos-create-app-bundle \
     --enable-console \
+    main.py
+
+package-win: install-dev
+    @echo "Packaging for Windows..."
+    rm -rf build dist public
+    npm run frontend:prod
+    uv sync
+    .venv/Scripts/python -m nuitka \
+    --standalone \
+    --output-dir=dist \
+    --include-data-dir=public=public \
+    --windows-disable-console \
     main.py

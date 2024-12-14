@@ -63,7 +63,6 @@ const OntologiesPage = () => {
           if (uuid) {
             try {
               createOntology(uuid, data);
-              refreshOntologies(uuid);
             } catch {
               /* empty */
             }

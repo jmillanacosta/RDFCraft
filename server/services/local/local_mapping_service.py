@@ -1,5 +1,6 @@
 import json
 import logging
+from uuid import uuid4
 
 from kink import inject
 
@@ -87,13 +88,24 @@ class LocalMappingService(MappingServiceProtocol):
             f"Mapping {mapping_id} updated successfully"
         )
 
-    def create_mapping(self, graph: MappingGraph) -> str:
+    def create_mapping(
+        self, name: str, description: str, source_uuid: str
+    ) -> str:
+        graph = MappingGraph(
+            uuid=uuid4().hex,
+            name=name,
+            description=description,
+            source_id=source_uuid,
+            nodes=[],
+            edges=[],
+        )
         self.logger.info(f"Creating mapping {graph.uuid}")
         self._fs_service.upload_file(
-            graph.uuid,
+            graph.name,
             json.dumps(graph.to_dict()).encode(
                 "utf-8",
             ),
+            graph.uuid,
         )
 
         self.logger.info(

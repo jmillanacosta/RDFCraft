@@ -49,10 +49,20 @@ class LocalWorkspaceService(
                     f"Workspace at {location} not found",
                     code=ErrCodes.WORKSPACE_NOT_FOUND,
                 )
-            self.logger.error(
-                f"Failed to get workspace at {location}"
-            )
-            raise e
+            if e.code == ErrCodes.FILE_CORRUPTED:
+                self.logger.error(
+                    f"Workspace at {location} is corrupted, hash mismatch, ignoring"
+                )
+                raise ServerException(
+                    f"Workspace at {location} is corrupted, hash mismatch",
+                    code=ErrCodes.FILE_CORRUPTED,
+                )
+
+            else:
+                self.logger.error(
+                    f"Failed to get workspace at {location}"
+                )
+                raise e
 
         except Exception as e:
             self.logger.error(

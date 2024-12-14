@@ -1,12 +1,9 @@
-from uuid import uuid4
-
 from kink import inject
 
 from server.facades import (
     BaseFacade,
     FacadeResponse,
 )
-from server.models.mapping import MappingGraph
 from server.models.source import SourceType
 from server.service_protocols.mapping_service_protocol import (
     MappingServiceProtocol,
@@ -72,27 +69,24 @@ class CreateMappingInWorkspaceFacade(BaseFacade):
             extra=extra,
         )
         self.logger.info("Creating mapping")
-        mapping_graph_uuid = uuid4().hex
-        mapping_graph = MappingGraph(
-            uuid=mapping_graph_uuid,
-            name=name,
-            description=description,
-            source_id=source,
-            nodes=[],
-            edges=[],
+        mapping_graph_uuid = (
+            self.mapping_service.create_mapping(
+                name=name,
+                description=description,
+                source_uuid=source,
+            )
         )
-        self.mapping_service.create_mapping(mapping_graph)
         self.logger.info("Mapping created")
-        workspace.copy_with(
+        new_model = workspace.copy_with(
             mappings=workspace.mappings
             + [mapping_graph_uuid],
         )
         self.workspace_service.update_workspace(
-            workspace,
+            new_model,
         )
         self.logger.info("Workspace updated")
         return FacadeResponse(
             status=202,
             message="Mapping created",
-            data=mapping_graph,
+            data=mapping_graph_uuid,
         )

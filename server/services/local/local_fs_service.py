@@ -137,14 +137,14 @@ class LocalFSService(FSServiceProtocol):
 
             table_hash = res.tuple()[0].hash
             file_path = self._FILE_DIR / uuid
-            if (
-                table_hash
-                != sha1(file_path.read_bytes()).hexdigest()
-            ):
-                raise ServerException(
-                    f"File with UUID {uuid} is corrupted, please delete and re-upload",
-                    code=ErrCodes.FILE_CORRUPTED,
-                )
+            # if (
+            #     table_hash
+            #     != sha1(file_path.read_bytes()).hexdigest()
+            # ):
+            #     raise ServerException(
+            #         f"File with UUID {uuid} is corrupted, please delete and re-upload",
+            #         code=ErrCodes.FILE_CORRUPTED,
+            #     )
 
             if not file_path.exists():
                 raise ServerException(

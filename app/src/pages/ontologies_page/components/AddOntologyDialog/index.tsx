@@ -95,7 +95,11 @@ const AddOntologyDialog = (props: AddOntologyDialogProps) => {
           </FormGroup>
           <FormGroup label='File' labelFor='file' labelInfo='(required)'>
             <FileInput
-              text={file?.name || 'Choose file...'}
+              inputProps={{
+                accept:
+                  '.json,.ttl,.rdf,.nt,.nq,.trig,.trix,.rdfa,.owl,.n3,.xml.tsv,.txt',
+              }}
+              text={file?.name ?? 'Choose file...'}
               onInputChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 if (e.target.files) {
                   setFile(e.target.files[0]);

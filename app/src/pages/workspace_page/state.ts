@@ -37,7 +37,7 @@ const defaultState: WorkspacePageState = {
 const functions: ZustandActions<
   WorkspacePageStateActions,
   WorkspacePageState
-> = set => ({
+> = (set, get) => ({
   async loadWorkspace(uuid) {
     set({ isLoading: 'Loading workspace...' });
     try {
@@ -68,36 +68,40 @@ const functions: ZustandActions<
     extra,
   ) {
     set({ isLoading: 'Creating mapping...' });
-    try {
-      await MappingService.createMappingInWorkspace(
-        workspaceUuid,
-        name,
-        description,
-        content,
-        sourceType,
-        extra,
-      );
-      await this.loadWorkspace(workspaceUuid);
-    } catch (error) {
-      if (error instanceof Error) {
-        set({ error: error.message });
-      }
-    } finally {
-      set({ isLoading: null, error: null });
-    }
+    MappingService.createMappingInWorkspace(
+      workspaceUuid,
+      name,
+      description,
+      content,
+      sourceType,
+      extra,
+    )
+      .then(() => {
+        return get().loadWorkspace(workspaceUuid);
+      })
+      .catch(error => {
+        if (error instanceof Error) {
+          set({ error: error.message });
+        }
+      })
+      .finally(() => {
+        set({ isLoading: null });
+      });
   },
   async deleteMapping(workspaceUuid, mappingUuid) {
     set({ isLoading: 'Deleting mapping...' });
-    try {
-      await MappingService.deleteMappingInWorkspace(workspaceUuid, mappingUuid);
-      await this.loadWorkspace(workspaceUuid);
-    } catch (error) {
-      if (error instanceof Error) {
-        set({ error: error.message });
-      }
-    } finally {
-      set({ isLoading: null, error: null });
-    }
+    MappingService.deleteMappingInWorkspace(workspaceUuid, mappingUuid)
+      .then(() => {
+        return get().loadWorkspace(workspaceUuid);
+      })
+      .catch(error => {
+        if (error instanceof Error) {
+          set({ error: error.message });
+        }
+      })
+      .finally(() => {
+        set({ isLoading: null });
+      });
   },
 });
 

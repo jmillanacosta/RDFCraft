@@ -1,9 +1,12 @@
 import { Button, ButtonGroup, Navbar, NonIdealState } from '@blueprintjs/core';
-import { useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import useWorkspacePageState from './state';
 
+import DeleteAlert from '../../components/DeleteAlert';
 import useErrorToast from '../../hooks/useErrorToast';
+import { MappingGraph } from '../../lib/api/mapping_service/types';
+import CreateMappingDialog from './components/CreateMappingDialog';
 import MappingCardItem from './components/MappingCard';
 import './styles.scss';
 
@@ -19,6 +22,8 @@ const WorkspacePage = () => {
   const isLoading = useWorkspacePageState(state => state.isLoading);
   const error = useWorkspacePageState(state => state.error);
   const loadWorkspace = useWorkspacePageState(state => state.loadWorkspace);
+  const createMapping = useWorkspacePageState(state => state.createMapping);
+  const deleteMapping = useWorkspacePageState(state => state.deleteMapping);
 
   useEffect(() => {
     if (props.uuid) {
@@ -28,8 +33,43 @@ const WorkspacePage = () => {
 
   useErrorToast(error);
 
+  const [open, setOpen] = useState<'create' | 'delete' | null>(null);
+  const [toBeDeleted, setToBeDeleted] = useState<MappingGraph | null>(null);
+
+  const handleDelete = useCallback(() => {
+    if (toBeDeleted && workspace) {
+      deleteMapping(workspace.uuid, toBeDeleted.uuid);
+    }
+    setOpen(null);
+  }, [toBeDeleted, workspace, deleteMapping]);
+
   return (
     <div className='workspace-page'>
+      <DeleteAlert
+        title='Delete Mapping'
+        message='Are you sure you want to delete this mapping?'
+        open={open === 'delete'}
+        onClose={() => setOpen(null)}
+        onConfirm={handleDelete}
+      />
+      <CreateMappingDialog
+        open={open === 'create'}
+        onClose={() => setOpen(null)}
+        onCreate={data => {
+          if (workspace) {
+            createMapping(
+              workspace.uuid,
+              data.name,
+              data.description,
+              data.file,
+              data.sourceType,
+              data.extra,
+            );
+            
+          }
+          setOpen(null);
+        }}
+      />
       <Navbar fixedToTop>
         <Navbar.Group>
           <Button
@@ -46,7 +86,14 @@ const WorkspacePage = () => {
         </Navbar.Group>
         <Navbar.Group align='right'>
           <ButtonGroup>
-            <Button icon='add-to-artifact'>Create New Mapping</Button>
+            <Button
+              icon='add-to-artifact'
+              onClick={() => {
+                setOpen('create');
+              }}
+            >
+              Create New Mapping
+            </Button>
             <Button
               icon='search-around'
               onClick={() => {
@@ -77,7 +124,9 @@ const WorkspacePage = () => {
               <Button
                 icon='add-to-artifact'
                 intent='primary'
-                onClick={() => navigation('create')}
+                onClick={() => {
+                  setOpen('create');
+                }}
               >
                 Create New Mapping
               </Button>
@@ -90,7 +139,10 @@ const WorkspacePage = () => {
               <MappingCardItem
                 key={mappingGraph.uuid}
                 mapping={mappingGraph}
-                onDelete={() => {}}
+                onDelete={mappingGraph => {
+                  setToBeDeleted(mappingGraph);
+                  setOpen('delete');
+                }}
                 onSelected={() => {}}
               />
             ))}

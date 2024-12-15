@@ -381,6 +381,31 @@ async def get_mappings(
     )
 
 
+@router.get("/{workspace_id}/mapping/{mapping_id}")
+async def get_mapping(
+    workspace_id: str,
+    mapping_id: str,
+    get_mappings_in_workspace_facade: GetMappingsInWorkspaceDep,
+) -> MappingGraph:
+    facade_response = (
+        get_mappings_in_workspace_facade.execute(
+            workspace_id=workspace_id,
+            mapping_id=mapping_id,
+        )
+    )
+
+    if (
+        facade_response.status // 100 == 2
+        and facade_response.data
+    ):
+        return facade_response.data
+
+    raise HTTPException(
+        status_code=facade_response.status,
+        detail=facade_response.to_dict(),
+    )
+
+
 @router.post("/{workspace_id}/mapping", status_code=201)
 async def create_mapping(
     workspace_id: str,

@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom';
 
 type NavbarProps = {
   uuid: string | undefined;
-  mapping_uuid: string | undefined;
+  name: string | undefined;
+  isLoading: string | null;
+  onSave: () => void;
 };
 
-const Navbar = ({ uuid, mapping_uuid }: NavbarProps) => {
+const Navbar = ({ uuid, name, isLoading, onSave }: NavbarProps) => {
   const navigation = useNavigate();
 
   return (
@@ -20,13 +22,17 @@ const Navbar = ({ uuid, mapping_uuid }: NavbarProps) => {
           }}
         />
         <div style={{ width: 10 }} />
-        <BPNavbar.Heading>Workspace: {mapping_uuid}</BPNavbar.Heading>
+        <BPNavbar.Heading>Mapping: {name}</BPNavbar.Heading>
         <BPNavbar.Divider />
-        <BPNavbar.Heading></BPNavbar.Heading>
+        <BPNavbar.Heading>
+          {isLoading ? <>{isLoading}</> : null}
+        </BPNavbar.Heading>
       </BPNavbar.Group>
       <BPNavbar.Group align='right'>
         <ButtonGroup>
-          <Button icon='floppy-disk'>Save</Button>
+          <Button icon='floppy-disk' onClick={onSave}>
+            Save
+          </Button>
           <Button icon='rocket'>Map</Button>
         </ButtonGroup>
       </BPNavbar.Group>

@@ -43,6 +43,7 @@ class GetMappingsInWorkspaceFacade(BaseFacade):
     def execute(
         self,
         workspace_id: str,
+        mapping_id: str | None = None,
     ) -> FacadeResponse:
         self.logger.info(
             f"Retrieving mappings in workspace {workspace_id}"
@@ -56,6 +57,25 @@ class GetMappingsInWorkspaceFacade(BaseFacade):
         workspace = self.workspace_service.get_workspace(
             workspace_metadata.location,
         )
+
+        if mapping_id and mapping_id in workspace.mappings:
+            self.logger.info(
+                f"Retrieving mapping {mapping_id}"
+            )
+            mapping = self.mapping_service.get_mapping(
+                mapping_id
+            )
+            return FacadeResponse(
+                status=200,
+                message=f"Retrieved mapping {mapping_id}",
+                data=mapping,
+            )
+        elif mapping_id:
+            return FacadeResponse(
+                status=404,
+                message=f"Mapping {mapping_id} not found in workspace {workspace_id}",
+            )
+
         self.logger.info("Retrieving mappings")
 
         mappings = [

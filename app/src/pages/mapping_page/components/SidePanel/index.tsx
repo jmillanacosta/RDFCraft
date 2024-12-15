@@ -13,6 +13,8 @@ const SidePanel = ({ selectedTab }: SidePanelProps) => {
         return <div>AI Panel Content</div>;
       case 'references':
         return <div>Source References Panel Content</div>;
+      case 'search':
+        return <div>Search Panel Content</div>;
       case 'settings':
         return <div>Settings Panel Content</div>;
       default:

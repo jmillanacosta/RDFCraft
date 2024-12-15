@@ -23,11 +23,11 @@ const MappingCardItem = ({
       }
       actions={
         <>
-          <Button intent='primary' onClick={() => onSelected(mapping)}>
-            Open
-          </Button>
           <Button intent='danger' onClick={() => onDelete(mapping)}>
             Delete
+          </Button>
+          <Button intent='primary' onClick={() => onSelected(mapping)}>
+            Open
           </Button>
         </>
       }

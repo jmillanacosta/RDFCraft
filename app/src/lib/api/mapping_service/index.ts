@@ -27,6 +27,27 @@ class MappingService {
     );
   }
 
+  public static async getMappingInWorkspace(
+    workspaceUuid: string,
+    mappingUuid: string,
+  ): Promise<MappingGraph> {
+    const result = await this.getApiClient().callApi<MappingGraph>(
+      `/workspaces/${workspaceUuid}/mapping/${mappingUuid}`,
+      {
+        method: 'GET',
+        parser: data => data as MappingGraph,
+      },
+    );
+
+    if (result.type === 'success') {
+      return result.data;
+    }
+
+    throw new Error(
+      `Failed to get mapping: ${result.message} (status: ${result.status})`,
+    );
+  }
+
   public static async createMappingInWorkspace(
     workspaceUuid: string,
     name: string,

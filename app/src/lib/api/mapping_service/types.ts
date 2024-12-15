@@ -1,43 +1,39 @@
-export enum MappingNodeType {
-  ENTITY = 'entity',
-  LITERAL = 'literal',
-  URIRef = 'uri_ref',
-}
+export type MappingNodeType = 'entity' | 'literal' | 'uri_ref';
 
-export interface MappingNode {
+export type MappingNode = {
   id: string;
-  type: MappingNodeType.ENTITY;
+  type: 'entity';
   label: string;
   uri_pattern: string;
   rdf_type: string[];
-}
+};
 
-export interface MappingLiteral {
+export type MappingLiteral = {
   id: string;
-  type: MappingNodeType.LITERAL;
+  type: 'literal';
   label: string;
   value: string;
   literal_type: string;
-}
+};
 
-export interface MappingURIRef {
+export type MappingURIRef = {
   id: string;
-  type: MappingNodeType.URIRef;
+  type: 'uri_ref';
   uri_pattern: string;
-}
+};
 
-export interface MappingEdge {
+export type MappingEdge = {
   id: string;
   source: string;
   target: string;
   predicate_uri: string;
-}
+};
 
-export interface MappingGraph {
+export type MappingGraph = {
   uuid: string;
   name: string;
   description: string;
   source_id: string;
   nodes: (MappingNode | MappingLiteral | MappingURIRef)[];
   edges: MappingEdge[];
-}
+};

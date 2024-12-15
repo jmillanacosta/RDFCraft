@@ -4,6 +4,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import WorkspacesPage from './pages/workspaces_page';
 
 import './index.scss';
+import MappingPage from './pages/mapping_page';
 import OntologiesPage from './pages/ontologies_page';
 import PrefixPage from './pages/prefixes_page';
 import WorkspacePage from './pages/workspace_page';
@@ -24,6 +25,10 @@ const router = createBrowserRouter([
   {
     path: '/workspaces/:uuid/prefixes',
     element: <PrefixPage />,
+  },
+  {
+    path: '/workspaces/:uuid/mapping/:mapping_uuid',
+    element: <MappingPage />,
   },
 ]);
 

@@ -1,0 +1,55 @@
+@use '@blueprintjs/core/lib/scss/variables' as bp-vars;
+
+.mapping-page {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+}
+
+.mapping-page-content {
+  margin-top: bp-vars.$pt-navbar-height;
+  width: 100vw;
+  height: calc(100vh - #{bp-vars.$pt-navbar-height});
+}
+
+.layout-container {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  width: 100%;
+}
+
+/* Vertical tabs area */
+.vertical-tabs {
+  display: flex;
+  flex-direction: column;
+  background: #182026; /* Light Blueprint sidebar color */
+  padding: 5px;
+}
+
+.vertical-tabs .bp4-button {
+  margin-bottom: 5px;
+  background: #182026;
+}
+
+.side-panel-card {
+  background: #182026; /* Light Blueprint sidebar color */
+  padding: 10px;
+  margin: 5px;
+}
+
+/* Main panel */
+.main-panel {
+  flex: 1;
+  padding: 20px;
+  overflow: auto;
+}
+
+.resize-handle {
+  cursor: ew-resize;
+  width: 10px;
+  // put handle to left of the panel
+  margin-left: -10px;
+  background: #182026;
+}

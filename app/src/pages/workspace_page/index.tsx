@@ -65,7 +65,6 @@ const WorkspacePage = () => {
               data.sourceType,
               data.extra,
             );
-            
           }
           setOpen(null);
         }}
@@ -143,7 +142,11 @@ const WorkspacePage = () => {
                   setToBeDeleted(mappingGraph);
                   setOpen('delete');
                 }}
-                onSelected={() => {}}
+                onSelected={() => {
+                  navigation(
+                    `/workspaces/${workspace.uuid}/mapping/${mappingGraph.uuid}`,
+                  );
+                }}
               />
             ))}
           </div>

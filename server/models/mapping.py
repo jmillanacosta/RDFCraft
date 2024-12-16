@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from enum import StrEnum
 
+from server.models.ontology import Property
+
 
 class MappingNodeType(StrEnum):
     ENTITY = "entity"
@@ -19,6 +21,7 @@ class MappingNode:
         label (str): The label of the node
         uri_pattern (str): The URI pattern of the node
         rdf_type (list[str]): The RDF type/s of the node
+        properties (list[Property]): The properties of the node
     """
 
     id: str
@@ -26,6 +29,7 @@ class MappingNode:
     label: str
     uri_pattern: str
     rdf_type: list[str]
+    properties: list[Property]
 
     def to_dict(self):
         return {
@@ -34,6 +38,9 @@ class MappingNode:
             "label": self.label,
             "uri_pattern": self.uri_pattern,
             "rdf_type": self.rdf_type,
+            "properties": [
+                prop.to_dict() for prop in self.properties
+            ],
         }
 
     @classmethod
@@ -48,12 +55,18 @@ class MappingNode:
             raise ValueError("uri_pattern is required")
         if "rdf_type" not in data:
             data["rdf_type"] = []
+        if "properties" not in data:
+            data["properties"] = []
         return cls(
             id=data["id"],
             type=data["type"],
             label=data["label"],
             uri_pattern=data["uri_pattern"],
             rdf_type=data["rdf_type"],
+            properties=[
+                Property.from_dict(prop)
+                for prop in data["properties"]
+            ],
         )
 
 
@@ -152,20 +165,23 @@ class MappingEdge:
         id (str): The ID of the edge
         source (str): The ID of the source node
         target (str): The ID of the target node
-        predicate_uri (str): The URI of the predicate
+        source_handle (str): The handle of the source node
+        target_handle (str): The handle of the target node
     """
 
     id: str
     source: str
     target: str
-    predicate_uri: str
+    source_handle: str
+    target_handle: str
 
     def to_dict(self):
         return {
             "id": self.id,
             "source": self.source,
             "target": self.target,
-            "predicate_uri": self.predicate_uri,
+            "source_handle": self.source_handle,
+            "target_handle": self.target_handle,
         }
 
     @classmethod
@@ -178,11 +194,16 @@ class MappingEdge:
             raise ValueError("target is required")
         if "predicate_uri" not in data:
             raise ValueError("predicate_uri is required")
+        if "source_handle" not in data:
+            raise ValueError("source_handle is required")
+        if "target_handle" not in data:
+            raise ValueError("target_handle is required")
         return cls(
             id=data["id"],
             source=data["source"],
             target=data["target"],
-            predicate_uri=data["predicate_uri"],
+            source_handle=data["source_handle"],
+            target_handle=data["target_handle"],
         )
 
 

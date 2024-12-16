@@ -1,4 +1,5 @@
 import { Card } from '@blueprintjs/core';
+import NodeProperties from './components/NodeProperties';
 
 type SidePanelProps = {
   selectedTab: string | undefined;
@@ -8,7 +9,7 @@ const SidePanel = ({ selectedTab }: SidePanelProps) => {
   const panelContent = () => {
     switch (selectedTab) {
       case 'properties':
-        return <div>Properties Panel Content</div>;
+        return <NodeProperties />;
       case 'ai':
         return <div>AI Panel Content</div>;
       case 'references':

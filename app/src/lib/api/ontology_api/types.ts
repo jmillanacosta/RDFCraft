@@ -23,12 +23,12 @@ interface NamedNode {
   /**
    * A named node is a node that has a URI.
    */
-  belongsTo: string;
+  belongs_to: string;
   type: NamedNodeType;
-  fullUri: string;
+  full_uri: string;
   label: Literal[];
   description: Literal[];
-  isDeprecated?: boolean;
+  is_deprecated?: boolean;
 }
 
 interface Individual extends NamedNode {
@@ -42,7 +42,7 @@ interface OntologyClass extends NamedNode {
   /**
    * A class is a named node that is a class.
    */
-  superClasses: string[];
+  super_classes: string[];
   type: NamedNodeType.CLASS;
 }
 
@@ -50,7 +50,7 @@ interface Property extends NamedNode {
   /**
    * A property is a named node that is a property.
    */
-  propertyType: PropertyType;
+  property_type: PropertyType;
   range: string[];
   domain: string[];
   type: NamedNodeType.PROPERTY;
@@ -61,7 +61,7 @@ interface Ontology {
    * An ontology is a collection of named nodes.
    */
   uuid: string;
-  fileUuid: string;
+  file_uuid: string;
   name: string;
   description: string;
   base_uri: string;

@@ -1,3 +1,5 @@
+import { Property } from '../ontology_api/types';
+
 export type MappingNodeType = 'entity' | 'literal' | 'uri_ref';
 
 export type MappingNode = {
@@ -6,6 +8,7 @@ export type MappingNode = {
   label: string;
   uri_pattern: string;
   rdf_type: string[];
+  properties: Property[];
 };
 
 export type MappingLiteral = {
@@ -26,7 +29,8 @@ export type MappingEdge = {
   id: string;
   source: string;
   target: string;
-  predicate_uri: string;
+  source_handle: string;
+  target_handle: string;
 };
 
 export type MappingGraph = {

@@ -47,8 +47,9 @@ const MainPanel = ({ initialGraph }: MainPanelProps) => {
           data: {
             id: `node-${nodes.length}`,
             label: 'New Entity',
-            rdf_type: [''],
+            rdf_type: [],
             uri_pattern: '',
+            properties: [],
             type: 'entity',
           },
           width: 200,

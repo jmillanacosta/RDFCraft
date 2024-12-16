@@ -2,10 +2,16 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import MappingService from '../../lib/api/mapping_service';
 import { MappingGraph } from '../../lib/api/mapping_service/types';
+import OntologyApi from '../../lib/api/ontology_api';
+import { Ontology } from '../../lib/api/ontology_api/types';
+import PrefixApi from '../../lib/api/prefix_api';
+import { Prefix } from '../../lib/api/prefix_api/types';
 import { ZustandActions } from '../../utils/zustand';
 
 interface MappingPageState {
   mapping: MappingGraph | null;
+  ontologies: Ontology[] | null;
+  prefixes: Prefix[] | null;
   isLoading: string | null;
   error: string | null;
 }
@@ -21,6 +27,8 @@ interface MappingPageStateActions {
 
 const defaultState: MappingPageState = {
   mapping: null,
+  ontologies: null,
+  prefixes: null,
   isLoading: null,
   error: null,
 };
@@ -33,11 +41,21 @@ const functions: ZustandActions<MappingPageStateActions, MappingPageState> = (
   async loadMapping(workspaceUuid: string, mappingUuid: string) {
     set({ isLoading: 'Loading mapping...' });
     try {
-      const mapping = await MappingService.getMappingInWorkspace(
+      const mapping_promise = MappingService.getMappingInWorkspace(
         workspaceUuid,
         mappingUuid,
       );
-      set({ mapping, error: null });
+      const ontologies_promise =
+        OntologyApi.getOntologiesInWorkspace(workspaceUuid);
+      const prefixes_promise = PrefixApi.getPrefixesInWorkspace(workspaceUuid);
+
+      const [mapping, ontologies, prefixes] = await Promise.all([
+        mapping_promise,
+        ontologies_promise,
+        prefixes_promise,
+      ]);
+
+      set({ mapping, ontologies, prefixes, error: null });
     } catch (error) {
       if (error instanceof Error) {
         set({ error: error.message });

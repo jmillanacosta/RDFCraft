@@ -54,3 +54,8 @@
   margin-left: -10px;
   background: #182026;
 }
+
+ul li {
+  /* or ol li, or a more specific selector */
+  list-style: none;
+}

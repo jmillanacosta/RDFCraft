@@ -1,13 +1,42 @@
 from dataclasses import dataclass
 from enum import StrEnum
 
-from server.models.ontology import Property
-
 
 class MappingNodeType(StrEnum):
     ENTITY = "entity"
     LITERAL = "literal"
     URIRef = "uri_ref"
+
+
+@dataclass(kw_only=True)
+class Position:
+    """
+    A position in a mapping graph.
+
+    Attributes:
+        x (int): The x-coordinate of the position
+        y (int): The y-coordinate of the position
+    """
+
+    x: int
+    y: int
+
+    def to_dict(self):
+        return {
+            "x": self.x,
+            "y": self.y,
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        if "x" not in data:
+            raise ValueError("x is required")
+        if "y" not in data:
+            raise ValueError("y is required")
+        return cls(
+            x=data["x"],
+            y=data["y"],
+        )
 
 
 @dataclass(kw_only=True)
@@ -22,6 +51,7 @@ class MappingNode:
         uri_pattern (str): The URI pattern of the node
         rdf_type (list[str]): The RDF type/s of the node
         properties (list[str]): The properties of the node
+        position (Position): The position of the node
     """
 
     id: str
@@ -30,6 +60,7 @@ class MappingNode:
     uri_pattern: str
     rdf_type: list[str]
     properties: list[str]
+    position: Position
 
     def to_dict(self):
         return {
@@ -39,6 +70,7 @@ class MappingNode:
             "uri_pattern": self.uri_pattern,
             "rdf_type": self.rdf_type,
             "properties": self.properties,
+            "position": self.position.to_dict(),
         }
 
     @classmethod
@@ -51,6 +83,8 @@ class MappingNode:
             raise ValueError("label is required")
         if "uri_pattern" not in data:
             raise ValueError("uri_pattern is required")
+        if "position" not in data:
+            raise ValueError("position is required")
         if "rdf_type" not in data:
             data["rdf_type"] = []
         if "properties" not in data:
@@ -62,6 +96,7 @@ class MappingNode:
             uri_pattern=data["uri_pattern"],
             rdf_type=data["rdf_type"],
             properties=data["properties"],
+            position=Position.from_dict(data["position"]),
         )
 
 
@@ -76,6 +111,7 @@ class MappingLiteral:
         label (str): The label of the literal
         value (str): The value of the literal
         literal_type (str): The type of the literal
+        position (Position): The position of the literal
     """
 
     id: str
@@ -83,6 +119,7 @@ class MappingLiteral:
     label: str
     value: str
     literal_type: str
+    position: Position
 
     def to_dict(self):
         return {
@@ -91,6 +128,7 @@ class MappingLiteral:
             "label": self.label,
             "value": self.value,
             "literal_type": self.literal_type,
+            "position": self.position.to_dict(),
         }
 
     @classmethod
@@ -105,12 +143,15 @@ class MappingLiteral:
             raise ValueError("value is required")
         if "literal_type" not in data:
             raise ValueError("literal_type is required")
+        if "position" not in data:
+            raise ValueError("position is required")
         return cls(
             id=data["id"],
             type=data["type"],
             label=data["label"],
             value=data["value"],
             literal_type=data["literal_type"],
+            position=Position.from_dict(data["position"]),
         )
 
 
@@ -122,18 +163,21 @@ class MappingURIRef:
     Attributes:
         id (str): The ID of the URI reference
         type (MappingNodeType): The type of the URI reference
-        uri (str): The URI of the URI reference
+        uri_pattern (str): The URI pattern of the URI reference
+        position (Position): The position of the URI reference
     """
 
     id: str
     type: MappingNodeType
     uri_pattern: str
+    position: Position
 
     def to_dict(self):
         return {
             "id": self.id,
             "type": self.type,
             "uri_pattern": self.uri_pattern,
+            "position": self.position.to_dict(),
         }
 
     @classmethod
@@ -144,10 +188,13 @@ class MappingURIRef:
             raise ValueError("type is required")
         if "uri_pattern" not in data:
             raise ValueError("uri_pattern is required")
+        if "position" not in data:
+            raise ValueError("position is required")
         return cls(
             id=data["id"],
             type=data["type"],
             uri_pattern=data["uri_pattern"],
+            position=Position.from_dict(data["position"]),
         )
 
 

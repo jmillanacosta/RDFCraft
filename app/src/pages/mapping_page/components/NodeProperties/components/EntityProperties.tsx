@@ -6,19 +6,56 @@ import {
   OntologyClass,
   Property,
 } from '@/lib/api/ontology_api/types';
-import { EntityNodeType } from '@/pages/mapping_page/components/MainPanel/types';
+import {
+  EntityNodeType,
+  XYEdgeType,
+} from '@/pages/mapping_page/components/MainPanel/types';
 import useClassOrderer from '@/pages/mapping_page/hooks/useClassOrderer';
 import useDomainOrderer from '@/pages/mapping_page/hooks/useDomainOrderer';
 import useMappingPage from '@/pages/mapping_page/state';
 import { FormGroup, H5, InputGroup, MenuItem } from '@blueprintjs/core';
-import { ItemListRendererProps, MultiSelect } from '@blueprintjs/select';
-import { useReactFlow } from '@xyflow/react';
+import {
+  ItemListRendererProps,
+  ItemRenderer,
+  MultiSelect,
+} from '@blueprintjs/select';
+import { getConnectedEdges, useEdges, useReactFlow } from '@xyflow/react';
 import { useCallback, useMemo } from 'react';
 
 import './styles.scss';
 
+const renderMenuItemProperty: ItemRenderer<NamedNode & { group: string }> = (
+  item,
+  { handleClick, modifiers },
+) => (
+  <MenuItem
+    role='menuitem'
+    key={item.full_uri}
+    label='Label'
+    text={item.label.length > 0 ? item.label[0].value : item.full_uri}
+    onClick={handleClick}
+    active={modifiers.active}
+  />
+);
+
+const renderMenuItemClass: ItemRenderer<NamedNode & { group: string }> = (
+  item,
+  { handleClick, modifiers },
+) => (
+  <MenuItem
+    role='menuitem'
+    key={item.full_uri}
+    label='Class'
+    text={item.label.length > 0 ? item.label[0].value : item.full_uri}
+    onClick={handleClick}
+    active={modifiers.active}
+  />
+);
+
 const EntityNodeProperties = ({ node }: { node: EntityNodeType }) => {
   const ontologies = useMappingPage(state => state.ontologies);
+  const edges = useEdges<XYEdgeType>();
+
   const reactflow = useReactFlow();
 
   const properties = useMemo<(Property & { group: string })[]>(
@@ -68,6 +105,39 @@ const EntityNodeProperties = ({ node }: { node: EntityNodeType }) => {
   const possibleClasses = useClassOrderer(node);
   const possibleProperties = useDomainOrderer(node);
 
+  const classItems = useMemo(
+    () =>
+      possibleClasses.classes.filter(
+        c => !rdfType.some(r => r.full_uri === c.full_uri),
+      ),
+    [possibleClasses.classes, rdfType],
+  );
+
+  const propertyItems = useMemo(
+    () =>
+      possibleProperties.filter(
+        p => !properties.some(prop => prop.full_uri === p.full_uri),
+      ),
+    [possibleProperties, properties],
+  );
+
+  const handlePropertyRemove = useCallback(
+    (item: NamedNode & { group: string }) => {
+      if (!reactflow) return;
+      console.log('Removing property', item.full_uri);
+      const connectedEdges = getConnectedEdges([node], edges).filter(
+        edge => edge.sourceHandle === item.full_uri,
+      );
+
+      if (connectedEdges.length > 0) {
+        reactflow.deleteElements({ edges: connectedEdges });
+      }
+    },
+    // Reason: we only want to update the node when the node id or reactflow changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [edges, node.id, reactflow],
+  );
+
   const updateNode = useCallback(
     (
       label: string | null,
@@ -75,6 +145,15 @@ const EntityNodeProperties = ({ node }: { node: EntityNodeType }) => {
       rdfType: (OntologyClass & { group: string })[] | null,
       properties: (Property & { group: string })[] | null,
     ) => {
+      if (!reactflow) return;
+      if (
+        label === null &&
+        uriPattern === null &&
+        rdfType === null &&
+        properties === null
+      )
+        return;
+      console.log('Updating node', node.id);
       reactflow.updateNode(node.id, {
         data: {
           ...node.data,
@@ -85,7 +164,9 @@ const EntityNodeProperties = ({ node }: { node: EntityNodeType }) => {
         },
       });
     },
-    [node, reactflow],
+    // Reason: we only want to update the node when the node id or reactflow changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [node.id, reactflow],
   );
 
   const createNewClassItemFromQuery = (query: string) => {
@@ -198,20 +279,9 @@ const EntityNodeProperties = ({ node }: { node: EntityNodeType }) => {
               null,
             )
           }
-          itemRenderer={(item, { handleClick, modifiers }) => (
-            <MenuItem
-              role='menuitem'
-              key={item.full_uri}
-              label='Class'
-              text={item.label.length > 0 ? item.label[0].value : item.full_uri}
-              onClick={handleClick}
-              active={modifiers.active}
-            />
-          )}
+          itemRenderer={renderMenuItemClass}
           itemPredicate={itemSearch}
-          items={possibleClasses.classes.filter(
-            c => !rdfType.some(r => r.full_uri === c.full_uri),
-          )}
+          items={classItems}
           onItemSelect={item => {
             try {
               new URL(item.full_uri);
@@ -248,28 +318,18 @@ const EntityNodeProperties = ({ node }: { node: EntityNodeType }) => {
             matchTargetWidth: true,
             popoverClassName: 'popover-scroll',
           }}
-          onRemove={item =>
+          onRemove={item => {
+            handlePropertyRemove(item);
             updateNode(
               null,
               null,
               null,
               properties.filter(p => p !== item),
-            )
-          }
-          itemRenderer={(item, { handleClick, modifiers }) => (
-            <MenuItem
-              role='menuitem'
-              key={item.full_uri}
-              label='Property'
-              text={item.label.length > 0 ? item.label[0].value : item.full_uri}
-              onClick={handleClick}
-              active={modifiers.active}
-            />
-          )}
+            );
+          }}
+          itemRenderer={renderMenuItemProperty}
           itemPredicate={itemSearch}
-          items={possibleProperties.filter(
-            p => !properties.some(prop => prop.full_uri === p.full_uri),
-          )}
+          items={propertyItems}
           onItemSelect={item => {
             try {
               new URL(item.full_uri);

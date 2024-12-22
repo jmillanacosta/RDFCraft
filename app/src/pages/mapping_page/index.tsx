@@ -1,4 +1,8 @@
-import { ReactFlowProvider } from '@xyflow/react';
+import {
+  XYEdgeType,
+  XYNodeTypes,
+} from '@/pages/mapping_page/components/MainPanel/types';
+import { useEdges, useNodes } from '@xyflow/react';
 import { languages } from 'monaco-editor';
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -40,10 +44,14 @@ const MappingPage = () => {
   const loadMapping = useMappingPage(state => state.loadMapping);
   const saveMapping = useMappingPage(state => state.saveMapping);
 
+  const nodes = useNodes<XYNodeTypes>();
+  const edges = useEdges<XYEdgeType>();
+
   useRegisterTheme('mapping-theme', mapping_theme);
   useRegisterLanguage('mapping_language', mapping_language, {});
   useRegisterCompletionItemProvider('mapping_language', [
     {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       provideCompletionItems(model, position, context, token) {
         const word = model.getWordUntilPosition(position);
 
@@ -110,47 +118,45 @@ const MappingPage = () => {
 
   const handleSave = () => {
     if (mapping && props.uuid && props.mapping_uuid) {
-      saveMapping(props.uuid, props.mapping_uuid, mapping);
+      saveMapping(props.uuid, props.mapping_uuid, mapping, nodes, edges);
     }
   };
 
   return (
-    <ReactFlowProvider>
-      <div className='mapping-page'>
-        <Navbar
-          uuid={props.uuid}
-          name={mapping?.name}
-          isLoading={isLoading}
-          onSave={handleSave}
-        />
-        <div className='mapping-page-content'>
-          <PanelGroup direction='horizontal' style={{ height: '100%' }}>
-            <VerticalTabs
-              selectedTab={selectedTab}
-              isCollapsed={isCollapsed}
-              handleTabClick={handleTabClick}
-            />
-            <Panel
-              ref={sidePanelHandle}
-              collapsible
-              collapsedSize={0}
-              onCollapse={() => setIsCollapsed(true)}
-              defaultSize={20}
-              minSize={10}
-              maxSize={50}
-            >
-              <SidePanel selectedTab={selectedTab} />
-            </Panel>
-            {!isCollapsed && (
-              <PanelResizeHandle className='resize-handle'></PanelResizeHandle>
-            )}
-            <Panel>
-              <MainPanel initialGraph={mapping} />
-            </Panel>
-          </PanelGroup>
-        </div>
+    <div className='mapping-page'>
+      <Navbar
+        uuid={props.uuid}
+        name={mapping?.name}
+        isLoading={isLoading}
+        onSave={handleSave}
+      />
+      <div className='mapping-page-content'>
+        <PanelGroup direction='horizontal' style={{ height: '100%' }}>
+          <VerticalTabs
+            selectedTab={selectedTab}
+            isCollapsed={isCollapsed}
+            handleTabClick={handleTabClick}
+          />
+          <Panel
+            ref={sidePanelHandle}
+            collapsible
+            collapsedSize={0}
+            onCollapse={() => setIsCollapsed(true)}
+            defaultSize={20}
+            minSize={10}
+            maxSize={50}
+          >
+            <SidePanel selectedTab={selectedTab} />
+          </Panel>
+          {!isCollapsed && (
+            <PanelResizeHandle className='resize-handle'></PanelResizeHandle>
+          )}
+          <Panel>
+            <MainPanel initialGraph={mapping} />
+          </Panel>
+        </PanelGroup>
       </div>
-    </ReactFlowProvider>
+    </div>
   );
 };
 

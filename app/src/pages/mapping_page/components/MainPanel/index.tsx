@@ -15,14 +15,16 @@ import {
 } from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { MappingGraph } from '../../../../lib/api/mapping_service/types';
 
 import ConnectionLineComponent from '@/pages/mapping_page/components/MainPanel/components/ConnectionLineComponent';
 import { EntityNode } from '@/pages/mapping_page/components/MainPanel/components/EntityNode';
 import FloatingEdge from '@/pages/mapping_page/components/MainPanel/components/FloatingEdge';
 import { LiteralNode } from '@/pages/mapping_page/components/MainPanel/components/LiteralNode';
-import { URIRefNode } from '@/pages/mapping_page/components/MainPanel/components/UriRefNode';
+
+import { URIRefNode } from '@/pages/mapping_page/components/MainPanel/components/URIRefNode';
+import { useBackendMappingGraph } from '@/pages/mapping_page/hooks/useBackendMappingGraph';
 import { XYEdgeType, XYNodeTypes } from './types';
 
 type MainPanelProps = {
@@ -51,9 +53,16 @@ const defaultEdgeOptions = {
 
 const MainPanel = ({ initialGraph }: MainPanelProps) => {
   const reactflow = useReactFlow();
+  const { nodes: initialNodes, edges: initialEdges } =
+    useBackendMappingGraph(initialGraph);
 
   const [nodes, setNodes, onNodesChange] = useNodesState<XYNodeTypes>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<XYEdgeType>([]);
+
+  useEffect(() => {
+    setNodes(initialNodes);
+    setEdges(initialEdges);
+  }, [initialNodes, initialEdges, setNodes, setEdges]);
 
   const onConnect = useCallback(
     (params: Connection) => {
@@ -75,8 +84,11 @@ const MainPanel = ({ initialGraph }: MainPanelProps) => {
             uri_pattern: '',
             properties: [],
             type: 'entity',
+            position: reactflow.screenToFlowPosition({
+              x: e.clientX,
+              y: e.clientY,
+            }),
           },
-
           position: reactflow.screenToFlowPosition({
             x: e.clientX,
             y: e.clientY,
@@ -98,6 +110,10 @@ const MainPanel = ({ initialGraph }: MainPanelProps) => {
             id: `node-${nodes.length}`,
             uri_pattern: 'http://example.com/',
             type: 'uri_ref',
+            position: reactflow.screenToFlowPosition({
+              x: e.clientX,
+              y: e.clientY,
+            }),
           },
           position: reactflow.screenToFlowPosition({
             x: e.clientX,
@@ -112,6 +128,10 @@ const MainPanel = ({ initialGraph }: MainPanelProps) => {
 
   const handleAddLiteralNode = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+      const position = reactflow.screenToFlowPosition({
+        x: e.clientX,
+        y: e.clientY,
+      });
       setNodes(nodes => [
         ...nodes,
         {
@@ -122,11 +142,9 @@ const MainPanel = ({ initialGraph }: MainPanelProps) => {
             value: '',
             literal_type: 'string',
             type: 'literal',
+            position: position,
           },
-          position: reactflow.screenToFlowPosition({
-            x: e.clientX,
-            y: e.clientY,
-          }),
+          position: position,
           type: 'literal',
         },
       ]);

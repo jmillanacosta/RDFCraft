@@ -1,3 +1,7 @@
+import {
+  XYEdgeType,
+  XYNodeTypes,
+} from '@/pages/mapping_page/components/MainPanel/types';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import MappingService from '../../lib/api/mapping_service';
@@ -24,7 +28,9 @@ interface MappingPageStateActions {
   saveMapping: (
     workspaceUuid: string,
     mappingUuid: string,
-    mapping: MappingGraph,
+    mappingGraph: MappingGraph,
+    nodes: XYNodeTypes[],
+    edges: XYEdgeType[],
   ) => Promise<void>;
 }
 
@@ -73,9 +79,29 @@ const functions: ZustandActions<MappingPageStateActions, MappingPageState> = (
   async saveMapping(
     workspaceUuid: string,
     mappingUuid: string,
-    mapping: MappingGraph,
+    mappingGraph: MappingGraph,
+    nodes: XYNodeTypes[],
+    edges: XYEdgeType[],
   ) {
     set({ isLoading: 'Saving mapping...' });
+    // Convert nodes and edges to MappingGraph, sync nodes position and id with node.data
+    // and edges source, sourceHandle, target, targetHandle and id with edge.data
+    const mapping = {
+      ...mappingGraph,
+      nodes: nodes.map(node => ({
+        ...node.data,
+        position: node.position,
+        id: node.id,
+      })),
+      edges: edges.map(edge => ({
+        ...edge.data,
+        source: edge.source,
+        target: edge.target,
+        source_handle: edge.sourceHandle,
+        target_handle: edge.targetHandle,
+        id: edge.id,
+      })),
+    } as MappingGraph;
     try {
       await MappingService.updateMapping(workspaceUuid, mappingUuid, mapping);
       set({ error: null });

@@ -11,6 +11,9 @@ const URIRefProperties = ({ node }: { node: URIRefNodeType }) => {
 
   const updateNode = useCallback(
     (uriPattern: string | null) => {
+      if (uriPattern === null) {
+        return;
+      }
       reactflow.updateNode(node.id, {
         data: {
           ...node.data,
@@ -18,7 +21,8 @@ const URIRefProperties = ({ node }: { node: URIRefNodeType }) => {
         },
       });
     },
-    [node, reactflow],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [node.id, reactflow],
   );
 
   return (

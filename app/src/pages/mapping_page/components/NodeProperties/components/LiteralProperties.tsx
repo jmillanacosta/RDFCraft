@@ -34,6 +34,9 @@ const LiteralNodeProperties = ({ node }: { node: LiteralNodeType }) => {
       literalType: string | null,
       value: string | null,
     ) => {
+      if (label === null && literalType === null && value === null) {
+        return;
+      }
       reactflow.updateNode(node.id, {
         data: {
           ...node.data,

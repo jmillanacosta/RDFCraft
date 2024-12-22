@@ -3,6 +3,7 @@ export type MappingNodeType = 'entity' | 'literal' | 'uri_ref';
 export type MappingNode = {
   id: string;
   type: 'entity';
+  position: { x: number; y: number };
   label: string;
   uri_pattern: string;
   rdf_type: string[];
@@ -12,6 +13,7 @@ export type MappingNode = {
 export type MappingLiteral = {
   id: string;
   type: 'literal';
+  position: { x: number; y: number };
   label: string;
   value: string;
   literal_type: string;
@@ -20,6 +22,7 @@ export type MappingLiteral = {
 export type MappingURIRef = {
   id: string;
   type: 'uri_ref';
+  position: { x: number; y: number };
   uri_pattern: string;
 };
 

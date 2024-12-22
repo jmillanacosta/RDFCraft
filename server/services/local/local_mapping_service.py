@@ -79,8 +79,11 @@ class LocalMappingService(MappingServiceProtocol):
 
         self.logger.info(f"Updating mapping {mapping_id}")
         self._fs_service.upload_file(
-            mapping_id,
-            json.dumps(graph.to_dict()).encode("utf-8"),
+            name=mapping_id,
+            content=json.dumps(graph.to_dict()).encode(
+                "utf-8"
+            ),
+            uuid=mapping_id,
             allow_overwrite=True,
         )
 

@@ -24,6 +24,7 @@ def setup_logging(
     )
 
     shared_processors: list[Processor] = [
+        structlog.contextvars.merge_contextvars,
         structlog.stdlib.add_logger_name,
         structlog.stdlib.add_log_level,
         structlog.stdlib.PositionalArgumentsFormatter(),
@@ -72,7 +73,7 @@ def setup_logging(
 
     handler = logging.StreamHandler()
     # Use OUR `ProcessorFormatter` to format all `logging` entries.
-    handler.setFormatter(formatter)
+    handler.setFormatter(fmt=formatter)
     root_logger = logging.getLogger()
     root_logger.addHandler(handler)
     root_logger.setLevel(log_level.upper())

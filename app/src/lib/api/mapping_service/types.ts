@@ -1,5 +1,3 @@
-import { Property } from '../ontology_api/types';
-
 export type MappingNodeType = 'entity' | 'literal' | 'uri_ref';
 
 export type MappingNode = {
@@ -8,7 +6,7 @@ export type MappingNode = {
   label: string;
   uri_pattern: string;
   rdf_type: string[];
-  properties: Property[];
+  properties: string[];
 };
 
 export type MappingLiteral = {

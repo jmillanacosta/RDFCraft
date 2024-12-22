@@ -17,6 +17,9 @@ from uvicorn.protocols.utils import (
 )
 
 from bootstrap import bootstrap, teardown
+from server.routers.sources.sources import (
+    router as sources_router,
+)
 from server.routers.workspaces.workspaces import (
     router as workspaces_router,
 )
@@ -121,12 +124,6 @@ if tracing_middleware is not None:
     app.middleware_stack = app.build_middleware_stack()
 
 
-# Example API endpoint
-@app.get("/api/data")
-async def get_data():
-    return {"message": "Hello from FastAPI!"}
-
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -141,6 +138,12 @@ app.include_router(
     workspaces_router,
     prefix="/api/workspaces",
     tags=["workspaces"],
+)
+
+app.include_router(
+    sources_router,
+    prefix="/api/sources",
+    tags=["sources"],
 )
 
 if not DEBUG:

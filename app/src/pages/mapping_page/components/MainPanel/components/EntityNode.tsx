@@ -1,35 +1,87 @@
-import { Card, H3 } from '@blueprintjs/core';
-import { Handle, NodeProps, NodeResizer, Position } from '@xyflow/react';
-import { EntityNodeType } from '../types';
+import { Property } from '@/lib/api/ontology_api/types';
+import { BaseNode } from '@/pages/mapping_page/components/MainPanel/components/BaseNode';
+import { LabeledHandle } from '@/pages/mapping_page/components/MainPanel/components/LabeledHandle';
+import { EntityNodeType } from '@/pages/mapping_page/components/MainPanel/types';
+import useMappingPage from '@/pages/mapping_page/state';
+import { Card, HTMLTable, Icon } from '@blueprintjs/core';
+import { NodeProps } from '@xyflow/react';
+import { useEffect, useState } from 'react';
 
-const EntityNode: React.FC<NodeProps<EntityNodeType>> = node => {
+export function EntityNode({ data, selected }: NodeProps<EntityNodeType>) {
+  const ontologies = useMappingPage(state => state.ontologies);
+
+  const [properties, setProperties] = useState<Property[]>([]);
+
+  useEffect(() => {
+    if (ontologies) {
+      const allProperties = ontologies.flatMap(ontology => ontology.properties);
+      const _properties = data.properties.map(property_1 => {
+        const _property = allProperties.find(
+          property_2 => property_2.full_uri === property_1,
+        );
+        return (
+          _property ??
+          ({
+            type: 'property',
+            belongs_to: 'Created',
+            description: [],
+            domain: [],
+            full_uri: property_1,
+            label: [],
+            property_type: 'any',
+            range: [],
+            is_deprecated: false,
+          } as Property)
+        );
+      });
+      setProperties(_properties);
+    }
+  }, [ontologies, data.properties]);
+
   return (
-    <>
-      <NodeResizer
-        color='blue'
-        isVisible={node.selected}
-        nodeId={node.id}
-        minWidth={200}
-        minHeight={100}
-      />
-      <Handle type='source' position={Position.Top} id='top' />
-      <Handle type='target' position={Position.Bottom} id='bottom' />
+    <BaseNode selected={selected}>
       <Card
         style={{
-          width: node.width,
-          height: node.height,
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
+          padding: 0,
+          textAlign: 'center',
+          width: '100%',
         }}
       >
-        <H3>{node.data.label}</H3>
-      </Card>
-      <Handle type='source' position={Position.Left} id='left' />
-      <Handle type='target' position={Position.Right} id='right' />
-    </>
-  );
-};
+        <div
+          className='custom-drag-handle'
+          style={{
+            height: '10px',
+            margin: '8px auto',
+            width: '100%',
+            cursor: 'grab',
+          }}
+        >
+          <Icon icon='drag-handle-horizontal' size={20} />
+        </div>
+        <LabeledHandle id={data.id} title={data.label} type='target' bigTitle />
 
-export default EntityNode;
+        <HTMLTable striped>
+          <tbody>
+            {properties.map(entry => (
+              <tr key={entry.full_uri} style={{ width: '100%' }}>
+                <td
+                  colSpan={100}
+                  style={{
+                    fontWeight: 300,
+                    minWidth: '150px',
+                  }}
+                >
+                  <LabeledHandle
+                    id={entry.full_uri}
+                    title={entry.label[0]?.value ?? entry.full_uri}
+                    type='source'
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </HTMLTable>
+      </Card>
+    </BaseNode>
+  );
+}

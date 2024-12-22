@@ -1,5 +1,5 @@
 import { Card } from '@blueprintjs/core';
-import NodeProperties from './components/NodeProperties';
+import NodeProperties from '../NodeProperties';
 
 type SidePanelProps = {
   selectedTab: string | undefined;
@@ -19,7 +19,7 @@ const SidePanel = ({ selectedTab }: SidePanelProps) => {
       case 'settings':
         return <div>Settings Panel Content</div>;
       default:
-        return <div>Select a tab to view panel content.</div>;
+        return <NodeProperties />;
     }
   };
 

@@ -57,6 +57,7 @@ class PropertyType(StrEnum):
     OBJECT = "object"
     DATATYPE = "datatype"
     ANNOTATION = "annotation"
+    ANY = "any"
 
 
 @dataclass(kw_only=True)

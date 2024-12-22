@@ -6,10 +6,13 @@ import OntologyApi from '../../lib/api/ontology_api';
 import { Ontology } from '../../lib/api/ontology_api/types';
 import PrefixApi from '../../lib/api/prefix_api';
 import { Prefix } from '../../lib/api/prefix_api/types';
+import SourceApi from '../../lib/api/source_api';
+import { Source } from '../../lib/api/source_api/types';
 import { ZustandActions } from '../../utils/zustand';
 
 interface MappingPageState {
   mapping: MappingGraph | null;
+  source: Source | null;
   ontologies: Ontology[] | null;
   prefixes: Prefix[] | null;
   isLoading: string | null;
@@ -27,6 +30,7 @@ interface MappingPageStateActions {
 
 const defaultState: MappingPageState = {
   mapping: null,
+  source: null,
   ontologies: null,
   prefixes: null,
   isLoading: null,
@@ -55,7 +59,9 @@ const functions: ZustandActions<MappingPageStateActions, MappingPageState> = (
         prefixes_promise,
       ]);
 
-      set({ mapping, ontologies, prefixes, error: null });
+      const source = await SourceApi.getSource(mapping.source_id);
+
+      set({ mapping, source, ontologies, prefixes, error: null });
     } catch (error) {
       if (error instanceof Error) {
         set({ error: error.message });

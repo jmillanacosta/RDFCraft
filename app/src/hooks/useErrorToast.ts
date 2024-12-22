@@ -1,5 +1,5 @@
+import toast from '@/consts/toast';
 import { useEffect } from 'react';
-import toast from '../consts/toast';
 
 const useErrorToast = (error: string | null) => {
   useEffect(() => {

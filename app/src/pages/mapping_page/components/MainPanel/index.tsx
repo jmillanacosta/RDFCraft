@@ -5,6 +5,8 @@ import {
   Background,
   Connection,
   Controls,
+  EdgeTypes,
+  MarkerType,
   NodeTypes,
   ReactFlow,
   useEdgesState,
@@ -15,7 +17,12 @@ import {
 import '@xyflow/react/dist/style.css';
 import { useCallback } from 'react';
 import { MappingGraph } from '../../../../lib/api/mapping_service/types';
-import EntityNode from './components/EntityNode';
+
+import ConnectionLineComponent from '@/pages/mapping_page/components/MainPanel/components/ConnectionLineComponent';
+import { EntityNode } from '@/pages/mapping_page/components/MainPanel/components/EntityNode';
+import FloatingEdge from '@/pages/mapping_page/components/MainPanel/components/FloatingEdge';
+import { LiteralNode } from '@/pages/mapping_page/components/MainPanel/components/LiteralNode';
+import { URIRefNode } from '@/pages/mapping_page/components/MainPanel/components/UriRefNode';
 import { XYEdgeType, XYNodeTypes } from './types';
 
 type MainPanelProps = {
@@ -23,6 +30,23 @@ type MainPanelProps = {
 };
 const nodeTypes: NodeTypes = {
   entity: EntityNode,
+  uri_ref: URIRefNode,
+  literal: LiteralNode,
+};
+
+const edgeTypes: EdgeTypes = {
+  floating: FloatingEdge,
+};
+
+const defaultEdgeOptions = {
+  type: 'floating',
+  markerEnd: {
+    type: MarkerType.ArrowClosed,
+  },
+  style: {
+    stroke: '#b1b1b7',
+    strokeWidth: 4,
+  },
 };
 
 const MainPanel = ({ initialGraph }: MainPanelProps) => {
@@ -52,13 +76,58 @@ const MainPanel = ({ initialGraph }: MainPanelProps) => {
             properties: [],
             type: 'entity',
           },
-          width: 200,
-          height: 100,
+
           position: reactflow.screenToFlowPosition({
             x: e.clientX,
             y: e.clientY,
           }),
           type: 'entity',
+        },
+      ]);
+    },
+    [setNodes, reactflow],
+  );
+
+  const handleAddUriRefNode = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+      setNodes(nodes => [
+        ...nodes,
+        {
+          id: `node-${nodes.length}`,
+          data: {
+            id: `node-${nodes.length}`,
+            uri_pattern: 'http://example.com/',
+            type: 'uri_ref',
+          },
+          position: reactflow.screenToFlowPosition({
+            x: e.clientX,
+            y: e.clientY,
+          }),
+          type: 'uri_ref',
+        },
+      ]);
+    },
+    [setNodes, reactflow],
+  );
+
+  const handleAddLiteralNode = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+      setNodes(nodes => [
+        ...nodes,
+        {
+          id: `node-${nodes.length}`,
+          data: {
+            id: `node-${nodes.length}`,
+            label: 'New Literal',
+            value: '',
+            literal_type: 'string',
+            type: 'literal',
+          },
+          position: reactflow.screenToFlowPosition({
+            x: e.clientX,
+            y: e.clientY,
+          }),
+          type: 'literal',
         },
       ]);
     },
@@ -71,8 +140,8 @@ const MainPanel = ({ initialGraph }: MainPanelProps) => {
       content: (
         <Menu>
           <MenuItem text='Create Node' onClick={handleAddEntityNode} />
-          <MenuItem text='Create URI Reference' />
-          <MenuItem text='Create Literal' />
+          <MenuItem text='Create URI Reference' onClick={handleAddUriRefNode} />
+          <MenuItem text='Create Literal' onClick={handleAddLiteralNode} />
         </Menu>
       ),
       targetOffset: { left: e.clientX, top: e.clientY },
@@ -87,6 +156,9 @@ const MainPanel = ({ initialGraph }: MainPanelProps) => {
         nodes={nodes}
         edges={edges}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
+        defaultEdgeOptions={defaultEdgeOptions}
+        connectionLineComponent={ConnectionLineComponent}
         onConnect={onConnect}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}

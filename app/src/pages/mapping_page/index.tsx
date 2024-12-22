@@ -1,5 +1,6 @@
 import { ReactFlowProvider } from '@xyflow/react';
-import { SetStateAction, useEffect, useRef, useState } from 'react';
+import { languages } from 'monaco-editor';
+import { useEffect, useRef, useState } from 'react';
 import {
   ImperativePanelHandle,
   Panel,
@@ -7,6 +8,11 @@ import {
   PanelResizeHandle,
 } from 'react-resizable-panels';
 import { useParams } from 'react-router-dom';
+import useRegisterCompletionItemProvider from '../../components/OneLineMonacoEditor/hooks/useRegisterCompletionItemProvider';
+import useRegisterLanguage from '../../components/OneLineMonacoEditor/hooks/useRegisterLanguage';
+import useRegisterTheme from '../../components/OneLineMonacoEditor/hooks/useRegisterTheme';
+import { mapping_language } from '../../consts/mapping-language';
+import mapping_theme from '../../consts/mapping-theme';
 import useErrorToast from '../../hooks/useErrorToast';
 import MainPanel from './components/MainPanel';
 import Navbar from './components/Navbar';
@@ -22,13 +28,54 @@ type MappingPageURLProps = {
 
 const MappingPage = () => {
   const props = useParams<MappingPageURLProps>();
-  const [selectedTab, setSelectedTab] = useState<string | undefined>(undefined);
+  const [selectedTab, setSelectedTab] = useState<
+    'properties' | 'ai' | 'references' | 'search' | 'settings'
+  >('properties');
   const [isCollapsed, setIsCollapsed] = useState(false);
   const mapping = useMappingPage(state => state.mapping);
+  const source = useMappingPage(state => state.source);
+  const prefixes = useMappingPage(state => state.prefixes);
   const isLoading = useMappingPage(state => state.isLoading);
   const error = useMappingPage(state => state.error);
   const loadMapping = useMappingPage(state => state.loadMapping);
   const saveMapping = useMappingPage(state => state.saveMapping);
+
+  useRegisterTheme('mapping-theme', mapping_theme);
+  useRegisterLanguage('mapping_language', mapping_language, {});
+  useRegisterCompletionItemProvider('mapping_language', [
+    {
+      provideCompletionItems(model, position, context, token) {
+        const word = model.getWordUntilPosition(position);
+
+        const range = {
+          startLineNumber: position.lineNumber,
+          startColumn: word.startColumn,
+          endLineNumber: position.lineNumber,
+          endColumn: word.endColumn,
+        };
+        return {
+          suggestions: [
+            ...(prefixes?.map(prefix => ({
+              label: prefix.prefix,
+              kind: languages.CompletionItemKind.Variable,
+              detail: 'Prefix',
+              insertText: prefix.prefix + ':',
+              range,
+            })) ?? []),
+            ...(source?.references
+              ? source.references.map(ref => ({
+                  label: ref,
+                  kind: languages.CompletionItemKind.Class,
+                  detail: 'Reference',
+                  insertText: '$(' + ref + ')',
+                  range,
+                }))
+              : []),
+          ],
+        } as languages.CompletionList;
+      },
+    },
+  ]);
 
   const sidePanelHandle = useRef<ImperativePanelHandle>(null);
 
@@ -50,13 +97,15 @@ const MappingPage = () => {
 
   useErrorToast(error);
 
-  const handleTabClick = (tabId: SetStateAction<string | undefined>) => {
+  const handleTabClick = (tabId: string) => {
     if (selectedTab === tabId && !isCollapsed) {
       setIsCollapsed(true);
-    } else {
-      setSelectedTab(tabId);
-      setIsCollapsed(false);
+      return;
     }
+    setSelectedTab(
+      tabId as 'properties' | 'ai' | 'references' | 'search' | 'settings',
+    );
+    setIsCollapsed(false);
   };
 
   const handleSave = () => {

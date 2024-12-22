@@ -66,12 +66,56 @@ class OntologyIndexer:
     }}
     """
 
+    GET_PROPERTY_RANGE_OWL_UNION_SPARQL = f"""
+    {PREFIXES}
+    SELECT DISTINCT ?range
+    WHERE {{
+        <___property_uri___> rdfs:range ?rangeValue .
+        ?rangeValue owl:unionOf ?list .
+        ?list rdf:rest*/rdf:first ?range .
+        FILTER (!isBlank(?range)) .
+    }}
+    """
+
+    GET_PROPERTY_RANGE_OWL_INTERSECTION_SPARQL = f"""
+    {PREFIXES}
+    SELECT DISTINCT ?range
+    WHERE {{
+        <___property_uri___> rdfs:range ?rangeValue .
+        ?rangeValue owl:intersectionOf ?list .
+        ?list rdf:rest*/rdf:first ?range .
+        FILTER (!isBlank(?range)) .
+    }}
+    """
+
     GET_PROPERTY_DOMAIN_SPARQL = f"""
     {PREFIXES}
 
     SELECT DISTINCT ?domain
     WHERE {{
         <___property_uri___> rdfs:domain ?domain .
+        FILTER (!isBlank(?domain)) .
+    }}
+    """
+
+    GET_PROPERTY_DOMAIN_OWL_UNION_SPARQL = f"""
+    {PREFIXES}
+    SELECT DISTINCT ?domain
+    WHERE {{
+        <___property_uri___> rdfs:domain ?domainValue .
+        ?domainValue owl:unionOf ?list .
+        ?list rdf:rest*/rdf:first ?domain .
+        FILTER (!isBlank(?domain)) .
+    }}
+    """
+
+    GET_PROPERTY_DOMAIN_OWL_INTERSECTION_SPARQL = f"""
+    {PREFIXES}
+    SELECT DISTINCT ?domain
+    WHERE {{
+        <___property_uri___> rdfs:domain ?domainValue .
+        ?domainValue owl:intersectionOf ?list .
+        ?list rdf:rest*/rdf:first ?domain .
         FILTER (!isBlank(?domain)) .
     }}
     """
@@ -250,18 +294,50 @@ class OntologyIndexer:
                 "___property_uri___", property_uri
             )
         )
+        range_union_result = g.query(
+            self.GET_PROPERTY_RANGE_OWL_UNION_SPARQL.replace(
+                "___property_uri___", property_uri
+            )
+        )
+        range_intersection_result = g.query(
+            self.GET_PROPERTY_RANGE_OWL_INTERSECTION_SPARQL.replace(
+                "___property_uri___", property_uri
+            )
+        )
         range_values = [
             str(cast(ResultRow, range_row)["range"])
-            for range_row in range_result
+            for range_row in [
+                *range_result,
+                *range_union_result,
+                *range_intersection_result,
+            ]
         ]
+
         domain_result = g.query(
             self.GET_PROPERTY_DOMAIN_SPARQL.replace(
                 "___property_uri___", property_uri
             )
         )
+
+        domain_union_result = g.query(
+            self.GET_PROPERTY_DOMAIN_OWL_UNION_SPARQL.replace(
+                "___property_uri___", property_uri
+            )
+        )
+
+        domain_intersection_result = g.query(
+            self.GET_PROPERTY_DOMAIN_OWL_INTERSECTION_SPARQL.replace(
+                "___property_uri___", property_uri
+            )
+        )
+
         domain_values = [
             str(cast(ResultRow, domain_row)["domain"])
-            for domain_row in domain_result
+            for domain_row in [
+                *domain_result,
+                *domain_union_result,
+                *domain_intersection_result,
+            ]
         ]
         is_deprecated = cast(
             Literal, property_result["isDeprecated"]

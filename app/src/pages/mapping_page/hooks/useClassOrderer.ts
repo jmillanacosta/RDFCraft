@@ -1,7 +1,8 @@
+import { xsdTypes } from '@/consts/xsdTypes';
 import { getConnectedEdges, useEdges } from '@xyflow/react';
 import { useEffect, useState } from 'react';
-import { OntologyClass } from '../../../lib/api/ontology_api/types';
-import { EntityNodeType, XYEdgeType } from '../components/MainPanel/types';
+import { NamedNode, OntologyClass } from '../../../lib/api/ontology_api/types';
+import { XYEdgeType, XYNodeTypes } from '../components/MainPanel/types';
 import useMappingPage from '../state';
 
 /**
@@ -23,10 +24,8 @@ import useMappingPage from '../state';
  * 10. Groups the remaining classes by their respective ontologies.
  * 11. Updates the classes state with the ordered classes.
  */
-export default function useClassOrderer(node: EntityNodeType) {
-  const [classes, setClasses] = useState<(OntologyClass & { group: string })[]>(
-    [],
-  );
+export default function useClassOrderer(node: XYNodeTypes) {
+  const [classes, setClasses] = useState<(NamedNode & { group: string })[]>([]);
   const edges = useEdges<XYEdgeType>();
   const ontologies = useMappingPage(state => state.ontologies);
 
@@ -36,11 +35,17 @@ export default function useClassOrderer(node: EntityNodeType) {
       return;
     }
 
-    const allClasses = ontologies.flatMap(ontology => ontology.classes);
+    const allClasses = [
+      ...ontologies.flatMap(ontology => ontology.classes),
+      ...xsdTypes,
+    ];
     const allProperties = ontologies.flatMap(ontology => ontology.properties);
-
-    const outgoingProperties = node.data.properties;
-    const incomingProperties = getConnectedEdges([node], edges)
+    const connectedEdges = getConnectedEdges([node], edges);
+    const outgoingProperties = connectedEdges
+      .filter(edge => edge.source === node.id)
+      .map(edge => allProperties.find(p => p.full_uri === edge.sourceHandle))
+      .filter((p): p is (typeof allProperties)[number] => p !== undefined);
+    const incomingProperties = connectedEdges
       .filter(edge => edge.target === node.id)
       .map(edge => allProperties.find(p => p.full_uri === edge.sourceHandle))
       .filter((p): p is (typeof allProperties)[number] => p !== undefined);
@@ -91,6 +96,10 @@ export default function useClassOrderer(node: EntityNodeType) {
     });
 
     setClasses(classesArr);
+
+    return () => {
+      setClasses([]);
+    };
   }, [edges, ontologies, node]);
 
   return { classes };

@@ -7,17 +7,9 @@ interface Literal {
   language?: string;
 }
 
-enum NamedNodeType {
-  CLASS = 'class',
-  INDIVIDUAL = 'individual',
-  PROPERTY = 'property',
-}
+type NamedNodeType = 'class' | 'individual' | 'property';
 
-enum PropertyType {
-  OBJECT = 'object',
-  DATATYPE = 'datatype',
-  ANNOTATION = 'annotation',
-}
+type PropertyType = 'object' | 'datatype' | 'annotation' | 'any';
 
 interface NamedNode {
   /**
@@ -35,7 +27,7 @@ interface Individual extends NamedNode {
   /**
    * An individual is a named node that is an instance of a class.
    */
-  type: NamedNodeType.INDIVIDUAL;
+  type: 'individual';
 }
 
 interface OntologyClass extends NamedNode {
@@ -43,7 +35,7 @@ interface OntologyClass extends NamedNode {
    * A class is a named node that is a class.
    */
   super_classes: string[];
-  type: NamedNodeType.CLASS;
+  type: 'class';
 }
 
 interface Property extends NamedNode {
@@ -53,7 +45,7 @@ interface Property extends NamedNode {
   property_type: PropertyType;
   range: string[];
   domain: string[];
-  type: NamedNodeType.PROPERTY;
+  type: 'property';
 }
 
 interface Ontology {

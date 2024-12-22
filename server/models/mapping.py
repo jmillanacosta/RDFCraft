@@ -21,7 +21,7 @@ class MappingNode:
         label (str): The label of the node
         uri_pattern (str): The URI pattern of the node
         rdf_type (list[str]): The RDF type/s of the node
-        properties (list[Property]): The properties of the node
+        properties (list[str]): The properties of the node
     """
 
     id: str
@@ -29,7 +29,7 @@ class MappingNode:
     label: str
     uri_pattern: str
     rdf_type: list[str]
-    properties: list[Property]
+    properties: list[str]
 
     def to_dict(self):
         return {
@@ -38,9 +38,7 @@ class MappingNode:
             "label": self.label,
             "uri_pattern": self.uri_pattern,
             "rdf_type": self.rdf_type,
-            "properties": [
-                prop.to_dict() for prop in self.properties
-            ],
+            "properties": self.properties,
         }
 
     @classmethod
@@ -63,10 +61,7 @@ class MappingNode:
             label=data["label"],
             uri_pattern=data["uri_pattern"],
             rdf_type=data["rdf_type"],
-            properties=[
-                Property.from_dict(prop)
-                for prop in data["properties"]
-            ],
+            properties=data["properties"],
         )
 
 

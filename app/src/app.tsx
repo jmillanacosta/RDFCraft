@@ -3,7 +3,6 @@ import { StrictMode } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import WorkspacesPage from './pages/workspaces_page';
 
-import { ReactFlowProvider } from '@xyflow/react';
 import './index.scss';
 import MappingPage from './pages/mapping_page';
 import OntologiesPage from './pages/ontologies_page';
@@ -29,11 +28,7 @@ const router = createBrowserRouter([
   },
   {
     path: '/workspaces/:uuid/mapping/:mapping_uuid',
-    element: (
-      <ReactFlowProvider>
-        <MappingPage />
-      </ReactFlowProvider>
-    ),
+    element: <MappingPage />,
   },
 ]);
 

@@ -12,7 +12,6 @@ export function EntityNode({ data, selected }: NodeProps<EntityNodeType>) {
 
   const properties = useMemo(() => {
     if (!ontologies) return [];
-
     const allProperties = ontologies.flatMap(ontology => ontology.properties);
     return data.properties.map(property_1 => {
       const _property = allProperties.find(

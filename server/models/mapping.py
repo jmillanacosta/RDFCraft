@@ -14,12 +14,12 @@ class Position:
     A position in a mapping graph.
 
     Attributes:
-        x (int): The x-coordinate of the position
-        y (int): The y-coordinate of the position
+        x (float): The x-coordinate of the position
+        y (float): The y-coordinate of the position
     """
 
-    x: int
-    y: int
+    x: float
+    y: float
 
     def to_dict(self):
         return {
@@ -234,8 +234,6 @@ class MappingEdge:
             raise ValueError("source is required")
         if "target" not in data:
             raise ValueError("target is required")
-        if "predicate_uri" not in data:
-            raise ValueError("predicate_uri is required")
         if "source_handle" not in data:
             raise ValueError("source_handle is required")
         if "target_handle" not in data:

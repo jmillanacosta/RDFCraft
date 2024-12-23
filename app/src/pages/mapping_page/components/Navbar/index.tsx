@@ -1,15 +1,37 @@
+import {
+  XYEdgeType,
+  XYNodeTypes,
+} from '@/pages/mapping_page/components/MainPanel/types';
+import useMappingPage from '@/pages/mapping_page/state';
 import { Navbar as BPNavbar, Button, ButtonGroup } from '@blueprintjs/core';
+import { useEdges, useNodes } from '@xyflow/react';
+import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 type NavbarProps = {
-  uuid: string | undefined;
+  workspace_uuid: string | undefined;
+  mapping_uuid: string | undefined;
   name: string | undefined;
   isLoading: string | null;
-  onSave: () => void;
 };
 
-const Navbar = ({ uuid, name, isLoading, onSave }: NavbarProps) => {
+const Navbar = ({
+  workspace_uuid,
+  mapping_uuid,
+  name,
+  isLoading,
+}: NavbarProps) => {
   const navigation = useNavigate();
+  const saveMapping = useMappingPage(state => state.saveMapping);
+  const mapping = useMappingPage(state => state.mapping);
+
+  const nodes = useNodes<XYNodeTypes>();
+  const edges = useEdges<XYEdgeType>();
+
+  const onSave = useCallback(() => {
+    if (!workspace_uuid || !mapping_uuid || !mapping) return;
+    saveMapping(workspace_uuid, mapping_uuid, mapping, nodes, edges);
+  }, [nodes, edges, mapping, saveMapping, workspace_uuid, mapping_uuid]);
 
   return (
     <BPNavbar fixedToTop>
@@ -18,7 +40,7 @@ const Navbar = ({ uuid, name, isLoading, onSave }: NavbarProps) => {
           icon='arrow-left'
           minimal
           onClick={() => {
-            navigation(`/workspaces/${uuid}`);
+            navigation(`/workspaces/${workspace_uuid}`);
           }}
         />
         <div style={{ width: 10 }} />

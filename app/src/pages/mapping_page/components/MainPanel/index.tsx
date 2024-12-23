@@ -7,6 +7,7 @@ import {
   Controls,
   EdgeTypes,
   MarkerType,
+  MiniMap,
   NodeTypes,
   ReactFlow,
   useEdgesState,
@@ -23,7 +24,7 @@ import { EntityNode } from '@/pages/mapping_page/components/MainPanel/components
 import FloatingEdge from '@/pages/mapping_page/components/MainPanel/components/FloatingEdge';
 import { LiteralNode } from '@/pages/mapping_page/components/MainPanel/components/LiteralNode';
 
-import { URIRefNode } from '@/pages/mapping_page/components/MainPanel/components/UriRefNode';
+import { URIRefNode } from '@/pages/mapping_page/components/MainPanel/components/URIRefNode';
 import { useBackendMappingGraph } from '@/pages/mapping_page/hooks/useBackendMappingGraph';
 import { XYEdgeType, XYNodeTypes } from './types';
 
@@ -59,10 +60,13 @@ const MainPanel = ({ initialGraph }: MainPanelProps) => {
   const [nodes, setNodes, onNodesChange] = useNodesState<XYNodeTypes>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<XYEdgeType>([]);
 
+  const screenToFlowPosition = reactflow.screenToFlowPosition;
+
   useEffect(() => {
     setNodes(initialNodes);
     setEdges(initialEdges);
-  }, [initialNodes, initialEdges, setNodes, setEdges]);
+    reactflow.fitView();
+  }, [initialNodes, initialEdges, setNodes, setEdges, reactflow]);
 
   const onConnect = useCallback(
     (params: Connection) => {
@@ -73,6 +77,10 @@ const MainPanel = ({ initialGraph }: MainPanelProps) => {
 
   const handleAddEntityNode = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+      const position = screenToFlowPosition({
+        x: e.clientX,
+        y: e.clientY,
+      });
       setNodes(nodes => [
         ...nodes,
         {
@@ -84,24 +92,22 @@ const MainPanel = ({ initialGraph }: MainPanelProps) => {
             uri_pattern: '',
             properties: [],
             type: 'entity',
-            position: reactflow.screenToFlowPosition({
-              x: e.clientX,
-              y: e.clientY,
-            }),
+            position: position,
           },
-          position: reactflow.screenToFlowPosition({
-            x: e.clientX,
-            y: e.clientY,
-          }),
+          position: position,
           type: 'entity',
         },
       ]);
     },
-    [setNodes, reactflow],
+    [setNodes, screenToFlowPosition],
   );
 
   const handleAddUriRefNode = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+      const position = screenToFlowPosition({
+        x: e.clientX,
+        y: e.clientY,
+      });
       setNodes(nodes => [
         ...nodes,
         {
@@ -110,25 +116,19 @@ const MainPanel = ({ initialGraph }: MainPanelProps) => {
             id: `node-${nodes.length}`,
             uri_pattern: 'http://example.com/',
             type: 'uri_ref',
-            position: reactflow.screenToFlowPosition({
-              x: e.clientX,
-              y: e.clientY,
-            }),
+            position: position,
           },
-          position: reactflow.screenToFlowPosition({
-            x: e.clientX,
-            y: e.clientY,
-          }),
+          position: position,
           type: 'uri_ref',
         },
       ]);
     },
-    [setNodes, reactflow],
+    [setNodes, screenToFlowPosition],
   );
 
   const handleAddLiteralNode = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
-      const position = reactflow.screenToFlowPosition({
+      const position = screenToFlowPosition({
         x: e.clientX,
         y: e.clientY,
       });
@@ -149,7 +149,7 @@ const MainPanel = ({ initialGraph }: MainPanelProps) => {
         },
       ]);
     },
-    [setNodes, reactflow],
+    [setNodes, screenToFlowPosition],
   );
 
   const openMenu = (e: React.MouseEvent) => {
@@ -184,6 +184,15 @@ const MainPanel = ({ initialGraph }: MainPanelProps) => {
         onContextMenu={openMenu}
       >
         <Background bgColor='#1C2127' gap={16} size={1} />
+        <MiniMap
+          nodeColor={n => {
+            if (n.type === 'entity') return '#ff0072';
+            if (n.type === 'uri_ref') return '#00ff00';
+            if (n.type === 'literal') return '#0057ff';
+            return '#eee';
+          }}
+          pannable
+        />
         <Controls />
       </ReactFlow>
     </div>

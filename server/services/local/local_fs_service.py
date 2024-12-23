@@ -135,7 +135,7 @@ class LocalFSService(FSServiceProtocol):
                     code=ErrCodes.FILE_NOT_FOUND,
                 )
 
-            table_hash = res.tuple()[0].hash
+            # table_hash = res.tuple()[0].hash
             file_path = self._FILE_DIR / uuid
             # if (
             #     table_hash

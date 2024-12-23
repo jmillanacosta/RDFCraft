@@ -1,6 +1,7 @@
 import { getEdgePosition } from '@/pages/mapping_page/components/MainPanel/utils';
 import { EdgeProps, getSmoothStepPath, useInternalNode } from '@xyflow/react';
 
+import { useMemo } from 'react';
 import './styles.scss';
 
 function FloatingEdge({
@@ -16,28 +17,30 @@ function FloatingEdge({
   const sourceNode = useInternalNode(source);
   const targetNode = useInternalNode(target);
 
-  if (!sourceNode || !targetNode) {
-    return null;
-  }
+  const [edgePath] = useMemo(() => {
+    if (!sourceNode || !targetNode) {
+      return [];
+    }
 
-  const { sx, sy, sp, tx, ty, tp, cx, cy } = getEdgePosition(
-    sourceNode,
-    sourceHandleId ?? '',
-    targetNode,
-    targetHandleId ?? '',
-  );
+    const { sx, sy, sp, tx, ty, tp, cx, cy } = getEdgePosition(
+      sourceNode,
+      sourceHandleId ?? '',
+      targetNode,
+      targetHandleId ?? '',
+    );
 
-  const [edgePath] = getSmoothStepPath({
-    sourceX: sx,
-    sourceY: sy,
-    sourcePosition: sp,
-    targetX: tx,
-    targetY: ty,
-    targetPosition: tp,
-    borderRadius: 10,
-    centerX: cx,
-    centerY: cy,
-  });
+    return getSmoothStepPath({
+      sourceX: sx,
+      sourceY: sy,
+      sourcePosition: sp,
+      targetX: tx,
+      targetY: ty,
+      targetPosition: tp,
+      borderRadius: 10,
+      centerX: cx,
+      centerY: cy,
+    });
+  }, [sourceHandleId, sourceNode, targetHandleId, targetNode]);
 
   return (
     <path

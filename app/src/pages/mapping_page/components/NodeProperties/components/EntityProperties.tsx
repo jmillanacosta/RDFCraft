@@ -164,9 +164,7 @@ const EntityNodeProperties = ({ node }: { node: EntityNodeType }) => {
         },
       });
     },
-    // Reason: we only want to update the node when the node id or reactflow changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [node.id, reactflow],
+    [node, reactflow],
   );
 
   const createNewClassItemFromQuery = (query: string) => {

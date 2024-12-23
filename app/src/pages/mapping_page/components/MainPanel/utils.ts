@@ -62,12 +62,17 @@ export function getCenter(
   node: InternalNode,
   handleId: string,
   handlePosition: Position,
+  sourceX: number,
   sourceY: number,
+  targetX: number,
   targetY: number,
 ): { x: number; y: number } {
   // Center's x is always located on left or right side of the handle
   // Center's y is always located between two handles
-  const offset = 150;
+  // Make offset based on the distance between two handles
+  const dx = Math.abs(sourceX - targetX);
+  const dy = sourceY - targetY;
+  const offset = dx * 0.5 + dy * 0.2;
   const handle = [
     ...(node.internals.handleBounds?.source ?? []),
     ...(node.internals.handleBounds?.target ?? []),
@@ -155,7 +160,9 @@ export function getEdgePosition(
         source,
         sourceHandleId,
         sourcePos,
+        sourceLocation.x,
         sourceLocation.y,
+        targetLocation.x,
         targetLocation.y,
       );
 

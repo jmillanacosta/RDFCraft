@@ -21,8 +21,7 @@ const URIRefProperties = ({ node }: { node: URIRefNodeType }) => {
         },
       });
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [node.id, reactflow],
+    [node, reactflow],
   );
 
   return (

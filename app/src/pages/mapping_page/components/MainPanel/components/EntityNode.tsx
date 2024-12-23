@@ -5,37 +5,34 @@ import { EntityNodeType } from '@/pages/mapping_page/components/MainPanel/types'
 import useMappingPage from '@/pages/mapping_page/state';
 import { Card, HTMLTable, Icon } from '@blueprintjs/core';
 import { NodeProps } from '@xyflow/react';
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 
 export function EntityNode({ data, selected }: NodeProps<EntityNodeType>) {
   const ontologies = useMappingPage(state => state.ontologies);
 
-  const [properties, setProperties] = useState<Property[]>([]);
+  const properties = useMemo(() => {
+    if (!ontologies) return [];
 
-  useEffect(() => {
-    if (ontologies) {
-      const allProperties = ontologies.flatMap(ontology => ontology.properties);
-      const _properties = data.properties.map(property_1 => {
-        const _property = allProperties.find(
-          property_2 => property_2.full_uri === property_1,
-        );
-        return (
-          _property ??
-          ({
-            type: 'property',
-            belongs_to: 'Created',
-            description: [],
-            domain: [],
-            full_uri: property_1,
-            label: [],
-            property_type: 'any',
-            range: [],
-            is_deprecated: false,
-          } as Property)
-        );
-      });
-      setProperties(_properties);
-    }
+    const allProperties = ontologies.flatMap(ontology => ontology.properties);
+    return data.properties.map(property_1 => {
+      const _property = allProperties.find(
+        property_2 => property_2.full_uri === property_1,
+      );
+      return (
+        _property ??
+        ({
+          type: 'property',
+          belongs_to: 'Created',
+          description: [],
+          domain: [],
+          full_uri: property_1,
+          label: [],
+          property_type: 'any',
+          range: [],
+          is_deprecated: false,
+        } as Property)
+      );
+    });
   }, [ontologies, data.properties]);
 
   return (

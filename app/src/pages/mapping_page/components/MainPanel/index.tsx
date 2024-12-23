@@ -23,7 +23,7 @@ import { EntityNode } from '@/pages/mapping_page/components/MainPanel/components
 import FloatingEdge from '@/pages/mapping_page/components/MainPanel/components/FloatingEdge';
 import { LiteralNode } from '@/pages/mapping_page/components/MainPanel/components/LiteralNode';
 
-import { URIRefNode } from '@/pages/mapping_page/components/MainPanel/components/URIRefNode';
+import { URIRefNode } from '@/pages/mapping_page/components/MainPanel/components/UriRefNode';
 import { useBackendMappingGraph } from '@/pages/mapping_page/hooks/useBackendMappingGraph';
 import { XYEdgeType, XYNodeTypes } from './types';
 

@@ -21,6 +21,7 @@ interface MappingPageState {
   prefixes: Prefix[] | null;
   isLoading: string | null;
   error: string | null;
+  isSaved: boolean;
 }
 
 interface MappingPageStateActions {
@@ -32,6 +33,7 @@ interface MappingPageStateActions {
     nodes: XYNodeTypes[],
     edges: XYEdgeType[],
   ) => Promise<void>;
+  setIsSaved: (isSaved: boolean) => void;
 }
 
 const defaultState: MappingPageState = {
@@ -41,6 +43,7 @@ const defaultState: MappingPageState = {
   prefixes: null,
   isLoading: null,
   error: null,
+  isSaved: true,
 };
 
 const functions: ZustandActions<MappingPageStateActions, MappingPageState> = (
@@ -104,7 +107,7 @@ const functions: ZustandActions<MappingPageStateActions, MappingPageState> = (
     } as MappingGraph;
     try {
       await MappingService.updateMapping(workspaceUuid, mappingUuid, mapping);
-      set({ error: null });
+      set({ error: null, isSaved: true });
     } catch (error) {
       if (error instanceof Error) {
         set({ error: error.message });
@@ -112,6 +115,9 @@ const functions: ZustandActions<MappingPageStateActions, MappingPageState> = (
     } finally {
       set({ isLoading: null });
     }
+  },
+  setIsSaved(isSaved: boolean) {
+    set({ isSaved });
   },
 });
 

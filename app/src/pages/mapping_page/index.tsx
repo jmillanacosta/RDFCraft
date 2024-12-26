@@ -38,7 +38,6 @@ const MappingPage = () => {
   const isLoading = useMappingPage(state => state.isLoading);
   const error = useMappingPage(state => state.error);
   const loadMapping = useMappingPage(state => state.loadMapping);
-  const saveMapping = useMappingPage(state => state.saveMapping);
 
   useRegisterTheme('mapping-theme', mapping_theme);
   useRegisterLanguage('mapping_language', mapping_language, {});

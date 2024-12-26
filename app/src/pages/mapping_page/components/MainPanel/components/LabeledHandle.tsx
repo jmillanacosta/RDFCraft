@@ -20,13 +20,20 @@ const LabeledHandle = React.forwardRef<
       position: 'relative',
       display: 'flex',
       alignItems: 'center',
-      textAlign: 'center',
+      textAlign: 'left',
+      overflow: 'hidden',
+      maxWidth: '150px',
     }}
   >
     <BaseHandle position={Position.Left} {...props} />
     {bigTitle ? (
       <h2
-        style={{ padding: '0 0.75rem', color: 'var(--foreground)' }}
+        style={{
+          padding: '0 0.75rem',
+          color: 'var(--foreground)',
+          overflowWrap: 'break-word',
+          hyphens: 'auto',
+        }}
         className={labelClassName}
       >
         {title}
@@ -37,6 +44,10 @@ const LabeledHandle = React.forwardRef<
           padding: '0 0.75rem',
           color: 'var(--foreground)',
           width: '100%',
+          textAlign: 'center',
+          overflowWrap: 'break-word',
+
+          hyphens: 'auto',
         }}
         className={labelClassName}
       >

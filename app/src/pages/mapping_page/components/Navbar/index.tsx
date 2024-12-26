@@ -23,6 +23,7 @@ const Navbar = ({
 }: NavbarProps) => {
   const navigation = useNavigate();
   const saveMapping = useMappingPage(state => state.saveMapping);
+  const isSaved = useMappingPage(state => state.isSaved);
   const mapping = useMappingPage(state => state.mapping);
 
   const nodes = useNodes<XYNodeTypes>();
@@ -52,7 +53,11 @@ const Navbar = ({
       </BPNavbar.Group>
       <BPNavbar.Group align='right'>
         <ButtonGroup>
-          <Button icon='floppy-disk' onClick={onSave}>
+          <Button
+            icon='floppy-disk'
+            onClick={onSave}
+            intent={isSaved ? 'success' : 'warning'}
+          >
             Save
           </Button>
           <Button icon='rocket'>Map</Button>

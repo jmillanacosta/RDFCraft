@@ -5,10 +5,13 @@ import {
   Background,
   Connection,
   Controls,
+  EdgeChange,
   EdgeTypes,
   MarkerType,
   MiniMap,
+  NodeChange,
   NodeTypes,
+  OnConnectEnd,
   ReactFlow,
   useEdgesState,
   useNodesState,
@@ -16,7 +19,7 @@ import {
 } from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { MappingGraph } from '../../../../lib/api/mapping_service/types';
 
 import ConnectionLineComponent from '@/pages/mapping_page/components/MainPanel/components/ConnectionLineComponent';
@@ -26,7 +29,14 @@ import { LiteralNode } from '@/pages/mapping_page/components/MainPanel/component
 
 import { URIRefNode } from '@/pages/mapping_page/components/MainPanel/components/URIRefNode';
 import { useBackendMappingGraph } from '@/pages/mapping_page/hooks/useBackendMappingGraph';
-import { XYEdgeType, XYNodeTypes } from './types';
+import useMappingPage from '@/pages/mapping_page/state';
+import {
+  EntityNodeType,
+  LiteralNodeType,
+  URIRefNodeType,
+  XYEdgeType,
+  XYNodeTypes,
+} from './types';
 
 type MainPanelProps = {
   initialGraph: MappingGraph | null;
@@ -54,11 +64,51 @@ const defaultEdgeOptions = {
 
 const MainPanel = ({ initialGraph }: MainPanelProps) => {
   const reactflow = useReactFlow();
+  const setIsSaved = useMappingPage(state => state.setIsSaved);
   const { nodes: initialNodes, edges: initialEdges } =
     useBackendMappingGraph(initialGraph);
+  const [dropConnection, setDropConnection] = useState<{
+    source: string;
+    sourceHandle: string;
+  } | null>(null);
+  const [newNode, setNewNode] = useState<XYNodeTypes | null>(null);
 
-  const [nodes, setNodes, onNodesChange] = useNodesState<XYNodeTypes>([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState<XYEdgeType>([]);
+  const [nodes, setNodes, xyOnNodesChange] = useNodesState<XYNodeTypes>([]);
+  const [edges, setEdges, xyOnEdgesChange] = useEdgesState<XYEdgeType>([]);
+  const [ignoreNodesChange, setIgnoreNodesChange] = useState(false);
+
+  const onNodesChange = useCallback(
+    (nodes: NodeChange<XYNodeTypes>[]) => {
+      setIsSaved(ignoreNodesChange);
+      if (ignoreNodesChange) {
+        setIgnoreNodesChange(false);
+      }
+      xyOnNodesChange(nodes);
+    },
+    [setIsSaved, ignoreNodesChange, xyOnNodesChange],
+  );
+
+  const onEdgesChange = useCallback(
+    (edges: EdgeChange<XYEdgeType>[]) => {
+      setIsSaved(ignoreNodesChange);
+      if (ignoreNodesChange) {
+        setIgnoreNodesChange(false);
+      }
+      xyOnEdgesChange(edges);
+    },
+    [setIsSaved, xyOnEdgesChange, ignoreNodesChange],
+  );
+
+  const onConnect = useCallback(
+    (params: Connection) => {
+      setIsSaved(ignoreNodesChange);
+      if (ignoreNodesChange) {
+        setIgnoreNodesChange(false);
+      }
+      setEdges(edges => addEdge(params, edges));
+    },
+    [setEdges, setIsSaved, ignoreNodesChange],
+  );
 
   const screenToFlowPosition = reactflow.screenToFlowPosition;
 
@@ -66,14 +116,26 @@ const MainPanel = ({ initialGraph }: MainPanelProps) => {
     setNodes(initialNodes);
     setEdges(initialEdges);
     reactflow.fitView();
+    setIgnoreNodesChange(true);
   }, [initialNodes, initialEdges, setNodes, setEdges, reactflow]);
 
-  const onConnect = useCallback(
-    (params: Connection) => {
-      setEdges(edges => addEdge(params, edges));
-    },
-    [setEdges],
-  );
+  useEffect(() => {
+    if (dropConnection && newNode) {
+      setEdges(edges =>
+        addEdge(
+          {
+            source: dropConnection.source,
+            target: newNode.id,
+            sourceHandle: dropConnection.sourceHandle,
+            targetHandle: newNode.id,
+          },
+          edges,
+        ),
+      );
+      setDropConnection(null);
+      setNewNode(null);
+    }
+  }, [dropConnection, newNode, setEdges]);
 
   const handleAddEntityNode = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
@@ -81,25 +143,24 @@ const MainPanel = ({ initialGraph }: MainPanelProps) => {
         x: e.clientX,
         y: e.clientY,
       });
-      setNodes(nodes => [
-        ...nodes,
-        {
+      const newNode = {
+        id: `node-${nodes.length}`,
+        data: {
           id: `node-${nodes.length}`,
-          data: {
-            id: `node-${nodes.length}`,
-            label: 'New Entity',
-            rdf_type: [],
-            uri_pattern: '',
-            properties: [],
-            type: 'entity',
-            position: position,
-          },
-          position: position,
+          label: 'New Entity',
+          rdf_type: [],
+          uri_pattern: '',
+          properties: [],
           type: 'entity',
+          position: position,
         },
-      ]);
+        position: position,
+        type: 'entity',
+      } as EntityNodeType;
+      setNodes(nodes => [...nodes, newNode]);
+      setNewNode(newNode);
     },
-    [setNodes, screenToFlowPosition],
+    [setNodes, screenToFlowPosition, nodes, setNewNode],
   );
 
   const handleAddUriRefNode = useCallback(
@@ -108,22 +169,21 @@ const MainPanel = ({ initialGraph }: MainPanelProps) => {
         x: e.clientX,
         y: e.clientY,
       });
-      setNodes(nodes => [
-        ...nodes,
-        {
+      const newNode = {
+        id: `node-${nodes.length}`,
+        data: {
           id: `node-${nodes.length}`,
-          data: {
-            id: `node-${nodes.length}`,
-            uri_pattern: 'http://example.com/',
-            type: 'uri_ref',
-            position: position,
-          },
-          position: position,
+          uri_pattern: 'http://example.com/',
           type: 'uri_ref',
+          position: position,
         },
-      ]);
+        position: position,
+        type: 'uri_ref',
+      } as URIRefNodeType;
+      setNodes(nodes => [...nodes, newNode]);
+      setNewNode(newNode);
     },
-    [setNodes, screenToFlowPosition],
+    [setNodes, screenToFlowPosition, nodes, setNewNode],
   );
 
   const handleAddLiteralNode = useCallback(
@@ -132,40 +192,78 @@ const MainPanel = ({ initialGraph }: MainPanelProps) => {
         x: e.clientX,
         y: e.clientY,
       });
-      setNodes(nodes => [
-        ...nodes,
-        {
+      const newNode = {
+        id: `node-${nodes.length}`,
+        data: {
           id: `node-${nodes.length}`,
-          data: {
-            id: `node-${nodes.length}`,
-            label: 'New Literal',
-            value: '',
-            literal_type: 'string',
-            type: 'literal',
-            position: position,
-          },
-          position: position,
+          label: 'New Literal',
+          value: '',
+          literal_type: 'string',
           type: 'literal',
+          position: position,
         },
-      ]);
+        position: position,
+        type: 'literal',
+      } as LiteralNodeType;
+      setNodes(nodes => [...nodes, newNode]);
+      setNewNode(newNode);
     },
-    [setNodes, screenToFlowPosition],
+    [setNodes, screenToFlowPosition, nodes, setNewNode],
   );
 
-  const openMenu = (e: React.MouseEvent) => {
-    e.preventDefault();
-    showContextMenu({
-      content: (
-        <Menu>
-          <MenuItem text='Create Node' onClick={handleAddEntityNode} />
-          <MenuItem text='Create URI Reference' onClick={handleAddUriRefNode} />
-          <MenuItem text='Create Literal' onClick={handleAddLiteralNode} />
-        </Menu>
-      ),
-      targetOffset: { left: e.clientX, top: e.clientY },
-      isDarkTheme: true,
-    });
-  };
+  const openMenu = useCallback(
+    (targetOffset: { left: number; top: number }) => {
+      showContextMenu({
+        content: (
+          <Menu>
+            <MenuItem text='Create Node' onClick={handleAddEntityNode} />
+            <MenuItem
+              text='Create URI Reference'
+              onClick={handleAddUriRefNode}
+            />
+            <MenuItem text='Create Literal' onClick={handleAddLiteralNode} />
+          </Menu>
+        ),
+        targetOffset,
+        isDarkTheme: true,
+      });
+    },
+    [handleAddEntityNode, handleAddLiteralNode, handleAddUriRefNode],
+  );
+
+  const onConnectEnd = useCallback<OnConnectEnd>(
+    (event, { fromNode, fromHandle }) => {
+      const targetIsPane =
+        event.target instanceof HTMLElement &&
+        event.target.classList.contains('react-flow__pane');
+
+      if (
+        targetIsPane &&
+        fromNode &&
+        fromHandle &&
+        fromHandle.type === 'source'
+      ) {
+        if (!fromHandle.id) throw new Error('fromHandle.id is undefined');
+
+        setDropConnection({
+          source: fromNode.id,
+          sourceHandle: fromHandle.id,
+        });
+
+        if (event instanceof MouseEvent)
+          openMenu({
+            left: event.clientX,
+            top: event.clientY,
+          });
+        else if (event instanceof TouchEvent)
+          openMenu({
+            left: event.touches[0].clientX,
+            top: event.touches[0].clientY,
+          });
+      }
+    },
+    [openMenu],
+  );
 
   return (
     // disable default right click menu
@@ -181,7 +279,14 @@ const MainPanel = ({ initialGraph }: MainPanelProps) => {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         colorMode='dark'
-        onContextMenu={openMenu}
+        onContextMenu={e => {
+          e.preventDefault();
+          openMenu({
+            left: e.clientX,
+            top: e.clientY,
+          });
+        }}
+        onConnectEnd={onConnectEnd}
       >
         <Background bgColor='#1C2127' gap={16} size={1} />
         <MiniMap

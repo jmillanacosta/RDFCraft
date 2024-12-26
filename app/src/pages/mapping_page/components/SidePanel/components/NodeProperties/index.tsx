@@ -1,12 +1,12 @@
-import LiteralNodeProperties from '@/pages/mapping_page/components/NodeProperties/components/LiteralProperties';
-import URIRefProperties from '@/pages/mapping_page/components/NodeProperties/components/URIRefProperties';
+import LiteralNodeProperties from '@/pages/mapping_page/components/SidePanel/components/NodeProperties/components/LiteralProperties';
+import URIRefProperties from '@/pages/mapping_page/components/SidePanel/components/NodeProperties/components/URIRefProperties';
 import { NonIdealState } from '@blueprintjs/core';
 import { useStore } from '@xyflow/react';
 import {
   EntityNodeType,
   LiteralNodeType,
   URIRefNodeType,
-} from '../MainPanel/types';
+} from '../../../MainPanel/types';
 import EntityNodeProperties from './components/EntityProperties';
 
 const NodeProperties = () => {

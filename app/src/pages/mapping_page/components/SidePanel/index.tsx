@@ -1,5 +1,5 @@
 import { Card } from '@blueprintjs/core';
-import NodeProperties from '../NodeProperties';
+import NodeProperties from './components/NodeProperties';
 
 type SidePanelProps = {
   selectedTab: string | undefined;

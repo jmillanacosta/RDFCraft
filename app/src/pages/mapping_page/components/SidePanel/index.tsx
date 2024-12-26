@@ -1,11 +1,10 @@
+import SearchPanel from '@/pages/mapping_page/components/SidePanel/components/SearchPanel';
+import useMappingPage from '@/pages/mapping_page/state';
 import { Card } from '@blueprintjs/core';
 import NodeProperties from './components/NodeProperties';
 
-type SidePanelProps = {
-  selectedTab: string | undefined;
-};
-
-const SidePanel = ({ selectedTab }: SidePanelProps) => {
+const SidePanel = () => {
+  const selectedTab = useMappingPage(state => state.selectedTab);
   const panelContent = () => {
     switch (selectedTab) {
       case 'properties':
@@ -15,7 +14,7 @@ const SidePanel = ({ selectedTab }: SidePanelProps) => {
       case 'references':
         return <div>Source References Panel Content</div>;
       case 'search':
-        return <div>Search Panel Content</div>;
+        return <SearchPanel />;
       case 'settings':
         return <div>Settings Panel Content</div>;
       default:

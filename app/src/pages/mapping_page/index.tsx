@@ -1,6 +1,6 @@
 import { ReactFlowProvider } from '@xyflow/react';
 import { languages } from 'monaco-editor';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import {
   ImperativePanelHandle,
   Panel,
@@ -28,16 +28,16 @@ type MappingPageURLProps = {
 
 const MappingPage = () => {
   const props = useParams<MappingPageURLProps>();
-  const [selectedTab, setSelectedTab] = useState<
-    'properties' | 'ai' | 'references' | 'search' | 'settings'
-  >('properties');
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const selectedTab = useMappingPage(state => state.selectedTab);
+  const isCollapsed = useMappingPage(state => state.isSidePanelCollapsed);
   const mapping = useMappingPage(state => state.mapping);
   const source = useMappingPage(state => state.source);
   const prefixes = useMappingPage(state => state.prefixes);
   const isLoading = useMappingPage(state => state.isLoading);
   const error = useMappingPage(state => state.error);
   const loadMapping = useMappingPage(state => state.loadMapping);
+  const setSelectedTab = useMappingPage(state => state.setSelectedTab);
+  const setIsCollapsed = useMappingPage(state => state.setIsSidePanelCollapsed);
 
   useRegisterTheme('mapping-theme', mapping_theme);
   useRegisterLanguage('mapping_language', mapping_language, {});
@@ -133,7 +133,7 @@ const MappingPage = () => {
               minSize={10}
               maxSize={50}
             >
-              <SidePanel selectedTab={selectedTab} />
+              <SidePanel />
             </Panel>
             {!isCollapsed && (
               <PanelResizeHandle className='resize-handle'></PanelResizeHandle>

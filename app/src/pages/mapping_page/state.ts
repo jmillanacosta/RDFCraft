@@ -14,6 +14,8 @@ import SourceApi from '../../lib/api/source_api';
 import { Source } from '../../lib/api/source_api/types';
 import { ZustandActions } from '../../utils/zustand';
 
+type SelectedTab = 'properties' | 'ai' | 'references' | 'search' | 'settings';
+
 interface MappingPageState {
   mapping: MappingGraph | null;
   source: Source | null;
@@ -22,6 +24,8 @@ interface MappingPageState {
   isLoading: string | null;
   error: string | null;
   isSaved: boolean;
+  selectedTab: SelectedTab;
+  isSidePanelCollapsed: boolean;
 }
 
 interface MappingPageStateActions {
@@ -34,6 +38,10 @@ interface MappingPageStateActions {
     edges: XYEdgeType[],
   ) => Promise<void>;
   setIsSaved: (isSaved: boolean) => void;
+  setSelectedTab: (
+    selectedTab: 'properties' | 'ai' | 'references' | 'search' | 'settings',
+  ) => void;
+  setIsSidePanelCollapsed: (isSidePanelCollapsed: boolean) => void;
 }
 
 const defaultState: MappingPageState = {
@@ -44,6 +52,8 @@ const defaultState: MappingPageState = {
   isLoading: null,
   error: null,
   isSaved: true,
+  selectedTab: 'properties',
+  isSidePanelCollapsed: false,
 };
 
 const functions: ZustandActions<MappingPageStateActions, MappingPageState> = (
@@ -118,6 +128,12 @@ const functions: ZustandActions<MappingPageStateActions, MappingPageState> = (
   },
   setIsSaved(isSaved: boolean) {
     set({ isSaved });
+  },
+  setSelectedTab(selectedTab: SelectedTab) {
+    set({ selectedTab, isSidePanelCollapsed: false });
+  },
+  setIsSidePanelCollapsed(isSidePanelCollapsed: boolean) {
+    set({ isSidePanelCollapsed });
   },
 });
 

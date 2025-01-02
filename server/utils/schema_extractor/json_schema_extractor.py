@@ -40,9 +40,7 @@ class JSONSchemaExtractor(ISchemaExtractor):
         elif isinstance(obj, list):
             for i, value in enumerate(obj):
                 result.update(
-                    self.getPaths(
-                        value, parent + "[" + str(i) + "]"
-                    )
+                    self.getPaths(value, parent + "[*]")
                 )
         else:
             result.add(parent)

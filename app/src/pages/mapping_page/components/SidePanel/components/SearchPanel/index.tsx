@@ -66,25 +66,33 @@ const SearchPanel = () => {
 
   const handleNodeFocus = useCallback(
     (node: XYNodeTypes) => {
-      reactflow?.fitView({
-        padding: 0.1,
-        includeHiddenNodes: false,
-      });
       reactflow?.setCenter(node.position.x, node.position.y, {
         zoom: 1.5,
+        duration: 1000,
       });
+      setNodes(
+        nodes.map(n => {
+          if (n.id === node.id) {
+            return {
+              ...n,
+              selected: true,
+            };
+          }
+          return {
+            ...n,
+            selected: false,
+          };
+        }),
+      );
     },
-    [reactflow],
+    [reactflow, setNodes, nodes],
   );
 
   const handleNodeEdit = useCallback(
     (node: XYNodeTypes) => {
-      reactflow?.fitView({
-        padding: 0.1,
-        includeHiddenNodes: false,
-      });
       reactflow?.setCenter(node.position.x, node.position.y, {
         zoom: 1.5,
+        duration: 1000,
       });
       setNodes(
         nodes.map(n => {

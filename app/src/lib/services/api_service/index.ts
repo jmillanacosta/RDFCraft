@@ -2,7 +2,6 @@ import axios, { AxiosInstance } from 'axios';
 import { ApiCallOptions, ApiCallResult } from './types';
 
 class ApiService {
-  // @ts-expect-error - private
   private readonly _baseUrl: string;
   private readonly _client: AxiosInstance;
 

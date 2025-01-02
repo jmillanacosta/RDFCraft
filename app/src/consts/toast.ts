@@ -1,14 +1,7 @@
-import { OverlayToaster } from '@blueprintjs/core';
-import { createRoot } from 'react-dom/client';
+import { OverlayToaster, Toaster } from '@blueprintjs/core';
 
-const toast = await OverlayToaster.createAsync(
-  {
-    position: 'top',
-  },
-  {
-    domRenderer: (toaster, containerElement) =>
-      createRoot(containerElement).render(toaster),
-  },
-);
+const toast: Toaster = OverlayToaster.create({
+  position: 'top',
+});
 
 export default toast;

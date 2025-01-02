@@ -102,9 +102,7 @@ const MappingPage = () => {
       setIsCollapsed(true);
       return;
     }
-    setSelectedTab(
-      tabId as 'properties' | 'ai' | 'references' | 'search' | 'settings',
-    );
+    setSelectedTab(tabId as 'properties' | 'ai' | 'references' | 'search');
     setIsCollapsed(false);
   };
 

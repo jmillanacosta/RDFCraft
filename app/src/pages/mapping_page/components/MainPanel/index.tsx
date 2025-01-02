@@ -38,6 +38,8 @@ import {
   XYNodeTypes,
 } from './types';
 
+import { v4 as uuidv4 } from 'uuid';
+
 type MainPanelProps = {
   initialGraph: MappingGraph | null;
 };
@@ -115,7 +117,12 @@ const MainPanel = ({ initialGraph }: MainPanelProps) => {
   useEffect(() => {
     setNodes(initialNodes);
     setEdges(initialEdges);
-    reactflow.fitView();
+    reactflow.fitView({
+      duration: 500,
+      maxZoom: 1,
+      padding: 0.1,
+      minZoom: 0.1,
+    });
     setIgnoreNodesChange(true);
   }, [initialNodes, initialEdges, setNodes, setEdges, reactflow]);
 
@@ -143,10 +150,11 @@ const MainPanel = ({ initialGraph }: MainPanelProps) => {
         x: e.clientX,
         y: e.clientY,
       });
+      const id = uuidv4();
       const newNode = {
-        id: `node-${nodes.length}`,
+        id: id,
         data: {
-          id: `node-${nodes.length}`,
+          id: id,
           label: 'New Entity',
           rdf_type: [],
           uri_pattern: '',
@@ -160,7 +168,7 @@ const MainPanel = ({ initialGraph }: MainPanelProps) => {
       setNodes(nodes => [...nodes, newNode]);
       setNewNode(newNode);
     },
-    [setNodes, screenToFlowPosition, nodes, setNewNode],
+    [setNodes, screenToFlowPosition, setNewNode],
   );
 
   const handleAddUriRefNode = useCallback(
@@ -169,10 +177,11 @@ const MainPanel = ({ initialGraph }: MainPanelProps) => {
         x: e.clientX,
         y: e.clientY,
       });
+      const id = uuidv4();
       const newNode = {
-        id: `node-${nodes.length}`,
+        id: id,
         data: {
-          id: `node-${nodes.length}`,
+          id: id,
           uri_pattern: 'http://example.com/',
           type: 'uri_ref',
           position: position,
@@ -183,7 +192,7 @@ const MainPanel = ({ initialGraph }: MainPanelProps) => {
       setNodes(nodes => [...nodes, newNode]);
       setNewNode(newNode);
     },
-    [setNodes, screenToFlowPosition, nodes, setNewNode],
+    [setNodes, screenToFlowPosition, setNewNode],
   );
 
   const handleAddLiteralNode = useCallback(
@@ -192,10 +201,11 @@ const MainPanel = ({ initialGraph }: MainPanelProps) => {
         x: e.clientX,
         y: e.clientY,
       });
+      const id = uuidv4();
       const newNode = {
-        id: `node-${nodes.length}`,
+        id: id,
         data: {
-          id: `node-${nodes.length}`,
+          id: id,
           label: 'New Literal',
           value: '',
           literal_type: 'string',
@@ -208,7 +218,7 @@ const MainPanel = ({ initialGraph }: MainPanelProps) => {
       setNodes(nodes => [...nodes, newNode]);
       setNewNode(newNode);
     },
-    [setNodes, screenToFlowPosition, nodes, setNewNode],
+    [setNodes, screenToFlowPosition, setNewNode],
   );
 
   const openMenu = useCallback(

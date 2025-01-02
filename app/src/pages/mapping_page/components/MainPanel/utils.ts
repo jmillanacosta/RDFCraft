@@ -31,8 +31,8 @@ export function getOuterBoundaryOfHandle(
   handleAbsoluteLocation: { x: number; y: number },
   position: Position,
 ): { x: number; y: number } {
-  const width = node.internals.bounds?.width ?? 250;
-  const height = node.internals.bounds?.height ?? 100;
+  const width = node.measured.width ?? 250;
+  const height = node.measured.height ?? 100;
 
   switch (position) {
     case Position.Top:
@@ -47,12 +47,12 @@ export function getOuterBoundaryOfHandle(
       };
     case Position.Left:
       return {
-        x: handleAbsoluteLocation.x - width / 4,
+        x: handleAbsoluteLocation.x - width / 2,
         y: handleAbsoluteLocation.y,
       };
     case Position.Right:
       return {
-        x: handleAbsoluteLocation.x + width / 4,
+        x: handleAbsoluteLocation.x + width / 2,
         y: handleAbsoluteLocation.y,
       };
   }

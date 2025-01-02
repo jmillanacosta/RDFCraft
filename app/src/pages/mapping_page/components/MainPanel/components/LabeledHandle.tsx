@@ -7,6 +7,7 @@ const LabeledHandle = React.forwardRef<
   Omit<HandleProps, 'position'> &
     React.HTMLAttributes<HTMLDivElement> & {
       title: string;
+      subtitle?: string;
       bigTitle?: boolean;
       handleClassName?: string;
       labelClassName?: string;
@@ -19,9 +20,11 @@ const LabeledHandle = React.forwardRef<
     style={{
       position: 'relative',
       display: 'flex',
+      flexDirection: 'column',
       alignItems: 'center',
       textAlign: 'left',
-      overflow: 'hidden',
+      overflow: 'clip',
+
       maxWidth: '150px',
     }}
   >
@@ -52,6 +55,22 @@ const LabeledHandle = React.forwardRef<
         className={labelClassName}
       >
         {title}
+      </label>
+    )}
+    {props.subtitle && (
+      <label
+        style={{
+          padding: '0 0.75rem',
+          color: 'gray',
+          width: '100%',
+          textAlign: 'center',
+          overflowWrap: 'break-word',
+          hyphens: 'auto',
+          fontSize: '0.875rem',
+        }}
+        className={labelClassName}
+      >
+        {props.subtitle}
       </label>
     )}
   </div>

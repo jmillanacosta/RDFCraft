@@ -1,0 +1,29 @@
+@use '@blueprintjs/core/lib/scss/variables' as *;
+
+.ontology-page {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+}
+
+.ontology-page-content {
+  margin-top: $pt-navbar-height;
+  width: 100vw;
+  height: calc(100vh - #{$pt-navbar-height});
+}
+
+.ontology-page-tabs {
+  // fixed to the top of the page
+  position: fixed;
+}
+
+.ontology-page-tab-panel {
+  margin-top: 40px;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+
+.ontology-page-card {
+  margin: 10px;
+}

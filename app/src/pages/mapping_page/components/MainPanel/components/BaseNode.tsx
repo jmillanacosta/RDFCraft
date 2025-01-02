@@ -1,6 +1,8 @@
 import { cn } from '@/utils/cn';
 import React from 'react';
 
+import './styles.scss';
+
 export const BaseNode = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & { selected?: boolean }

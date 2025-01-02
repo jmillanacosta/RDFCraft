@@ -31,7 +31,7 @@ const renderMenuItemProperty: ItemRenderer<NamedNode & { group: string }> = (
   <MenuItem
     role='menuitem'
     key={item.full_uri}
-    label='Label'
+    label={'Property'}
     text={item.label.length > 0 ? item.label[0].value : item.full_uri}
     onClick={handleClick}
     active={modifiers.active}

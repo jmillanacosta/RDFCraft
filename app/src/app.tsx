@@ -3,6 +3,7 @@ import { StrictMode } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import WorkspacesPage from './pages/workspaces_page';
 
+import OntologyPage from '@/pages/ontology_page';
 import './index.scss';
 import MappingPage from './pages/mapping_page';
 import OntologiesPage from './pages/ontologies_page';
@@ -29,6 +30,10 @@ const router = createBrowserRouter([
   {
     path: '/workspaces/:uuid/mapping/:mapping_uuid',
     element: <MappingPage />,
+  },
+  {
+    path: '/workspaces/:uuid/ontologies/:ontology_uuid',
+    element: <OntologyPage />,
   },
 ]);
 

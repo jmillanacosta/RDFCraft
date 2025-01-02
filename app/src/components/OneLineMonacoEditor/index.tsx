@@ -66,6 +66,7 @@ const OneLineMonaco = ({
         hideCursorInOverviewRuler: true,
         scrollBeyondLastColumn: 0,
         folding: false,
+        fixedOverflowWidgets: true,
         scrollbar: {
           horizontal: 'hidden',
           vertical: 'hidden',

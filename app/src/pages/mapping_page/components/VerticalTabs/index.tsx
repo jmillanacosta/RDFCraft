@@ -1,14 +1,13 @@
 import { Button } from '@blueprintjs/core';
 import {
   VscBook,
-  VscGear,
   VscPlug,
   VscSearch,
   VscSymbolProperty,
 } from 'react-icons/vsc';
 
 type VerticalTabsProps = {
-  selectedTab: 'properties' | 'ai' | 'references' | 'search' | 'settings';
+  selectedTab: 'properties' | 'ai' | 'references' | 'search';
   isCollapsed: boolean;
   handleTabClick: (tabId: string) => void;
 };
@@ -18,7 +17,6 @@ const tabs: { id: string; label: string; icon: JSX.Element }[] = [
   { id: 'ai', label: 'AI', icon: <VscPlug /> },
   { id: 'search', label: 'Search', icon: <VscSearch /> },
   { id: 'references', label: 'Source References', icon: <VscBook /> },
-  { id: 'settings', label: 'Settings', icon: <VscGear /> },
 ];
 
 const VerticalTabs = ({

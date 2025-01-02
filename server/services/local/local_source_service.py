@@ -120,20 +120,22 @@ class LocalSourceService(SourceServiceProtocol):
     ) -> str:
         self.logger.info(f"Creating source of type {type}")
 
+        schema_content = content
+
         if type == SourceType.JSON:
             if "json_path" not in extra:
                 raise ServerException(
                     "JSON path is required for JSON source",
                     ErrCodes.JSON_PATH_NOT_PROVIDED,
                 )
-            content = self.adjust_json_source(
+            schema_content = self.adjust_json_source(
                 content, extra["json_path"]
             )
 
         try:
             references = (
                 self.schema_extractor.extract_schema(
-                    content, type
+                    schema_content, type
                 )
             )
         except KeyError:

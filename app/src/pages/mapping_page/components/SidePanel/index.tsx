@@ -1,4 +1,5 @@
 import SearchPanel from '@/pages/mapping_page/components/SidePanel/components/SearchPanel';
+import SourcePanel from '@/pages/mapping_page/components/SidePanel/components/SourcePanel';
 import useMappingPage from '@/pages/mapping_page/state';
 import { Card } from '@blueprintjs/core';
 import NodeProperties from './components/NodeProperties';
@@ -12,11 +13,9 @@ const SidePanel = () => {
       case 'ai':
         return <div>AI Panel Content</div>;
       case 'references':
-        return <div>Source References Panel Content</div>;
+        return <SourcePanel />;
       case 'search':
         return <SearchPanel />;
-      case 'settings':
-        return <div>Settings Panel Content</div>;
       default:
         return <NodeProperties />;
     }

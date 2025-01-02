@@ -70,6 +70,7 @@ export function EntityNode({ data, selected }: NodeProps<EntityNodeType>) {
                   <LabeledHandle
                     id={entry.full_uri}
                     title={entry.label[0]?.value ?? entry.full_uri}
+                    subtitle={entry.property_type}
                     type='source'
                   />
                 </td>

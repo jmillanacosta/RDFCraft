@@ -14,7 +14,7 @@ import SourceApi from '../../lib/api/source_api';
 import { Source } from '../../lib/api/source_api/types';
 import { ZustandActions } from '../../utils/zustand';
 
-type SelectedTab = 'properties' | 'ai' | 'references' | 'search' | 'settings';
+type SelectedTab = 'properties' | 'ai' | 'references' | 'search';
 
 interface MappingPageState {
   mapping: MappingGraph | null;
@@ -39,7 +39,7 @@ interface MappingPageStateActions {
   ) => Promise<void>;
   setIsSaved: (isSaved: boolean) => void;
   setSelectedTab: (
-    selectedTab: 'properties' | 'ai' | 'references' | 'search' | 'settings',
+    selectedTab: 'properties' | 'ai' | 'references' | 'search',
   ) => void;
   setIsSidePanelCollapsed: (isSidePanelCollapsed: boolean) => void;
 }

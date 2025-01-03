@@ -45,6 +45,9 @@ async def bootstrap():
 
     di["TEMP_DIR"] = di["APP_DIR"] / "temp"
 
+    if not di["TEMP_DIR"].exists():
+        di["TEMP_DIR"].mkdir()
+
     # Detecting system and architecture for later use
     di["SYSTEM"] = platform.system()
     di["ARCH"] = platform.machine()

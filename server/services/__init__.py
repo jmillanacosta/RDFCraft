@@ -1,6 +1,9 @@
 from server.services.core.config_service import (
     ConfigService,
 )
+from server.services.core.mapping_to_yarrrml_service import (
+    MappingToYARRRMLService,
+)
 from server.services.core.sqlite_db_service import DBService
 from server.services.core.workspace_metadata_service import (
     WorkspaceMetadataService,
@@ -30,4 +33,5 @@ __all__ = [
     "LocalOntologyService",
     "LocalSourceService",
     "LocalMappingService",
+    "MappingToYARRRMLService",
 ]

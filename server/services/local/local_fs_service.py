@@ -154,5 +154,8 @@ class LocalFSService(FSServiceProtocol):
 
         return file_path.read_bytes()
 
+    def provide_file_path_of_uuid(self, uuid: str) -> Path:
+        return self._FILE_DIR / uuid
+
 
 __all__ = ["LocalFSService"]

@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from pathlib import Path
 
 from server.models.file_metadata import (
     FileMetadata,
@@ -50,3 +51,16 @@ class FSServiceProtocol(ABC):
             bytes: content of the file
         """
         ...
+
+    @abstractmethod
+    def provide_file_path_of_uuid(self, uuid: str) -> Path:
+        """
+        Provide the path of a file with UUID. If file does not exist locally, implementation should first download it.
+
+        Args:
+            uuid (str): UUID of the file
+
+        Returns:
+            pathlib.Path: path of the file
+        """
+        

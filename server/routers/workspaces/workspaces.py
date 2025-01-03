@@ -4,6 +4,7 @@ from fastapi.exceptions import HTTPException
 from fastapi.params import Depends
 from fastapi.routing import APIRouter
 from kink.container import di
+from starlette.routing import PlainTextResponse
 
 from server.facades import FacadeResponse
 from server.facades.workspace.create_workspace_facade import (
@@ -23,6 +24,9 @@ from server.facades.workspace.mapping.delete_mapping_from_workspace_facade impor
 )
 from server.facades.workspace.mapping.get_mappings_in_workspace_facade import (
     GetMappingsInWorkspaceFacade,
+)
+from server.facades.workspace.mapping.mapping_to_yarrrml_facade import (
+    MappingToYARRRMLFacade,
 )
 from server.facades.workspace.mapping.update_mapping_facade import (
     UpdateMappingFacade,
@@ -122,6 +126,11 @@ GetMappingsInWorkspaceDep = Annotated[
 UpdateMappingDep = Annotated[
     UpdateMappingFacade,
     Depends(lambda: di[UpdateMappingFacade]),
+]
+
+MappingToYARRRMLDep = Annotated[
+    MappingToYARRRMLFacade,
+    Depends(lambda: di[MappingToYARRRMLFacade]),
 ]
 
 
@@ -473,6 +482,32 @@ async def update_mapping(
         return BasicResponse(
             message=facade_response.message,
         )
+
+    raise HTTPException(
+        status_code=facade_response.status,
+        detail=facade_response.to_dict(),
+    )
+
+
+@router.get(
+    "/{workspace_id}/mapping/{mapping_id}/yarrrml",
+    response_class=PlainTextResponse,
+)
+async def mapping_to_yarrrml(
+    workspace_id: str,
+    mapping_id: str,
+    mapping_to_yarrrml_facade: MappingToYARRRMLDep,
+) -> str:
+    facade_response = mapping_to_yarrrml_facade.execute(
+        workspace_id=workspace_id,
+        mapping_id=mapping_id,
+    )
+
+    if (
+        facade_response.status // 100 == 2
+        and facade_response.data
+    ):
+        return facade_response.data
 
     raise HTTPException(
         status_code=facade_response.status,

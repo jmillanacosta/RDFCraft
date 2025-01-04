@@ -27,7 +27,11 @@ class RMLMapperService(RMLMapperServiceProtocol):
         self.logger.info(
             "Determining if system has Java installed"
         )
-        self.mapper_bin = Path("bin/mapper.jar")
+        self.mapper_bin = (
+            Path(__file__).parent.parent.parent.parent
+            / "bin"
+            / "mapper.jar"
+        )
         custom_java_path = config_service.get("java_path")
         self.java_memory = (
             config_service.get("java_memory") or "4G"

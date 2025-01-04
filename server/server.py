@@ -17,6 +17,7 @@ from uvicorn.protocols.utils import (
 )
 
 from bootstrap import bootstrap, teardown
+from server.routers.rml.rml import router as rml_router
 from server.routers.sources.sources import (
     router as sources_router,
 )
@@ -144,6 +145,12 @@ app.include_router(
     sources_router,
     prefix="/api/sources",
     tags=["sources"],
+)
+
+app.include_router(
+    rml_router,
+    prefix="/api/rml",
+    tags=["rml"],
 )
 
 if not DEBUG:

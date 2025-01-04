@@ -74,6 +74,11 @@ const CreateMappingDialog = (props: CreateMappingDialogProps) => {
       setError('Please fill all fields');
       return;
     }
+    // json_path must end with '[*]'
+    if (sourceType === 'json' && json_path.value.slice(-3) !== '[*]') {
+      setError('JSON Path must end with "[*]"');
+      return;
+    }
 
     const extra = sourceType === 'json' ? { json_path: json_path.value } : {};
 

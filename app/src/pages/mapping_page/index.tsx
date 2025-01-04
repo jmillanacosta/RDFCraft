@@ -1,6 +1,7 @@
+import MappingDialog from '@/pages/mapping_page/components/MappingDialog';
 import { ReactFlowProvider } from '@xyflow/react';
 import { languages } from 'monaco-editor';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   ImperativePanelHandle,
   Panel,
@@ -38,7 +39,9 @@ const MappingPage = () => {
   const loadMapping = useMappingPage(state => state.loadMapping);
   const setSelectedTab = useMappingPage(state => state.setSelectedTab);
   const setIsCollapsed = useMappingPage(state => state.setIsSidePanelCollapsed);
+  const completeMapping = useMappingPage(state => state.completeMapping);
 
+  const [openDialog, setOpenDialog] = useState<'complete_mapping' | null>(null);
   useRegisterTheme('mapping-theme', mapping_theme);
   useRegisterLanguage('mapping_language', mapping_language, {});
   useRegisterCompletionItemProvider('mapping_language', [
@@ -106,14 +109,38 @@ const MappingPage = () => {
     setIsCollapsed(false);
   };
 
+  const [completeMappingResult, setCompleteMappingResult] = useState<{
+    yarrrml: string;
+    rml: string;
+    ttl: string;
+  } | null>(null);
+
+  const onCompleteMapping = async () => {
+    if (!props.uuid || !props.mapping_uuid) return;
+    const { yarrrml, rml, ttl } = await completeMapping(
+      props.uuid,
+      props.mapping_uuid,
+    );
+    setCompleteMappingResult({ yarrrml, rml, ttl });
+    setOpenDialog('complete_mapping');
+  };
+
   return (
     <ReactFlowProvider>
       <div className='mapping-page'>
+        <MappingDialog
+          open={openDialog === 'complete_mapping'}
+          yarrrml={completeMappingResult?.yarrrml ?? ''}
+          rml={completeMappingResult?.rml ?? ''}
+          ttl={completeMappingResult?.ttl ?? ''}
+          onClose={() => setOpenDialog(null)}
+        />
         <Navbar
           workspace_uuid={props.uuid}
           mapping_uuid={props.mapping_uuid}
           name={mapping?.name}
           isLoading={isLoading}
+          onCompleteMapping={onCompleteMapping}
         />
         <div className='mapping-page-content'>
           <PanelGroup direction='horizontal' style={{ height: '100%' }}>

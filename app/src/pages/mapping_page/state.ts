@@ -1,3 +1,4 @@
+import YARRRMLService from '@/lib/api/yarrrml_service';
 import {
   XYEdgeType,
   XYNodeTypes,
@@ -37,6 +38,10 @@ interface MappingPageStateActions {
     nodes: XYNodeTypes[],
     edges: XYEdgeType[],
   ) => Promise<void>;
+  completeMapping: (
+    workspaceUuid: string,
+    mappingUuid: string,
+  ) => Promise<{ yarrrml: string; rml: string; ttl: string }>;
   setIsSaved: (isSaved: boolean) => void;
   setSelectedTab: (
     selectedTab: 'properties' | 'ai' | 'references' | 'search',
@@ -122,6 +127,28 @@ const functions: ZustandActions<MappingPageStateActions, MappingPageState> = (
       if (error instanceof Error) {
         set({ error: error.message });
       }
+    } finally {
+      set({ isLoading: null });
+    }
+  },
+  completeMapping: async (workspaceUuid: string, mappingUuid: string) => {
+    set({ isLoading: 'Creating YARRRML' });
+    try {
+      const yarrrml = await YARRRMLService.getYARRRMLMapping(
+        workspaceUuid,
+        mappingUuid,
+      );
+      set({ isLoading: 'Creating RML' });
+      const rml = await YARRRMLService.yarrrmlToRML(yarrrml);
+      set({ isLoading: 'Creating TTL' });
+      const ttl = await YARRRMLService.rmlToTTL(rml);
+      set({ error: null, isLoading: null });
+      return { yarrrml, rml, ttl };
+    } catch (error) {
+      if (error instanceof Error) {
+        set({ error: error.message });
+      }
+      throw error;
     } finally {
       set({ isLoading: null });
     }

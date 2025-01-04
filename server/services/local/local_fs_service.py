@@ -155,7 +155,17 @@ class LocalFSService(FSServiceProtocol):
         return file_path.read_bytes()
 
     def provide_file_path_of_uuid(self, uuid: str) -> Path:
-        return self._FILE_DIR / uuid
+        self.logger.info(
+            f"Providing file path of UUID {uuid}"
+        )
+        path = self._FILE_DIR / uuid
+        if not path.exists():
+            raise ServerException(
+                f"File with UUID {uuid} does not exist",
+                code=ErrCodes.FILE_NOT_FOUND,
+            )
+
+        return path
 
 
 __all__ = ["LocalFSService"]

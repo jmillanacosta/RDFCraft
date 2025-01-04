@@ -1,4 +1,5 @@
 import datetime
+import logging
 from pathlib import Path
 from typing import cast
 
@@ -26,6 +27,7 @@ class MappingToYARRRMLService(
     MappingToYARRRMLServiceProtocol
 ):
     def __init__(self, TEMP_DIR: Path) -> None:
+        self.logger = logging.getLogger(__name__)
         self.temp_dir = TEMP_DIR
 
     def convert_mapping_to_yarrrml(
@@ -35,136 +37,31 @@ class MappingToYARRRMLService(
         mapping: MappingGraph,
         fs_service: FSServiceProtocol,  # Implementation might change depending the environment (local, cloud, etc)
     ) -> str:
+        self.logger.info(
+            f"Converting mapping {mapping.name} to YARRRML"
+        )
         yarrrml_dict: dict = {
             "prefixes": prefixes,
         }
 
-        source_dict: dict = {}
+        source_path = self._prepare_source_file(
+            source, fs_service
+        )
+        yarrrml_dict["sources"] = self._get_source_dict(
+            source, source_path
+        )
 
-        match source.type:
-            case SourceType.CSV:
-                source_dict["data"] = {
-                    "access": str(
-                        fs_service.provide_file_path_of_uuid(
-                            source.uuid
-                        ).absolute()
-                    ),
-                    "referenceFormulation": "csv",
-                }
+        yarrrml_dict["mappings"] = self._get_mappings_dict(
+            mapping
+        )
 
-            case SourceType.JSON:
-                source_dict["data"] = {
-                    "access": str(
-                        fs_service.provide_file_path_of_uuid(
-                            source.uuid
-                        ).absolute()
-                    ),
-                    "referenceFormulation": "json",
-                    "iterator": source.extra["json_path"],
-                }
+        # Delete any empty keys
 
-        yarrrml_dict["sources"] = source_dict
-
-        # Mappings
-
-        mappings: dict = {}
-
-        entities: list[MappingNode] = [
-            cast(MappingNode, node)
-            for node in mapping.nodes
-            if node.type == MappingNodeType.ENTITY
-        ]
-
-        for entity in entities:
-            if entity.uri_pattern == "":
-                raise ServerException(
-                    f"Entity {entity.label} has no URI pattern",
-                    code=ErrCodes.ENTITY_URI_PATTERN_NOT_FOUND,
-                )
-            entity_dict: dict = {
-                "source": "data",
-                "s": entity.uri_pattern,
-            }
-            po: list[dict | list] = [
-                {
-                    "predicate": "http://www.w3.org/1999/02/22-rdf-syntax-ns#label",
-                    "object": entity.label,
-                }
-            ]
-
-            for rdf_type in entity.rdf_type:
-                po.append(
-                    {
-                        "predicate": "a",
-                        "object": rdf_type,
-                        "type": "iri",
-                    }
-                )
-
-            outgoing_edges_target_nodes: list[
-                tuple[
-                    MappingEdge,
-                    MappingNode
-                    | MappingLiteral
-                    | MappingURIRef,
-                ]
-            ] = self._get_outgoing_edges(entity, mapping)
-
-            for (
-                edge,
-                target_node,
-            ) in outgoing_edges_target_nodes:
-                if isinstance(target_node, MappingLiteral):
-                    if target_node.value == "":
-                        raise ServerException(
-                            f"Literal with id {target_node.id} has no value",
-                            code=ErrCodes.LITERAL_VALUE_NOT_FOUND,
-                        )
-                    po.append(
-                        {
-                            "predicate": edge.source_handle,
-                            "object": {
-                                "value": target_node.value,
-                                "datatype": target_node.literal_type,
-                            },
-                        }
-                    )
-                elif isinstance(target_node, MappingURIRef):
-                    if target_node.uri_pattern == "":
-                        raise ServerException(
-                            f"URIRef with id {target_node.id} has no URI pattern",
-                            code=ErrCodes.URIREF_URI_PATTERN_NOT_FOUND,
-                        )
-                    po.append(
-                        {
-                            "predicate": edge.source_handle,
-                            "object": {
-                                "value": target_node.uri_pattern,
-                                "type": "iri",
-                            },
-                        }
-                    )
-                elif isinstance(target_node, MappingNode):
-                    if target_node.uri_pattern == "":
-                        raise ServerException(
-                            f"Node with id {target_node.id} has no URI pattern",
-                            code=ErrCodes.ENTITY_URI_PATTERN_NOT_FOUND,
-                        )
-                    po.append(
-                        {
-                            "predicate": edge.source_handle,
-                            "object": {
-                                "value": target_node.uri_pattern,
-                                "type": "iri",
-                            },
-                        }
-                    )
-
-            entity_dict["po"] = po
-
-            mappings[entity.id] = entity_dict
-
-        yarrrml_dict["mappings"] = mappings
+        yarrrml_dict = {
+            k: v
+            for k, v in yarrrml_dict.items()
+            if len(v) > 0
+        }
 
         yaml_str = yaml.dump(
             yarrrml_dict,
@@ -184,6 +81,177 @@ class MappingToYARRRMLService(
         temp_file_path.write_text(yaml_str)
 
         return yaml_str
+
+    def _prepare_source_file(
+        self, source: Source, fs_service: FSServiceProtocol
+    ) -> Path:
+        self.logger.info(
+            "Downloading source file content, to workaround a limitation in the RMLMapper (files must have a extension)"
+        )
+        source_content = fs_service.download_file_with_uuid(
+            source.file_uuid
+        )
+
+        extension = (
+            "csv"
+            if source.type == SourceType.CSV
+            else "json"
+        )
+
+        source_path = (
+            self.temp_dir
+            / f"{source.file_uuid}.{extension}"
+        )
+
+        self.logger.info(
+            f"Writing source file content to {source_path}"
+        )
+
+        if source_path.exists():
+            source_path.unlink()
+
+        source_path.touch()
+
+        source_path.write_bytes(source_content)
+
+        return source_path
+
+    def _get_source_dict(
+        self, source: Source, source_path: Path
+    ) -> dict:
+        source_dict: dict = {}
+
+        match source.type:
+            case SourceType.CSV:
+                source_dict["data"] = {
+                    "access": str(source_path.absolute()),
+                    "referenceFormulation": "csv",
+                }
+
+            case SourceType.JSON:
+                source_dict["data"] = {
+                    "access": str(source_path.absolute()),
+                    "referenceFormulation": "jsonpath",
+                    "iterator": source.extra["json_path"],
+                }
+
+        return source_dict
+
+    def _get_mappings_dict(
+        self, mapping: MappingGraph
+    ) -> dict:
+        mappings: dict = {}
+
+        entities: list[MappingNode] = [
+            cast(MappingNode, node)
+            for node in mapping.nodes
+            if node.type == MappingNodeType.ENTITY
+        ]
+
+        for entity in entities:
+            self._validate_entity(entity)
+            entity_dict = self._create_entity_dict(entity)
+            po = self._create_po_list(entity)
+            outgoing_edges_target_nodes = (
+                self._get_outgoing_edges(entity, mapping)
+            )
+
+            for (
+                edge,
+                target_node,
+            ) in outgoing_edges_target_nodes:
+                po.append(
+                    self._create_po_entry(edge, target_node)
+                )
+
+            entity_dict["po"] = po
+            mappings[entity.id] = entity_dict
+
+        return mappings
+
+    def _validate_entity(self, entity: MappingNode) -> None:
+        if entity.uri_pattern == "":
+            raise ServerException(
+                f"Entity {entity.label} has no URI pattern",
+                code=ErrCodes.ENTITY_URI_PATTERN_NOT_FOUND,
+            )
+
+    def _create_entity_dict(
+        self, entity: MappingNode
+    ) -> dict:
+        return {
+            "source": "data",
+            "s": entity.uri_pattern,
+        }
+
+    def _create_po_list(self, entity: MappingNode) -> list:
+        po = [
+            {
+                "predicate": "http://www.w3.org/1999/02/22-rdf-syntax-ns#label",
+                "object": {
+                    "value": entity.label,
+                    "datatype": "http://www.w3.org/2001/XMLSchema#string",
+                },
+            }
+        ]
+
+        for rdf_type in entity.rdf_type:
+            po.append(
+                {
+                    "predicate": "a",
+                    "object": rdf_type,
+                    "type": "iri",
+                }
+            )
+
+        return po
+
+    def _create_po_entry(
+        self,
+        edge: MappingEdge,
+        target_node: MappingNode
+        | MappingLiteral
+        | MappingURIRef,
+    ) -> dict:
+        if isinstance(target_node, MappingLiteral):
+            if target_node.value == "":
+                raise ServerException(
+                    f"Literal with id {target_node.id} has no value",
+                    code=ErrCodes.LITERAL_VALUE_NOT_FOUND,
+                )
+            return {
+                "predicate": edge.source_handle,
+                "object": {
+                    "value": target_node.value,
+                    "datatype": target_node.literal_type,
+                },
+            }
+        elif isinstance(target_node, MappingURIRef):
+            if target_node.uri_pattern == "":
+                raise ServerException(
+                    f"URIRef with id {target_node.id} has no URI pattern",
+                    code=ErrCodes.URIREF_URI_PATTERN_NOT_FOUND,
+                )
+            return {
+                "predicate": edge.source_handle,
+                "object": {
+                    "value": target_node.uri_pattern,
+                    "type": "iri",
+                },
+            }
+        elif isinstance(target_node, MappingNode):
+            if target_node.uri_pattern == "":
+                raise ServerException(
+                    f"Node with id {target_node.id} has no URI pattern",
+                    code=ErrCodes.ENTITY_URI_PATTERN_NOT_FOUND,
+                )
+            return {
+                "predicate": edge.source_handle,
+                "object": {
+                    "value": target_node.uri_pattern,
+                    "type": "iri",
+                },
+            }
 
     def _get_outgoing_edges(
         self, node: MappingNode, mapping: MappingGraph

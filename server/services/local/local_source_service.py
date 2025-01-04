@@ -172,7 +172,7 @@ class LocalSourceService(SourceServiceProtocol):
             type=type,
             references=references,
             file_uuid=file_metadata.uuid,
-            extra={},
+            extra=extra,
         )
 
         self.fs_service.upload_file(

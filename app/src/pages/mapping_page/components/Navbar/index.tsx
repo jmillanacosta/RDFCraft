@@ -13,6 +13,7 @@ type NavbarProps = {
   mapping_uuid: string | undefined;
   name: string | undefined;
   isLoading: string | null;
+  onCompleteMapping: () => void;
 };
 
 const Navbar = ({
@@ -20,9 +21,11 @@ const Navbar = ({
   mapping_uuid,
   name,
   isLoading,
+  onCompleteMapping,
 }: NavbarProps) => {
   const navigation = useNavigate();
   const saveMapping = useMappingPage(state => state.saveMapping);
+
   const isSaved = useMappingPage(state => state.isSaved);
   const mapping = useMappingPage(state => state.mapping);
 
@@ -60,7 +63,9 @@ const Navbar = ({
           >
             Save
           </Button>
-          <Button icon='rocket'>Map</Button>
+          <Button icon='rocket' onClick={onCompleteMapping}>
+            Map
+          </Button>
         </ButtonGroup>
       </BPNavbar.Group>
     </BPNavbar>

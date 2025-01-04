@@ -34,7 +34,7 @@ class YARRRMLService {
     const writer = new Writer();
     writer.addQuads(quads);
     return new Promise((resolve, reject) => {
-      writer.end((error, result) => {
+      writer.end((error: Error | null, result: string) => {
         if (error) {
           reject(error);
         } else {

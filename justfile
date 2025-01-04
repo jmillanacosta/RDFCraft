@@ -42,4 +42,5 @@ package-win: install-dev
     --include-data-dir=public=public \
     --include-data-dir=bin=bin \
     --windows-disable-console \
+    --onefile \
     main.py

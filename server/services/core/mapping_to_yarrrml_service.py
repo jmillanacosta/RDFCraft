@@ -73,7 +73,7 @@ class MappingToYARRRMLService(
 
         temp_file_path: Path = (
             self.temp_dir
-            / f"yarrrml-{mapping.name}-{datetime.datetime.now().isoformat()}.yml"
+            / f"yarrrml-{mapping.name}-{datetime.datetime.now().isoformat().replace(':', '_')}.yml"
         )
 
         temp_file_path.touch()

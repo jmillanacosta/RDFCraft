@@ -1,12 +1,13 @@
 import logging
 import sys
+from pathlib import Path
 
 import structlog
 from structlog.types import EventDict, Processor
 
 
 def drop_color_message_key(
-    _, __, event_dict: EventDict
+    logger, method_name, event_dict: EventDict
 ) -> EventDict:
     """
     Uvicorn logs the message a second time in the extra `color_message`, but we don't
@@ -19,7 +20,7 @@ def drop_color_message_key(
 def setup_logging(
     json_logs: bool = False, log_level: str = "INFO"
 ):
-    timestamper = structlog.processors.TimeStamper(
+    time_stamper = structlog.processors.TimeStamper(
         fmt="iso"
     )
 
@@ -30,7 +31,7 @@ def setup_logging(
         structlog.stdlib.PositionalArgumentsFormatter(),
         structlog.stdlib.ExtraAdder(),
         drop_color_message_key,
-        timestamper,
+        time_stamper,
         structlog.processors.StackInfoRenderer(),
         structlog.processors.format_exc_info,
     ]
@@ -73,10 +74,19 @@ def setup_logging(
     )
 
     handler = logging.StreamHandler()
+    file_handler = logging.FileHandler(
+        (
+            Path.home() / "rdfcraft" / "rdfcraft.log"
+        ).resolve(),
+        mode="a",
+        encoding="utf-8",
+    )
     # Use OUR `ProcessorFormatter` to format all `logging` entries.
     handler.setFormatter(fmt=formatter)
+    file_handler.setFormatter(fmt=formatter)
     root_logger = logging.getLogger()
     root_logger.addHandler(handler)
+    root_logger.addHandler(file_handler)
     root_logger.setLevel(log_level.upper())
 
     for _log in ["uvicorn", "uvicorn.error"]:

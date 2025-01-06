@@ -1,3 +1,4 @@
+import ProblemsPanel from '@/pages/mapping_page/components/SidePanel/components/ProblemsPanel';
 import SearchPanel from '@/pages/mapping_page/components/SidePanel/components/SearchPanel';
 import SourcePanel from '@/pages/mapping_page/components/SidePanel/components/SourcePanel';
 import useMappingPage from '@/pages/mapping_page/state';
@@ -16,6 +17,8 @@ const SidePanel = () => {
         return <SourcePanel />;
       case 'search':
         return <SearchPanel />;
+      case 'problems':
+        return <ProblemsPanel />;
       default:
         return <NodeProperties />;
     }

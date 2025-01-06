@@ -15,7 +15,7 @@ import SourceApi from '../../lib/api/source_api';
 import { Source } from '../../lib/api/source_api/types';
 import { ZustandActions } from '../../utils/zustand';
 
-type SelectedTab = 'properties' | 'ai' | 'references' | 'search';
+type SelectedTab = 'properties' | 'ai' | 'references' | 'search' | 'problems';
 
 interface MappingPageState {
   mapping: MappingGraph | null;
@@ -174,3 +174,5 @@ export const useMappingPage = create<
 );
 
 export default useMappingPage;
+
+export type { SelectedTab };

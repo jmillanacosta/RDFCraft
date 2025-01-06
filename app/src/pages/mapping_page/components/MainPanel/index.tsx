@@ -182,7 +182,7 @@ const MainPanel = ({ initialGraph }: MainPanelProps) => {
         id: id,
         data: {
           id: id,
-          uri_pattern: 'http://example.com/',
+          uri_pattern: '',
           type: 'uri_ref',
           position: position,
         },
@@ -208,7 +208,7 @@ const MainPanel = ({ initialGraph }: MainPanelProps) => {
           id: id,
           label: 'New Literal',
           value: '',
-          literal_type: 'string',
+          literal_type: '',
           type: 'literal',
           position: position,
         },

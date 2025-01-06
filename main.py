@@ -1,4 +1,6 @@
 import os
+import random
+import socket
 import threading
 
 import webview
@@ -27,11 +29,34 @@ setup_logging(
 )
 
 
+def get_free_port():
+    while True:
+        port = random.randint(
+            1024, 65535
+        )  # Ports below 1024 are reserved
+        with socket.socket(
+            socket.AF_INET, socket.SOCK_STREAM
+        ) as s:
+            try:
+                s.bind(
+                    ("", port)
+                )  # Bind to the port on all network interfaces
+                s.listen(
+                    1
+                )  # Start listening to check if the port is available
+                return port  # If binding succeeds, the port is free
+            except OSError:
+                continue  # If binding fails, try another port
+
+
+port = 8000 if DEBUG else get_free_port()
+
+
 def start_fastapi():
     import uvicorn
 
     uvicorn.run(
-        app, host="0.0.0.0", port=8000, log_config=None
+        app, host="0.0.0.0", port=port, log_config=None
     )
 
 
@@ -52,7 +77,7 @@ if __name__ == "__main__":
         # Create window
         window = webview.create_window(
             "RDFCraft",
-            "http://localhost:8000",
+            f"http://localhost:{port}",
             width=800,
             height=600,
             resizable=True,

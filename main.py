@@ -5,6 +5,7 @@ import threading
 
 import webview
 from dotenv import load_dotenv
+from kink.container import di
 from pydantic import parse_obj_as
 
 from server.logger import setup_logging
@@ -50,6 +51,8 @@ def get_free_port():
 
 
 port = 8000 if DEBUG else get_free_port()
+
+di["PORT"] = port
 
 
 def start_fastapi():

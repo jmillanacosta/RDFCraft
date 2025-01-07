@@ -74,10 +74,10 @@ def setup_logging(
     )
 
     handler = logging.StreamHandler()
+    log_path = Path.home() / "rdfcraft" / "rdfcraft.log"
+    log_path.parent.mkdir(parents=True, exist_ok=True)
     file_handler = logging.FileHandler(
-        (
-            Path.home() / "rdfcraft" / "rdfcraft.log"
-        ).resolve(),
+        (log_path).resolve(),
         mode="a",
         encoding="utf-8",
     )

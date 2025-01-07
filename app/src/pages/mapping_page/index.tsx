@@ -1,3 +1,4 @@
+import toast from '@/consts/toast';
 import MappingDialog from '@/pages/mapping_page/components/MappingDialog';
 import { ReactFlowProvider } from '@xyflow/react';
 import { languages } from 'monaco-editor';
@@ -36,6 +37,7 @@ const MappingPage = () => {
   const prefixes = useMappingPage(state => state.prefixes);
   const isLoading = useMappingPage(state => state.isLoading);
   const error = useMappingPage(state => state.error);
+  const isSaved = useMappingPage(state => state.isSaved);
   const loadMapping = useMappingPage(state => state.loadMapping);
   const setSelectedTab = useMappingPage(state => state.setSelectedTab);
   const setIsCollapsed = useMappingPage(state => state.setIsSidePanelCollapsed);
@@ -117,6 +119,13 @@ const MappingPage = () => {
 
   const onCompleteMapping = async () => {
     if (!props.uuid || !props.mapping_uuid) return;
+    if (!isSaved) {
+      toast.show({
+        message: 'Please save the mapping before completing it',
+        intent: 'warning',
+      });
+      return;
+    }
     const { yarrrml, rml, ttl } = await completeMapping(
       props.uuid,
       props.mapping_uuid,

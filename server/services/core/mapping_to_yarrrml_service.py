@@ -37,50 +37,59 @@ class MappingToYARRRMLService(
         mapping: MappingGraph,
         fs_service: FSServiceProtocol,  # Implementation might change depending the environment (local, cloud, etc)
     ) -> str:
-        self.logger.info(
-            f"Converting mapping {mapping.name} to YARRRML"
-        )
-        yarrrml_dict: dict = {
-            "prefixes": prefixes,
-        }
+        try:
+            self.logger.info(
+                f"Converting mapping {mapping.name} to YARRRML"
+            )
+            yarrrml_dict: dict = {
+                "prefixes": prefixes,
+            }
 
-        source_path = self._prepare_source_file(
-            source, fs_service
-        )
-        yarrrml_dict["sources"] = self._get_source_dict(
-            source, source_path
-        )
+            source_path = self._prepare_source_file(
+                source, fs_service
+            )
+            yarrrml_dict["sources"] = self._get_source_dict(
+                source, source_path
+            )
 
-        yarrrml_dict["mappings"] = self._get_mappings_dict(
-            mapping
-        )
+            yarrrml_dict["mappings"] = (
+                self._get_mappings_dict(mapping)
+            )
 
-        # Delete any empty keys
+            # Delete any empty keys
 
-        yarrrml_dict = {
-            k: v
-            for k, v in yarrrml_dict.items()
-            if len(v) > 0
-        }
+            yarrrml_dict = {
+                k: v
+                for k, v in yarrrml_dict.items()
+                if len(v) > 0
+            }
 
-        yaml_str = yaml.dump(
-            yarrrml_dict,
-            sort_keys=False,
-            default_flow_style=False,
-        )
+            yaml_str = yaml.dump(
+                yarrrml_dict,
+                sort_keys=False,
+                default_flow_style=False,
+            )
 
-        # Write the YARRRML to a temporary file
+            # Write the YARRRML to a temporary file
 
-        temp_file_path: Path = (
-            self.temp_dir
-            / f"yarrrml-{mapping.name}-{datetime.datetime.now().isoformat().replace(':', '_')}.yml"
-        )
+            temp_file_path: Path = (
+                self.temp_dir
+                / f"yarrrml-{mapping.name}-{datetime.datetime.now().isoformat().replace(':', '_')}.yml"
+            )
 
-        temp_file_path.touch()
+            temp_file_path.touch()
 
-        temp_file_path.write_text(yaml_str)
+            temp_file_path.write_text(yaml_str)
 
-        return yaml_str
+            return yaml_str
+
+        except Exception as e:
+            self.logger.error(
+                "Failed to convert mapping to YARRRML",
+                exc_info=e,
+            )
+
+            raise e
 
     def _prepare_source_file(
         self, source: Source, fs_service: FSServiceProtocol
@@ -276,7 +285,7 @@ class MappingToYARRRMLService(
                     lambda n, e=edge: n.id == e.target,
                     mapping.nodes,
                 )
-                target_node = next(target_node_iter)
+                target_node = next(target_node_iter, None)
                 if target_node is not None:
                     outgoing_edges.append(
                         (edge, target_node)

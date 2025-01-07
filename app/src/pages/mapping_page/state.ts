@@ -104,6 +104,7 @@ const functions: ZustandActions<MappingPageStateActions, MappingPageState> = (
     set({ isLoading: 'Saving mapping...' });
     // Convert nodes and edges to MappingGraph, sync nodes position and id with node.data
     // and edges source, sourceHandle, target, targetHandle and id with edge.data
+
     const mapping = {
       ...mappingGraph,
       nodes: nodes.map(node => ({
@@ -111,14 +112,20 @@ const functions: ZustandActions<MappingPageStateActions, MappingPageState> = (
         position: node.position,
         id: node.id,
       })),
-      edges: edges.map(edge => ({
-        ...edge.data,
-        source: edge.source,
-        target: edge.target,
-        source_handle: edge.sourceHandle,
-        target_handle: edge.targetHandle,
-        id: edge.id,
-      })),
+      edges: edges
+        .map(edge => ({
+          ...edge.data,
+          source: edge.source,
+          target: edge.target,
+          source_handle: edge.sourceHandle,
+          target_handle: edge.targetHandle,
+          id: edge.id,
+        }))
+        .filter(edge => {
+          const sourceNode = nodes.find(node => node.id === edge.source);
+          const targetNode = nodes.find(node => node.id === edge.target);
+          return sourceNode && targetNode;
+        }),
     } as MappingGraph;
     try {
       await MappingService.updateMapping(workspaceUuid, mappingUuid, mapping);

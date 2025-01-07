@@ -25,8 +25,9 @@ package-mac: install-dev
     --include-data-dir=public=public \
     --include-data-dir=bin=bin \
     --macos-create-app-bundle \
-    --enable-console \
+    --deployment \
     main.py
+    mv dist/main.app dist/RDFCraft.app
 
 package-win: install-dev
     @echo "Packaging for Windows..."
@@ -44,3 +45,4 @@ package-win: install-dev
     --windows-disable-console \
     --onefile \
     main.py
+    mv dist/main.exe dist/RDFCraft.exe

@@ -25,6 +25,8 @@ package-mac: install-dev
     --include-data-dir=public=public \
     --include-data-dir=bin=bin \
     --macos-create-app-bundle \
+    --product-name=RDFCraft \
+    --assume-yes-for-downloads \
     --deployment \
     main.py
     mv dist/main.app dist/RDFCraft.app
@@ -43,6 +45,8 @@ package-win: install-dev
     --include-data-dir=public=public \
     --include-data-dir=bin=bin \
     --windows-disable-console \
+    --product-name=RDFCraft \
+    --assume-yes-for-downloads \
     --onefile \
     main.py
     mv dist/main.exe dist/RDFCraft.exe

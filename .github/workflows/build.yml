@@ -21,7 +21,7 @@ jobs:
           just package-mac
       # This will upload the built application to the artifacts application is located at dist/RDFCraft.app
       - name: Archive
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: RDFCraft
           path: dist/RDFCraft.app
@@ -41,7 +41,7 @@ jobs:
           just package-win
       # This will upload the built application to the artifacts application is located at dist/RDFCraft.exe
       - name: Archive
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: RDFCraft
           path: dist/RDFCraft.exe

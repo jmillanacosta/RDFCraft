@@ -21,11 +21,11 @@ const LabeledHandle = React.forwardRef<
       position: 'relative',
       display: 'flex',
       flexDirection: 'column',
-      alignItems: 'center',
+
       textAlign: 'left',
       overflow: 'clip',
 
-      maxWidth: '150px',
+      width: 200,
     }}
   >
     <BaseHandle position={Position.Left} {...props} />
@@ -36,6 +36,7 @@ const LabeledHandle = React.forwardRef<
           color: 'var(--foreground)',
           overflowWrap: 'break-word',
           hyphens: 'auto',
+          width: '100%',
         }}
         className={labelClassName}
       >
@@ -49,7 +50,6 @@ const LabeledHandle = React.forwardRef<
           width: '100%',
           textAlign: 'center',
           overflowWrap: 'break-word',
-
           hyphens: 'auto',
         }}
         className={labelClassName}

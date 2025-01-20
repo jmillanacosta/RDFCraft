@@ -30,12 +30,19 @@ export function getOuterBoundaryOfHandle(
   node: InternalNode,
   handleAbsoluteLocation: { x: number; y: number },
   position: Position,
+  isTarget: boolean = false,
 ): { x: number; y: number } {
-  const width = node.measured.width ?? 250;
-  const height = node.measured.height ?? 100;
+  const width = node.measured.width ?? 0;
+  const height = node.measured.height ?? 0;
 
   switch (position) {
     case Position.Top:
+      if (isTarget) {
+        return {
+          x: handleAbsoluteLocation.x + 10,
+          y: handleAbsoluteLocation.y - height / 2 + 80,
+        };
+      }
       return {
         x: handleAbsoluteLocation.x,
         y: handleAbsoluteLocation.y - height / 2,
@@ -71,7 +78,7 @@ export function getCenter(
   // Center's y is always located between two handles
   // Make offset based on the distance between two handles
   const dx = Math.abs(sourceX - targetX);
-  const dy = sourceY - targetY;
+  const dy = Math.abs(sourceY - targetY);
   const offset = dx * 0.5 + dy * 0.2;
   const handle = [
     ...(node.internals.handleBounds?.source ?? []),
@@ -176,6 +183,7 @@ export function getEdgePosition(
     target,
     targetLocation,
     targetPos,
+    true,
   );
 
   return {

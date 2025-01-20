@@ -97,7 +97,7 @@ const CreateMappingDialog = (props: CreateMappingDialogProps) => {
     <Dialog
       className='bp5-dark'
       isOpen={props.open}
-      title='Add Ontology'
+      title='Add Mapping'
       onClose={onClose}
     >
       <form ref={form_ref} onSubmit={submit}>

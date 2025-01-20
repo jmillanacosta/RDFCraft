@@ -3,6 +3,43 @@ import random
 import socket
 import threading
 
+# WORKAROUND: Ensures Nuitka includes the necessary plugins
+import rdflib.plugins.parsers.hext  # noqa: F401
+import rdflib.plugins.parsers.jsonld  # noqa: F401
+import rdflib.plugins.parsers.notation3  # noqa: F401
+import rdflib.plugins.parsers.nquads  # noqa: F401
+import rdflib.plugins.parsers.ntriples  # noqa: F401
+import rdflib.plugins.parsers.patch  # noqa: F401
+import rdflib.plugins.parsers.RDFVOC  # noqa: F401
+import rdflib.plugins.parsers.rdfxml  # noqa: F401
+import rdflib.plugins.parsers.trig  # noqa: F401
+import rdflib.plugins.parsers.trix  # noqa: F401
+import rdflib.plugins.serializers.hext  # noqa: F401
+import rdflib.plugins.serializers.jsonld  # noqa: F401
+import rdflib.plugins.serializers.longturtle  # noqa: F401
+import rdflib.plugins.serializers.n3  # noqa: F401
+import rdflib.plugins.serializers.nquads  # noqa: F401
+import rdflib.plugins.serializers.nt  # noqa: F401
+import rdflib.plugins.serializers.patch  # noqa: F401
+import rdflib.plugins.serializers.rdfxml  # noqa: F401
+import rdflib.plugins.serializers.trig  # noqa: F401
+import rdflib.plugins.serializers.trix  # noqa: F401
+import rdflib.plugins.serializers.turtle  # noqa: F401
+import rdflib.plugins.serializers.xmlwriter  # noqa: F401
+import rdflib.plugins.sparql.aggregates  # noqa: F401
+import rdflib.plugins.sparql.algebra  # noqa: F401
+import rdflib.plugins.sparql.datatypes  # noqa: F401
+import rdflib.plugins.sparql.evaluate  # noqa: F401
+import rdflib.plugins.sparql.evalutils  # noqa: F401
+import rdflib.plugins.sparql.operators  # noqa: F401
+import rdflib.plugins.sparql.parser  # noqa: F401
+import rdflib.plugins.sparql.parserutils  # noqa: F401
+import rdflib.plugins.sparql.processor  # noqa: F401
+import rdflib.plugins.sparql.sparql  # noqa: F401
+import rdflib.plugins.sparql.update  # noqa: F401
+import rdflib.plugins.stores.memory  # noqa: F401
+
+# WORKAROUND: Ensures Nuitka includes the necessary plugins
 import webview
 from dotenv import load_dotenv
 from kink.container import di

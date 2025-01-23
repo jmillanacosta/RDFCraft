@@ -3,7 +3,7 @@ name: Build Application
 on:
   push:
     tags:
-      - 'v*'
+      - '[0-9]+.[0-9]+.[0-9]+'
 
 jobs:
   build-mac:
@@ -11,9 +11,6 @@ jobs:
     # It requires just and uv to be installed
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Install just
-        uses: extractions/setup-just@v2
       - name: Install uv
         uses: astral-sh/setup-uv@v4
       - name: Install node
@@ -22,8 +19,28 @@ jobs:
           node-version: '22.9.0'
       - name: Build
         run: |
-          just package-mac
-      # This will upload the built application to the artifacts application is located at dist/RDFCraft.app
+          mkdir -p bin
+          echo "Downloading RMLMapper"
+          curl -L https://github.com/RMLio/rmlmapper-java/releases/download/v7.2.0/rmlmapper-7.2.0-r374-all.jar -o bin/mapper.jar
+          echo "Building frontend"
+          npm run frontend:prod
+          echo "Installing python dependencies"
+          uv sync
+          echo "Building application"
+          uv run nuitka \
+          --standalone \
+          --product-version=${{ github.ref_name }} \
+          --file-version=${{ github.ref_name }} \
+          --output-dir=dist \
+          --include-data-dir=public=public \
+          --include-data-dir=bin=bin \
+          --macos-create-app-bundle \
+          --product-name=RDFCraft \
+          --assume-yes-for-downloads \
+          --deployment \
+          main.py
+          mv dist/main.app dist/RDFCraft.app
+        # This will upload the built application to the artifacts application is located at dist/RDFCraft.app
       - name: Archive
         uses: actions/upload-artifact@v3
         with:
@@ -35,9 +52,6 @@ jobs:
     # It requires just and uv to be installed
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Install just
-        uses: extractions/setup-just@v2
       - name: Install uv
         uses: astral-sh/setup-uv@v4
       - name: Install node
@@ -46,7 +60,28 @@ jobs:
           node-version: '22.9.0'
       - name: Build
         run: |
-          just package-win
+          mkdir -p bin
+          echo "Downloading RMLMapper"
+          curl -L https://github.com/RMLio/rmlmapper-java/releases/download/v7.2.0/rmlmapper-7.2.0-r374-all.jar -o bin/mapper.jar
+          echo "Building frontend"
+          npm run frontend:prod
+          echo "Installing python dependencies"
+          uv sync
+          echo "Building application"
+          .venv/Scripts/python -m nuitka \
+          --standalone \
+          --onefile \
+          --product-version=${{ github.ref_name }} \
+          --file-version=${{ github.ref_name }} \
+          --output-dir=dist \
+          --include-data-dir=public=public \
+          --include-data-dir=bin=bin \
+          --windows-disable-console \
+          --product-name=RDFCraft \
+          --assume-yes-for-downloads \
+          --deployment \
+          main.py
+          mv dist/main.exe dist/RDFCraft.exe
       # This will upload the built application to the artifacts application is located at dist/RDFCraft.exe
       - name: Archive
         uses: actions/upload-artifact@v3

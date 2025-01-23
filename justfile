@@ -21,6 +21,8 @@ package-mac: install-dev
     uv sync
     uv run nuitka \
     --standalone \
+    --product-version=0.1.0 \
+    --file-version=0.1.0 \
     --output-dir=dist \
     --include-data-dir=public=public \
     --include-data-dir=bin=bin \
@@ -41,13 +43,15 @@ package-win: install-dev
     uv sync
     .venv/Scripts/python -m nuitka \
     --standalone \
+    --onefile \
+    --product-version=0.1.0 \
+    --file-version=0.1.0 \
     --output-dir=dist \
     --include-data-dir=public=public \
     --include-data-dir=bin=bin \
     --windows-disable-console \
     --product-name=RDFCraft \
     --assume-yes-for-downloads \
-    --onefile \
     --deployment \
     main.py
     mv dist/main.exe dist/RDFCraft.exe

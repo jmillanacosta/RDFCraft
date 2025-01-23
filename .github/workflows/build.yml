@@ -42,7 +42,7 @@ jobs:
           mv dist/main.app dist/RDFCraft.app
         # This will upload the built application to the artifacts application is located at dist/RDFCraft.app
       - name: Archive
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: RDFCraft
           path: dist/RDFCraft.app
@@ -84,7 +84,7 @@ jobs:
           mv dist/main.exe dist/RDFCraft.exe
       # This will upload the built application to the artifacts application is located at dist/RDFCraft.exe
       - name: Archive
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: RDFCraft
           path: dist/RDFCraft.exe

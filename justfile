@@ -44,5 +44,6 @@ package-win: install-dev
     --include-data-dir=bin=bin \
     --windows-disable-console \
     --onefile \
+    --deployment \
     main.py
     mv dist/main.exe dist/RDFCraft.exe

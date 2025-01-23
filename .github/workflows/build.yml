@@ -70,7 +70,7 @@ jobs:
           echo "Installing python dependencies"
           uv sync
           echo "Building application"
-          uv run nuitka `
+          .\.venv\Scripts\python.exe -m nuitka `
           --standalone `
           --onefile `
           --product-version=$env:GITHUB_REF_NAME `

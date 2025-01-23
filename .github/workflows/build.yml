@@ -70,20 +70,21 @@ jobs:
           echo "Installing python dependencies"
           uv sync
           echo "Building application"
-          .venv/Scripts/python -m nuitka \
-          --standalone \
-          --onefile \
-          --product-version=${{ github.ref_name }} \
-          --file-version=${{ github.ref_name }} \
-          --output-dir=dist \
-          --include-data-dir=public=public \
-          --include-data-dir=bin=bin \
-          --windows-disable-console \
-          --product-name=RDFCraft \
-          --assume-yes-for-downloads \
-          --deployment \
+          nuitka `
+          --standalone `
+          --onefile `
+          --product-version=$env:GITHUB_REF_NAME `
+          --file-version=$env:GITHUB_REF_NAME `
+          --output-dir=dist `
+          --include-data-dir=public=public `
+          --include-data-dir=bin=bin `
+          --windows-disable-console `
+          --product-name=RDFCraft `
+          --assume-yes-for-downloads `
+          --deployment `
           main.py
           mv dist/main.exe dist/RDFCraft.exe
+
       # This will upload the built application to the artifacts application is located at dist/RDFCraft.exe
       - name: Archive
         uses: actions/upload-artifact@v4

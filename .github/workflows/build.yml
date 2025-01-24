@@ -1,4 +1,4 @@
-name: Build Application
+name: Build and Release Application
 
 on:
   push:
@@ -7,87 +7,123 @@ on:
 
 jobs:
   build-mac:
-    # This job runs on macOS
-    # It requires just and uv to be installed
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Install uv
         uses: astral-sh/setup-uv@v4
+
       - name: Install node
         uses: actions/setup-node@v2
         with:
           node-version: '22.9.0'
+
       - name: Build
         run: |
           mkdir -p bin
           echo "Downloading RMLMapper"
           curl -L https://github.com/RMLio/rmlmapper-java/releases/download/v7.2.0/rmlmapper-7.2.0-r374-all.jar -o bin/mapper.jar
+
           echo "Building frontend"
           npm run frontend:prod
+
           echo "Installing python dependencies"
           uv sync
+
           echo "Building application"
           uv run nuitka \
-          --standalone \
-          --product-version=${{ github.ref_name }} \
-          --file-version=${{ github.ref_name }} \
-          --output-dir=dist \
-          --include-data-dir=public=public \
-          --include-data-dir=bin=bin \
-          --macos-create-app-bundle \
-          --product-name=RDFCraft \
-          --assume-yes-for-downloads \
-          --deployment \
-          main.py
+            --standalone \
+            --product-version=${{ github.ref_name }} \
+            --file-version=${{ github.ref_name }} \
+            --output-dir=dist \
+            --include-data-dir=public=public \
+            --include-data-dir=bin=bin \
+            --macos-create-app-bundle \
+            --product-name=RDFCraft \
+            --assume-yes-for-downloads \
+            --deployment \
+            main.py
+
+          # Nuitka will produce dist/main.app. Rename to RDFCraft.app
           mv dist/main.app dist/RDFCraft.app
-        # This will upload the built application to the artifacts application is located at dist/RDFCraft.app
-      - name: Archive
+
+      # Zip the RDFCraft.app so it remains a folder after download
+      - name: Create ZIP from .app
+        run: |
+          cd dist
+          zip -r RDFCraft-mac.zip RDFCraft.app
+
+      - name: Upload Mac Artifact
         uses: actions/upload-artifact@v4
         with:
           name: RDFCraft-Mac
-          path: dist/RDFCraft.app
+          path: dist/RDFCraft-mac.zip
 
   build-win:
-    # This job runs on Windows
-    # It requires just and uv to be installed
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Install uv
         uses: astral-sh/setup-uv@v4
+
       - name: Install node
         uses: actions/setup-node@v2
         with:
           node-version: '22.9.0'
+
       - name: Build
         run: |
           mkdir -p bin
           echo "Downloading RMLMapper"
           curl -L https://github.com/RMLio/rmlmapper-java/releases/download/v7.2.0/rmlmapper-7.2.0-r374-all.jar -o bin/mapper.jar
+
           echo "Building frontend"
           npm run frontend:prod
+
           echo "Installing python dependencies"
           uv sync
+
           echo "Building application"
           .\.venv\Scripts\python.exe -m nuitka `
-          --standalone `
-          --onefile `
-          --product-version=$env:GITHUB_REF_NAME `
-          --file-version=$env:GITHUB_REF_NAME `
-          --output-dir=dist `
-          --include-data-dir=public=public `
-          --include-data-dir=bin=bin `
-          --windows-disable-console `
-          --product-name=RDFCraft `
-          --assume-yes-for-downloads `
-          --deployment `
-          main.py
+            --standalone `
+            --onefile `
+            --product-version=$env:GITHUB_REF_NAME `
+            --file-version=$env:GITHUB_REF_NAME `
+            --output-dir=dist `
+            --include-data-dir=public=public `
+            --include-data-dir=bin=bin `
+            --windows-disable-console `
+            --product-name=RDFCraft `
+            --assume-yes-for-downloads `
+            --deployment `
+            main.py
+
           mv dist/main.exe dist/RDFCraft.exe
 
-      # This will upload the built application to the artifacts application is located at dist/RDFCraft.exe
-      - name: Archive
+      - name: Upload Windows Artifact
         uses: actions/upload-artifact@v4
         with:
           name: RDFCraft-Windows
           path: dist/RDFCraft.exe
+
+  release:
+    needs: [build-mac, build-win]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create Release
+        uses: 'marvinpinto/action-automatic-releases@latest'
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          title: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          files: |
+            artifacts/RDFCraft-Mac/RDFCraft-mac.zip
+            artifacts/RDFCraft-Windows/RDFCraft.exe

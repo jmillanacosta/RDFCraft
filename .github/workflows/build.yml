@@ -118,12 +118,14 @@ jobs:
           path: artifacts
 
       - name: Create Release
-        uses: 'marvinpinto/action-automatic-releases@latest'
+        uses: 'softprops/action-gh-release@v1'
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          title: Release ${{ github.ref_name }}
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
           draft: false
           prerelease: false
           files: |
             artifacts/RDFCraft-Mac/RDFCraft-mac.zip
             artifacts/RDFCraft-Windows/RDFCraft.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

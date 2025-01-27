@@ -4,6 +4,7 @@ import {
   addEdge,
   Background,
   Connection,
+  ControlButton,
   Controls,
   EdgeChange,
   EdgeTypes,
@@ -38,6 +39,7 @@ import {
   XYNodeTypes,
 } from './types';
 
+import { Trash } from '@blueprintjs/icons';
 import { v4 as uuidv4 } from 'uuid';
 
 type MainPanelProps = {
@@ -275,6 +277,11 @@ const MainPanel = ({ initialGraph }: MainPanelProps) => {
     [openMenu],
   );
 
+  const onDelete = useCallback(() => {
+    setNodes(nodes => nodes.filter(n => (n.selected ?? false) === false));
+    setEdges(edges => edges.filter(e => (e.selected ?? false) === false));
+  }, [setNodes, setEdges]);
+
   return (
     // disable default right click menu
     <div className='main-panel'>
@@ -308,7 +315,11 @@ const MainPanel = ({ initialGraph }: MainPanelProps) => {
           }}
           pannable
         />
-        <Controls />
+        <Controls>
+          <ControlButton onClick={onDelete}>
+            <Trash />
+          </ControlButton>
+        </Controls>
       </ReactFlow>
     </div>
   );

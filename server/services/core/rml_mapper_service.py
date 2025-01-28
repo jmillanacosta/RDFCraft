@@ -34,7 +34,7 @@ class RMLMapperService(RMLMapperServiceProtocol):
         )
         custom_java_path = config_service.get("java_path")
         self.java_memory = (
-            config_service.get("java_memory") or "4G"
+            config_service.get("java_memory") or "1G"
         )
         self.java_path = None
         if custom_java_path:

@@ -1,7 +1,7 @@
 import datetime
 import logging
 from pathlib import Path
-from typing import cast
+from typing import Any, cast
 
 import yaml
 from kink import inject
@@ -194,15 +194,7 @@ class MappingToYARRRMLService(
         }
 
     def _create_po_list(self, entity: MappingNode) -> list:
-        po = [
-            {
-                "predicate": "http://www.w3.org/1999/02/22-rdf-syntax-ns#label",
-                "object": {
-                    "value": entity.label,
-                    "datatype": "http://www.w3.org/2001/XMLSchema#string",
-                },
-            }
-        ]
+        po: list[dict[str, Any]] = []
 
         for rdf_type in entity.rdf_type:
             po.append(

@@ -32,8 +32,9 @@ single executable using Nuitka.
 
 ## Installation 🚀
 
-From Releases page, download the latest release for your OS and extract the
-contents. Run the executable and you are good to go.
+From [Releases](https://github.com/MaastrichtU-IDS/RDFCraft/releases) page,
+download the latest release for your OS and extract the contents if it is
+compressed. Run the executable and you are good to go.
 
 > [!WARNING]
 >

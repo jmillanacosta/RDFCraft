@@ -4,7 +4,7 @@ RDFCraft is a tool for mapping csv/json data to RDF with an easy to use GUI. It
 uses FastAPI for the backend, React for the frontend and everything packed in a
 single executable using Nuitka.
 
-![RDFCraft Mapping Interface](./imgs/1.png)
+![RDFCraft Mapping Interface](imgs/1.png)
 
 ## Features 🌟
 
@@ -24,13 +24,22 @@ single executable using Nuitka.
 
 - **Multiple RML formats**: It generates both YARRRML and RML mappings.
 
+## Requirements 📦
+
+- Latest Java Runtime Environment (JRE) or Java Development Kit (JDK) to use the
+  [RMLMapper](https://github.com/RMLio/rmlmapper-java)
+  - This is required to generate RML mappings.
+
 ## Installation 🚀
 
-From Releases page, download the latest release for your OS and extract the
-contents. Run the executable and you are good to go.
+From [Releases](https://github.com/MaastrichtU-IDS/RDFCraft/releases) page,
+download the latest release for your OS and extract the contents if it is
+compressed. Run the executable and you are good to go.
 
-> [!IMPORTANT] On macOS, because app is not notarized by Apple, you need to run
-> following command to bypass the gatekeeper:
+> [!WARNING]
+>
+> On macOS, because app is not notarized by Apple, you need to run following
+> command to bypass the gatekeeper:
 >
 > ```bash
 > xattr -rd com.apple.quarantine </path/to/RDFCraft.app>
@@ -38,6 +47,11 @@ contents. Run the executable and you are good to go.
 >
 > More information about gatekeeper can be found
 > [here](https://support.apple.com/en-us/HT202491).
+
+## Getting Started 🚦
+
+You can find a detailed guide on how to use RDFCraft in the
+[Guide](guide/guide.md) section.
 
 ## Development 🛠
 

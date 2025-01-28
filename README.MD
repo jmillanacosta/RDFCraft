@@ -68,9 +68,15 @@ cd app
 npm install
 ```
 
-4- Start the backend
+4- Create `.env` file in the root directory and add the following:
 
-5- Start the frontend
+```bash
+DEBUG=1
+```
+
+5- Start the backend
+
+6- Start the frontend
 
 ```bash
 cd app

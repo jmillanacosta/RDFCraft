@@ -167,5 +167,29 @@ class LocalFSService(FSServiceProtocol):
 
         return path
 
+    def get_file_metadata_by_uuid(
+        self, uuid: str
+    ) -> FileMetadata:
+        self.logger.info(
+            f"Getting file metadata by UUID {uuid}"
+        )
+        query = (
+            select(FileMetadataTable)
+            .filter(FileMetadataTable.uuid == uuid)
+            .limit(1)
+        )
+        with self._db_service.get_session() as session:
+            res: Row[Tuple[FileMetadataTable]] | None = (
+                session.execute(query).first()
+            )
+
+            if not res:
+                raise ServerException(
+                    f"File with UUID {uuid} does not exist",
+                    code=ErrCodes.FILE_NOT_FOUND,
+                )
+
+            return FileMetadata.from_table(res.tuple()[0])
+
 
 __all__ = ["LocalFSService"]

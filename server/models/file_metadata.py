@@ -57,3 +57,44 @@ class FileMetadata:
             suffix=table.suffix,
             hash=table.hash,
         )
+
+    @classmethod
+    def from_dict(cls, data):
+        """
+        Convert from dict representation
+
+        Args:
+            data (dict): Dict representation
+
+        Returns:
+            FileMetadata: File metadata
+        """
+        if "uuid" not in data:
+            raise ValueError("uuid is required")
+        if "name" not in data:
+            raise ValueError("name is required")
+        if "stem" not in data:
+            raise ValueError("stem is required")
+        if "suffix" not in data:
+            raise ValueError("suffix is required")
+        if "hash" not in data:
+            raise ValueError("hash is required")
+        return cls(
+            uuid=data["uuid"],
+            name=data["name"],
+            stem=data["stem"],
+            suffix=data["suffix"],
+            hash=data["hash"],
+        )
+
+    def to_dict(self):
+        """
+        Convert to dict representation
+        """
+        return {
+            "uuid": self.uuid,
+            "name": self.name,
+            "stem": self.stem,
+            "suffix": self.suffix,
+            "hash": self.hash,
+        }

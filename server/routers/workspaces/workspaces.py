@@ -1,9 +1,11 @@
-from typing import Annotated
+from pathlib import Path
+from typing import Annotated, cast
 
 from fastapi.exceptions import HTTPException
 from fastapi.params import Depends
 from fastapi.routing import APIRouter
 from kink.container import di
+from starlette.responses import FileResponse
 from starlette.routing import PlainTextResponse
 
 from server.facades import FacadeResponse
@@ -21,6 +23,9 @@ from server.facades.workspace.mapping.create_mapping_in_workspace_facade import 
 )
 from server.facades.workspace.mapping.delete_mapping_from_workspace_facade import (
     DeleteMappingFromWorkspaceFacade,
+)
+from server.facades.workspace.mapping.export_mapping_in_workspace_facade import (
+    ExportMappingInWorkspaceFacade,
 )
 from server.facades.workspace.mapping.get_mappings_in_workspace_facade import (
     GetMappingsInWorkspaceFacade,
@@ -126,6 +131,11 @@ GetMappingsInWorkspaceDep = Annotated[
 UpdateMappingDep = Annotated[
     UpdateMappingFacade,
     Depends(lambda: di[UpdateMappingFacade]),
+]
+
+ExportMappingInWorkspaceDep = Annotated[
+    ExportMappingInWorkspaceFacade,
+    Depends(lambda: di[ExportMappingInWorkspaceFacade]),
 ]
 
 MappingToYARRRMLDep = Annotated[
@@ -481,6 +491,38 @@ async def update_mapping(
     if facade_response.status // 100 == 2:
         return BasicResponse(
             message=facade_response.message,
+        )
+
+    raise HTTPException(
+        status_code=facade_response.status,
+        detail=facade_response.to_dict(),
+    )
+
+
+@router.get(
+    "/{workspace_id}/mapping/{mapping_id}/export",
+    response_class=FileResponse,
+)
+async def export_mapping(
+    workspace_id: str,
+    mapping_id: str,
+    export_mapping_in_workspace_facade: ExportMappingInWorkspaceDep,
+) -> FileResponse:
+    facade_response: FacadeResponse = (
+        export_mapping_in_workspace_facade.execute(
+            mapping_id=mapping_id,
+        )
+    )
+
+    if (
+        facade_response.status // 100 == 2
+        and facade_response.data
+    ):
+        _data = cast(Path, facade_response.data)
+        return FileResponse(
+            path=facade_response.data,
+            filename=_data.name,
+            media_type="application/gzip",
         )
 
     raise HTTPException(

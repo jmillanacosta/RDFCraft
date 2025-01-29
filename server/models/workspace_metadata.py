@@ -53,3 +53,36 @@ class WorkspaceMetadata:
                 self.enabled_features
             ),
         )
+
+    @classmethod
+    def from_dict(cls, data):
+        if "uuid" not in data:
+            raise ValueError("uuid is required")
+        if "name" not in data:
+            raise ValueError("name is required")
+        if "description" not in data:
+            raise ValueError("description is required")
+        if "type" not in data:
+            raise ValueError("type is required")
+        if "location" not in data:
+            raise ValueError("location is required")
+        if "enabled_features" not in data:
+            raise ValueError("enabled_features is required")
+        return cls(
+            uuid=data["uuid"],
+            name=data["name"],
+            description=data["description"],
+            type=WorkspaceType(data["type"]),
+            location=data["location"],
+            enabled_features=data["enabled_features"],
+        )
+
+    def to_dict(self):
+        return {
+            "uuid": self.uuid,
+            "name": self.name,
+            "description": self.description,
+            "type": self.type,
+            "location": self.location,
+            "enabled_features": self.enabled_features,
+        }

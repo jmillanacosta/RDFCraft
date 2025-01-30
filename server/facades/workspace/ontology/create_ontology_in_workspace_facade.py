@@ -25,9 +25,7 @@ class CreateOntologyInWorkspaceFacade(BaseFacade):
         ontology_service: OntologyServiceProtocol,
     ):
         super().__init__()
-        self.workspace_metadata_service = (
-            workspace_metadata_service
-        )
+        self.workspace_metadata_service = workspace_metadata_service
         self.workspace_service = workspace_service
         self.ontology_service = ontology_service
 
@@ -51,20 +49,17 @@ class CreateOntologyInWorkspaceFacade(BaseFacade):
         )
 
         self.logger.info("Creating ontology")
-        ontology: Ontology = (
-            self.ontology_service.create_ontology(
-                name,
-                description,
-                base_uri,
-                content,
-            )
+        ontology: Ontology = self.ontology_service.create_ontology(
+            name,
+            description,
+            base_uri,
+            content,
         )
 
         self.logger.info("Adding ontology to workspace")
 
         new_model = workspace.copy_with(
-            ontologies=workspace.ontologies
-            + [ontology.uuid],
+            ontologies=workspace.ontologies + [ontology.uuid],
         )
 
         self.workspace_service.update_workspace(

@@ -49,6 +49,4 @@ class RDFLoader:
                     f"Failed to parse RDF bytes with parser {parser}: {e}"
                 )
 
-        raise ValueError(
-            "Failed to parse RDF bytes with any parser"
-        )
+        raise ValueError("Failed to parse RDF bytes with any parser")

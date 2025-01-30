@@ -17,9 +17,7 @@ class UpdateMappingFacade(BaseFacade):
         mapping_service: MappingServiceProtocol,
     ):
         super().__init__()
-        self.mapping_service: MappingServiceProtocol = (
-            mapping_service
-        )
+        self.mapping_service: MappingServiceProtocol = mapping_service
 
     @BaseFacade.error_wrapper
     def execute(

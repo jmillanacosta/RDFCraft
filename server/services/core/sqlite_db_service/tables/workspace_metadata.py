@@ -28,9 +28,7 @@ class WorkspaceMetadataTable(Base):
 
     __tablename__ = "workspace_metadata"
 
-    uuid: Mapped[str] = mapped_column(
-        String, primary_key=True
-    )
+    uuid: Mapped[str] = mapped_column(String, primary_key=True)
     name: Mapped[str] = mapped_column(String)
     description: Mapped[str] = mapped_column(String)
     type: Mapped[WorkspaceType] = mapped_column(String)

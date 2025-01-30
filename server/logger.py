@@ -6,9 +6,7 @@ import structlog
 from structlog.types import EventDict, Processor
 
 
-def drop_color_message_key(
-    logger, method_name, event_dict: EventDict
-) -> EventDict:
+def drop_color_message_key(logger, method_name, event_dict: EventDict) -> EventDict:
     """
     Uvicorn logs the message a second time in the extra `color_message`, but we don't
     need it. This processor drops the key from the event dict if it exists.
@@ -17,12 +15,8 @@ def drop_color_message_key(
     return event_dict
 
 
-def setup_logging(
-    json_logs: bool = False, log_level: str = "INFO"
-):
-    time_stamper = structlog.processors.TimeStamper(
-        fmt="iso"
-    )
+def setup_logging(json_logs: bool = False, log_level: str = "INFO"):
+    time_stamper = structlog.processors.TimeStamper(fmt="iso")
 
     shared_processors: list[Processor] = [
         structlog.contextvars.merge_contextvars,
@@ -41,9 +35,7 @@ def setup_logging(
         # `message` key but the pretty ConsoleRenderer looks for `event`
         # Format the exception only for JSON logs, as we want to pretty-print them when
         # using the ConsoleRenderer
-        shared_processors.append(
-            structlog.processors.format_exc_info
-        )
+        shared_processors.append(structlog.processors.format_exc_info)
 
     structlog.configure(
         processors=shared_processors
@@ -103,18 +95,14 @@ def setup_logging(
     logging.getLogger("uvicorn.access").handlers.clear()
     logging.getLogger("uvicorn.access").propagate = False
 
-    def handle_exception(
-        exc_type, exc_value, exc_traceback
-    ):
+    def handle_exception(exc_type, exc_value, exc_traceback):
         """
         Log any uncaught exception instead of letting it be printed by Python
         (but leave KeyboardInterrupt untouched to allow users to Ctrl+C to stop)
         See https://stackoverflow.com/a/16993115/3641865
         """
         if issubclass(exc_type, KeyboardInterrupt):
-            sys.__excepthook__(
-                exc_type, exc_value, exc_traceback
-            )
+            sys.__excepthook__(exc_type, exc_value, exc_traceback)
             return
 
         root_logger.error(

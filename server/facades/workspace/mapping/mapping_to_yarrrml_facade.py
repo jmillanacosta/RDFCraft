@@ -36,16 +36,12 @@ class MappingToYARRRMLFacade(BaseFacade):
         fs_service: FSServiceProtocol,
     ):
         super().__init__()
-        self.workspace_metadata_service: WorkspaceMetadataServiceProtocol = workspace_metadata_service
-        self.workspace_service: WorkspaceServiceProtocol = (
-            workspace_service
+        self.workspace_metadata_service: WorkspaceMetadataServiceProtocol = (
+            workspace_metadata_service
         )
-        self.mapping_service: MappingServiceProtocol = (
-            mapping_service
-        )
-        self.source_service: SourceServiceProtocol = (
-            source_service
-        )
+        self.workspace_service: WorkspaceServiceProtocol = workspace_service
+        self.mapping_service: MappingServiceProtocol = mapping_service
+        self.source_service: SourceServiceProtocol = source_service
         self.yarrrml_service: MappingToYARRRMLServiceProtocol = yarrrml_service
         self.fs_service: FSServiceProtocol = fs_service
 
@@ -82,9 +78,7 @@ class MappingToYARRRMLFacade(BaseFacade):
                 ErrCodes.MAPPING_NOT_FOUND,
             )
 
-        mapping = self.mapping_service.get_mapping(
-            mapping_id
-        )
+        mapping = self.mapping_service.get_mapping(mapping_id)
 
         self.logger.info("Retrieving source")
 
@@ -94,13 +88,11 @@ class MappingToYARRRMLFacade(BaseFacade):
 
         self.logger.info("Converting mapping to YARRRML")
 
-        yarrrml = (
-            self.yarrrml_service.convert_mapping_to_yarrrml(
-                workspace.prefixes,
-                source,
-                mapping,
-                self.fs_service,
-            )
+        yarrrml = self.yarrrml_service.convert_mapping_to_yarrrml(
+            workspace.prefixes,
+            source,
+            mapping,
+            self.fs_service,
         )
 
         return self._success_response(

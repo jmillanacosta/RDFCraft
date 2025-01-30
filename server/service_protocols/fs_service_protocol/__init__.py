@@ -65,9 +65,7 @@ class FSServiceProtocol(ABC):
         """
 
     @abstractmethod
-    def get_file_metadata_by_uuid(
-        self, uuid: str
-    ) -> FileMetadata:
+    def get_file_metadata_by_uuid(self, uuid: str) -> FileMetadata:
         """
         Get file metadata by UUID
 

@@ -29,16 +29,12 @@ class CreateMappingInWorkspaceFacade(BaseFacade):
         source_service: SourceServiceProtocol,
     ):
         super().__init__()
-        self.workspace_metadata_service: WorkspaceMetadataServiceProtocol = workspace_metadata_service
-        self.workspace_service: WorkspaceServiceProtocol = (
-            workspace_service
+        self.workspace_metadata_service: WorkspaceMetadataServiceProtocol = (
+            workspace_metadata_service
         )
-        self.mapping_service: MappingServiceProtocol = (
-            mapping_service
-        )
-        self.source_service: SourceServiceProtocol = (
-            source_service
-        )
+        self.workspace_service: WorkspaceServiceProtocol = workspace_service
+        self.mapping_service: MappingServiceProtocol = mapping_service
+        self.source_service: SourceServiceProtocol = source_service
 
     @BaseFacade.error_wrapper
     def execute(
@@ -53,9 +49,7 @@ class CreateMappingInWorkspaceFacade(BaseFacade):
         self.logger.info(
             f"Creating mapping in workspace {workspace_id} with name {name}"
         )
-        self.logger.info(
-            f"Retrieving workspace {workspace_id}"
-        )
+        self.logger.info(f"Retrieving workspace {workspace_id}")
         workspace_metadata = self.workspace_metadata_service.get_workspace_metadata(
             workspace_id,
         )
@@ -69,17 +63,14 @@ class CreateMappingInWorkspaceFacade(BaseFacade):
             extra=extra,
         )
         self.logger.info("Creating mapping")
-        mapping_graph_uuid = (
-            self.mapping_service.create_mapping(
-                name=name,
-                description=description,
-                source_uuid=source,
-            )
+        mapping_graph_uuid = self.mapping_service.create_mapping(
+            name=name,
+            description=description,
+            source_uuid=source,
         )
         self.logger.info("Mapping created")
         new_model = workspace.copy_with(
-            mappings=workspace.mappings
-            + [mapping_graph_uuid],
+            mappings=workspace.mappings + [mapping_graph_uuid],
         )
         self.workspace_service.update_workspace(
             new_model,

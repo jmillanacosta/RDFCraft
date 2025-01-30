@@ -34,9 +34,7 @@ class DeleteWorkspaceFacade(BaseFacade):
         source_service: SourceServiceProtocol,
     ):
         super().__init__()
-        self.workspace_metadata_service = (
-            workspace_metadata_service
-        )
+        self.workspace_metadata_service = workspace_metadata_service
         self.workspace_service = workspace_service
         self.ontology_service = ontology_service
         self.mapping_service = mapping_service
@@ -67,8 +65,7 @@ class DeleteWorkspaceFacade(BaseFacade):
             )
         self.logger.info("Fetching mappings")
         mappings = [
-            self.mapping_service.get_mapping(mapping)
-            for mapping in workspace.mappings
+            self.mapping_service.get_mapping(mapping) for mapping in workspace.mappings
         ]
         self.logger.info("Deleting Sources")
         for mapping in mappings:

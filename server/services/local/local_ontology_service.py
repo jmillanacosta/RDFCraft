@@ -34,22 +34,16 @@ class LocalOntologyService(OntologyServiceProtocol):
         db_service: DBService,
     ):
         self.logger = logging.getLogger(__name__)
-        self.ontology_indexer: OntologyIndexer = (
-            ontology_indexer
-        )
+        self.ontology_indexer: OntologyIndexer = ontology_indexer
         self.fs_service: FSServiceProtocol = fs_service
         self.db_service: DBService = db_service
 
         self.logger.info("LocalOntologyService initialized")
 
-    def _get_from_ontology_table(
-        self, ontology_id: str
-    ) -> OntologyTable | None:
+    def _get_from_ontology_table(self, ontology_id: str) -> OntologyTable | None:
         try:
             query = (
-                select(OntologyTable)
-                .where(OntologyTable.uuid == ontology_id)
-                .limit(1)
+                select(OntologyTable).where(OntologyTable.uuid == ontology_id).limit(1)
             )
 
             with self.db_service.get_session() as session:
@@ -69,27 +63,19 @@ class LocalOntologyService(OntologyServiceProtocol):
             )
 
     def get_ontology(self, ontology_id: str) -> Ontology:
-        self.logger.info(
-            f"Getting ontology with id: {ontology_id}"
-        )
-        ontology_table = self._get_from_ontology_table(
-            ontology_id
-        )
+        self.logger.info(f"Getting ontology with id: {ontology_id}")
+        ontology_table = self._get_from_ontology_table(ontology_id)
 
         if not ontology_table:
-            self.logger.error(
-                f"Ontology with id: {ontology_id} not found"
-            )
+            self.logger.error(f"Ontology with id: {ontology_id} not found")
             raise ServerException(
                 "Ontology not found",
                 ErrCodes.ONTOLOGY_NOT_FOUND,
             )
 
         try:
-            file_bytes = (
-                self.fs_service.download_file_with_uuid(
-                    ontology_table.json_file_uuid
-                )
+            file_bytes = self.fs_service.download_file_with_uuid(
+                ontology_table.json_file_uuid
             )
 
             data = json.loads(file_bytes.decode("utf-8"))
@@ -120,15 +106,9 @@ class LocalOntologyService(OntologyServiceProtocol):
                 ErrCodes.UNKNOWN_ERROR,
             )
 
-    def get_ontologies(
-        self, ids: list[str]
-    ) -> list[Ontology]:
-        self.logger.info(
-            f"Getting ontologies with ids: {ids}"
-        )
-        query = select(OntologyTable).where(
-            OntologyTable.uuid.in_(ids)
-        )
+    def get_ontologies(self, ids: list[str]) -> list[Ontology]:
+        self.logger.info(f"Getting ontologies with ids: {ids}")
+        query = select(OntologyTable).where(OntologyTable.uuid.in_(ids))
 
         ontologies = []
 
@@ -142,12 +122,8 @@ class LocalOntologyService(OntologyServiceProtocol):
                         ontology_table.json_file_uuid
                     )
 
-                    data = json.loads(
-                        file_bytes.decode("utf-8")
-                    )
-                    ontologies.append(
-                        Ontology.from_dict(data)
-                    )
+                    data = json.loads(file_bytes.decode("utf-8"))
+                    ontologies.append(Ontology.from_dict(data))
 
             return ontologies
         except Exception as e:
@@ -173,27 +149,15 @@ class LocalOntologyService(OntologyServiceProtocol):
             g = RDFLoader.load_rdf_bytes(content)
             self.logger.info(f"Indexing ontology: {name}")
 
-            all_classes = self.ontology_indexer.get_classes(
-                base_uri, g
-            )
+            all_classes = self.ontology_indexer.get_classes(base_uri, g)
 
-            all_properties = (
-                self.ontology_indexer.get_properties(
-                    base_uri, g
-                )
-            )
+            all_properties = self.ontology_indexer.get_properties(base_uri, g)
 
-            all_individuals = (
-                self.ontology_indexer.get_individuals(
-                    base_uri, g
-                )
-            )
+            all_individuals = self.ontology_indexer.get_individuals(base_uri, g)
 
             self.logger.info("Indexing complete")
             self.logger.info("Uploading ontology file")
-            file_metadata = self.fs_service.upload_file(
-                name, content
-            )
+            file_metadata = self.fs_service.upload_file(name, content)
             self.logger.info("File uploaded")
 
             ontology = Ontology(
@@ -207,17 +171,13 @@ class LocalOntologyService(OntologyServiceProtocol):
                 properties=all_properties,
             )
 
-            self.logger.info(
-                "Saving ontology to filesystem"
-            )
+            self.logger.info("Saving ontology to filesystem")
 
             json_data = ontology.to_dict()
 
-            ontology_json_file = (
-                self.fs_service.upload_file(
-                    f"{name}.json",
-                    json.dumps(json_data).encode("utf-8"),
-                )
+            ontology_json_file = self.fs_service.upload_file(
+                f"{name}.json",
+                json.dumps(json_data).encode("utf-8"),
             )
             self.logger.info("Ontology saved to filesystem")
 
@@ -249,43 +209,29 @@ class LocalOntologyService(OntologyServiceProtocol):
         name: str,
         file_metadata: FileMetadata,
     ) -> Ontology:
-        raise ServerException(
-            "Not implemented", ErrCodes.NOT_IMPLEMENTED
-        )
+        raise ServerException("Not implemented", ErrCodes.NOT_IMPLEMENTED)
 
     def delete_ontology(self, ontology_id: str):
-        self.logger.info(
-            f"Deleting ontology with id: {ontology_id}"
-        )
+        self.logger.info(f"Deleting ontology with id: {ontology_id}")
 
-        ontology_table = self._get_from_ontology_table(
-            ontology_id
-        )
+        ontology_table = self._get_from_ontology_table(ontology_id)
 
         if not ontology_table:
-            self.logger.error(
-                f"Ontology with id: {ontology_id} not found"
-            )
+            self.logger.error(f"Ontology with id: {ontology_id} not found")
             raise ServerException(
                 "Ontology not found",
                 ErrCodes.ONTOLOGY_NOT_FOUND,
             )
 
         try:
-            self.fs_service.delete_file_with_uuid(
-                ontology_table.json_file_uuid
-            )
-            self.fs_service.delete_file_with_uuid(
-                ontology_table.ontology_file_uuid
-            )
+            self.fs_service.delete_file_with_uuid(ontology_table.json_file_uuid)
+            self.fs_service.delete_file_with_uuid(ontology_table.ontology_file_uuid)
 
             with self.db_service.get_session() as session:
                 session.delete(ontology_table)
                 session.commit()
 
-            self.logger.info(
-                f"Ontology with id: {ontology_id} deleted"
-            )
+            self.logger.info(f"Ontology with id: {ontology_id} deleted")
 
             return None
         except Exception as e:

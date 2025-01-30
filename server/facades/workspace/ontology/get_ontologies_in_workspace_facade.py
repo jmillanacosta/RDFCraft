@@ -24,9 +24,7 @@ class GetOntologyInWorkspaceFacade(BaseFacade):
         ontology_service: OntologyServiceProtocol,
     ):
         super().__init__()
-        self.workspace_metadata_service = (
-            workspace_metadata_service
-        )
+        self.workspace_metadata_service = workspace_metadata_service
         self.workspace_service = workspace_service
         self.ontology_service = ontology_service
 
@@ -45,18 +43,11 @@ class GetOntologyInWorkspaceFacade(BaseFacade):
             workspace_metadata.location,
         )
 
-        self.logger.info(
-            "Retrieving ontologies in workspace"
-        )
-        ontologies = self.ontology_service.get_ontologies(
-            workspace.ontologies
-        )
+        self.logger.info("Retrieving ontologies in workspace")
+        ontologies = self.ontology_service.get_ontologies(workspace.ontologies)
 
         return FacadeResponse(
             status=200,
             message="Ontologies retrieved",
-            data=[
-                ontology.to_dict()
-                for ontology in ontologies
-            ],
+            data=[ontology.to_dict() for ontology in ontologies],
         )

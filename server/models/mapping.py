@@ -264,9 +264,7 @@ class MappingGraph:
     name: str
     description: str
     source_id: str
-    nodes: list[
-        MappingNode | MappingLiteral | MappingURIRef
-    ]
+    nodes: list[MappingNode | MappingLiteral | MappingURIRef]
     edges: list[MappingEdge]
 
     def to_dict(self):
@@ -275,12 +273,8 @@ class MappingGraph:
             "name": self.name,
             "description": self.description,
             "source_id": self.source_id,
-            "nodes": [
-                node.to_dict() for node in self.nodes
-            ],
-            "edges": [
-                edge.to_dict() for edge in self.edges
-            ],
+            "nodes": [node.to_dict() for node in self.nodes],
+            "edges": [edge.to_dict() for edge in self.edges],
         }
 
     @classmethod
@@ -310,8 +304,5 @@ class MappingGraph:
                 else MappingURIRef.from_dict(node)
                 for node in data["nodes"]
             ],
-            edges=[
-                MappingEdge.from_dict(edge)
-                for edge in data["edges"]
-            ],
+            edges=[MappingEdge.from_dict(edge) for edge in data["edges"]],
         )

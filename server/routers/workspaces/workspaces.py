@@ -165,9 +165,7 @@ MappingToYARRRMLDep = Annotated[
 async def get_workspaces(
     get_workspaces_facade: GetWorkspacesFacadeDep,
 ) -> list[WorkspaceModel]:
-    facade_response: FacadeResponse = (
-        get_workspaces_facade.execute()
-    )
+    facade_response: FacadeResponse = get_workspaces_facade.execute()
 
     if facade_response.status // 100 == 2:
         return facade_response.data or []
@@ -183,10 +181,8 @@ async def get_workspace(
     workspace_id: str,
     get_workspaces_facade: GetWorkspacesFacadeDep,
 ) -> WorkspaceModel:
-    facade_response: FacadeResponse = (
-        get_workspaces_facade.execute(
-            uuid=workspace_id,
-        )
+    facade_response: FacadeResponse = get_workspaces_facade.execute(
+        uuid=workspace_id,
     )
 
     if (
@@ -196,10 +192,7 @@ async def get_workspace(
     ):
         return facade_response.data[0]
 
-    if (
-        facade_response.data is None
-        or len(facade_response.data) == 0
-    ):
+    if facade_response.data is None or len(facade_response.data) == 0:
         raise HTTPException(
             status_code=404,
             detail={
@@ -257,23 +250,16 @@ async def delete_workspace(
     )
 
 
-@router.get(
-    "/{workspace_id}/export", response_class=FileResponse
-)
+@router.get("/{workspace_id}/export", response_class=FileResponse)
 async def export_workspace(
     workspace_id: str,
     export_workspace_facade: ExportWorkspaceFacadeDep,
 ) -> FileResponse:
-    facade_response: FacadeResponse = (
-        export_workspace_facade.execute(
-            workspace_id=workspace_id,
-        )
+    facade_response: FacadeResponse = export_workspace_facade.execute(
+        workspace_id=workspace_id,
     )
 
-    if (
-        facade_response.status // 100 == 2
-        and facade_response.data
-    ):
+    if facade_response.status // 100 == 2 and facade_response.data:
         _data = cast(Path, facade_response.data)
         return FileResponse(
             path=facade_response.data,
@@ -292,10 +278,8 @@ async def get_prefixes(
     workspace_id: str,
     get_prefix_in_workspace_facade: GetPrefixInWorkspaceFacadeDep,
 ) -> dict[str, str]:
-    facade_response = (
-        get_prefix_in_workspace_facade.execute(
-            workspace_id=workspace_id,
-        )
+    facade_response = get_prefix_in_workspace_facade.execute(
+        workspace_id=workspace_id,
     )
 
     if facade_response.status // 100 == 2:
@@ -313,12 +297,10 @@ async def create_prefix(
     data: CreatePrefixInput,
     create_prefix_in_workspace_facade: CreatePrefixInWorkspaceDep,
 ) -> BasicResponse:
-    facade_response = (
-        create_prefix_in_workspace_facade.execute(
-            workspace_id=workspace_id,
-            prefix=data.prefix,
-            uri=str(data.uri),
-        )
+    facade_response = create_prefix_in_workspace_facade.execute(
+        workspace_id=workspace_id,
+        prefix=data.prefix,
+        uri=str(data.uri),
     )
 
     if facade_response.status // 100 == 2:
@@ -338,11 +320,9 @@ async def delete_prefix(
     prefix: str,
     delete_prefix_from_workspace_facade: DeletePrefixFromWorkspaceDep,
 ) -> BasicResponse:
-    facade_response = (
-        delete_prefix_from_workspace_facade.execute(
-            workspace_id=workspace_id,
-            prefix=prefix,
-        )
+    facade_response = delete_prefix_from_workspace_facade.execute(
+        workspace_id=workspace_id,
+        prefix=prefix,
     )
 
     if facade_response.status // 100 == 2:
@@ -361,10 +341,8 @@ async def get_ontologies(
     workspace_id: str,
     get_ontology_in_workspace_facade: GetOntologyInWorkspaceFacadeDep,
 ) -> list[Ontology]:
-    facade_response = (
-        get_ontology_in_workspace_facade.execute(
-            workspace_id=workspace_id,
-        )
+    facade_response = get_ontology_in_workspace_facade.execute(
+        workspace_id=workspace_id,
     )
 
     if facade_response.status // 100 == 2:
@@ -382,14 +360,12 @@ async def create_ontology(
     data: CreateOntologyInput,
     create_ontology_in_workspace_facade: CreateOntologyInWorkspaceDep,
 ) -> BasicResponse:
-    facade_response = (
-        create_ontology_in_workspace_facade.execute(
-            workspace_id=workspace_id,
-            name=data.name,
-            description=data.description,
-            base_uri=str(data.base_uri),
-            content=data.content.encode(),
-        )
+    facade_response = create_ontology_in_workspace_facade.execute(
+        workspace_id=workspace_id,
+        name=data.name,
+        description=data.description,
+        base_uri=str(data.base_uri),
+        content=data.content.encode(),
     )
 
     if facade_response.status // 100 == 2:
@@ -409,11 +385,9 @@ async def delete_ontology(
     ontology_id: str,
     delete_ontology_from_workspace_facade: DeleteOntologyFromWorkspaceDep,
 ) -> BasicResponse:
-    facade_response = (
-        delete_ontology_from_workspace_facade.execute(
-            workspace_id=workspace_id,
-            ontology_id=ontology_id,
-        )
+    facade_response = delete_ontology_from_workspace_facade.execute(
+        workspace_id=workspace_id,
+        ontology_id=ontology_id,
     )
 
     if facade_response.status // 100 == 2:
@@ -432,10 +406,8 @@ async def get_mappings(
     workspace_id: str,
     get_mappings_in_workspace_facade: GetMappingsInWorkspaceDep,
 ) -> list[MappingGraph]:
-    facade_response = (
-        get_mappings_in_workspace_facade.execute(
-            workspace_id=workspace_id,
-        )
+    facade_response = get_mappings_in_workspace_facade.execute(
+        workspace_id=workspace_id,
     )
 
     if facade_response.status // 100 == 2:
@@ -453,17 +425,12 @@ async def get_mapping(
     mapping_id: str,
     get_mappings_in_workspace_facade: GetMappingsInWorkspaceDep,
 ) -> MappingGraph:
-    facade_response = (
-        get_mappings_in_workspace_facade.execute(
-            workspace_id=workspace_id,
-            mapping_id=mapping_id,
-        )
+    facade_response = get_mappings_in_workspace_facade.execute(
+        workspace_id=workspace_id,
+        mapping_id=mapping_id,
     )
 
-    if (
-        facade_response.status // 100 == 2
-        and facade_response.data
-    ):
+    if facade_response.status // 100 == 2 and facade_response.data:
         return facade_response.data
 
     raise HTTPException(
@@ -478,15 +445,13 @@ async def create_mapping(
     data: CreateMappingInput,
     create_mapping_in_workspace_facade: CreateMappingInWorkspaceDep,
 ) -> BasicResponse:
-    facade_response = (
-        create_mapping_in_workspace_facade.execute(
-            workspace_id=workspace_id,
-            name=data.name,
-            description=data.description,
-            source_content=data.content.encode(),
-            source_type=data.source_type,
-            extra=data.extra,
-        )
+    facade_response = create_mapping_in_workspace_facade.execute(
+        workspace_id=workspace_id,
+        name=data.name,
+        description=data.description,
+        source_content=data.content.encode(),
+        source_type=data.source_type,
+        extra=data.extra,
     )
 
     if facade_response.status // 100 == 2:
@@ -506,11 +471,9 @@ async def delete_mapping(
     mapping_id: str,
     delete_mapping_from_workspace_facade: DeleteMappingFromWorkspaceDep,
 ) -> BasicResponse:
-    facade_response = (
-        delete_mapping_from_workspace_facade.execute(
-            workspace_id=workspace_id,
-            mapping_id=mapping_id,
-        )
+    facade_response = delete_mapping_from_workspace_facade.execute(
+        workspace_id=workspace_id,
+        mapping_id=mapping_id,
     )
 
     if facade_response.status // 100 == 2:
@@ -555,16 +518,11 @@ async def export_mapping(
     mapping_id: str,
     export_mapping_in_workspace_facade: ExportMappingInWorkspaceDep,
 ) -> FileResponse:
-    facade_response: FacadeResponse = (
-        export_mapping_in_workspace_facade.execute(
-            mapping_id=mapping_id,
-        )
+    facade_response: FacadeResponse = export_mapping_in_workspace_facade.execute(
+        mapping_id=mapping_id,
     )
 
-    if (
-        facade_response.status // 100 == 2
-        and facade_response.data
-    ):
+    if facade_response.status // 100 == 2 and facade_response.data:
         _data = cast(Path, facade_response.data)
         return FileResponse(
             path=facade_response.data,
@@ -587,11 +545,9 @@ async def import_mapping(
     tar: Annotated[bytes, File()],
     import_mapping_in_workspace_facade: ImportMappingInWorkspaceDep,
 ) -> str:
-    facade_response = (
-        import_mapping_in_workspace_facade.execute(
-            workspace_id=workspace_id,
-            tar=tar,
-        )
+    facade_response = import_mapping_in_workspace_facade.execute(
+        workspace_id=workspace_id,
+        tar=tar,
     )
 
     if facade_response.status // 100 == 2:
@@ -617,10 +573,7 @@ async def mapping_to_yarrrml(
         mapping_id=mapping_id,
     )
 
-    if (
-        facade_response.status // 100 == 2
-        and facade_response.data
-    ):
+    if facade_response.status // 100 == 2 and facade_response.data:
         return facade_response.data
 
     raise HTTPException(

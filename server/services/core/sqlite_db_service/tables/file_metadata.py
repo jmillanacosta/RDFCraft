@@ -9,9 +9,7 @@ from server.services.core.sqlite_db_service.base import (
 class FileMetadataTable(Base):
     __tablename__ = "file_metadata"
 
-    uuid: Mapped[str] = mapped_column(
-        String, primary_key=True
-    )
+    uuid: Mapped[str] = mapped_column(String, primary_key=True)
     name: Mapped[str] = mapped_column(String)
     stem: Mapped[str] = mapped_column(String)
     suffix: Mapped[str] = mapped_column(String)

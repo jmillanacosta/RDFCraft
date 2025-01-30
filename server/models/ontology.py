@@ -85,12 +85,8 @@ class NamedNode:
             "belongs_to": self.belongs_to,
             "type": self.type,
             "full_uri": self.full_uri,
-            "label": [
-                label.to_dict() for label in self.label
-            ],
-            "description": [
-                desc.to_dict() for desc in self.description
-            ],
+            "label": [label.to_dict() for label in self.label],
+            "description": [desc.to_dict() for desc in self.description],
             "is_deprecated": self.is_deprecated,
         }
 
@@ -112,14 +108,8 @@ class NamedNode:
             belongs_to=data["belongs_to"],
             type=data["type"],
             full_uri=data["full_uri"],
-            label=[
-                Literal.from_dict(label)
-                for label in data["label"]
-            ],
-            description=[
-                Literal.from_dict(desc)
-                for desc in data["description"]
-            ],
+            label=[Literal.from_dict(label) for label in data["label"]],
+            description=[Literal.from_dict(desc) for desc in data["description"]],
             is_deprecated=data["is_deprecated"],
         )
 
@@ -132,15 +122,11 @@ class Individual(NamedNode):
     Inherits from NamedNode.
     """
 
-    type: NamedNodeType = field(
-        default=NamedNodeType.INDIVIDUAL
-    )
+    type: NamedNodeType = field(default=NamedNodeType.INDIVIDUAL)
 
     def __post_init__(self):
         if self.type != NamedNodeType.INDIVIDUAL:
-            raise ValueError(
-                f"Individual must have type {NamedNodeType.INDIVIDUAL}"
-            )
+            raise ValueError(f"Individual must have type {NamedNodeType.INDIVIDUAL}")
 
     def to_dict(self):
         return {
@@ -154,14 +140,8 @@ class Individual(NamedNode):
             belongs_to=data["belongs_to"],
             type=data["type"],
             full_uri=data["full_uri"],
-            label=[
-                Literal.from_dict(label)
-                for label in data["label"]
-            ],
-            description=[
-                Literal.from_dict(desc)
-                for desc in data["description"]
-            ],
+            label=[Literal.from_dict(label) for label in data["label"]],
+            description=[Literal.from_dict(desc) for desc in data["description"]],
             is_deprecated=data["is_deprecated"],
         )
 
@@ -182,9 +162,7 @@ class Class(NamedNode):
 
     def __post_init__(self):
         if self.type != NamedNodeType.CLASS:
-            raise ValueError(
-                f"Class must have type {NamedNodeType.CLASS}"
-            )
+            raise ValueError(f"Class must have type {NamedNodeType.CLASS}")
 
     def to_dict(self):
         return {
@@ -198,14 +176,8 @@ class Class(NamedNode):
             belongs_to=data["belongs_to"],
             type=data["type"],
             full_uri=data["full_uri"],
-            label=[
-                Literal.from_dict(label)
-                for label in data["label"]
-            ],
-            description=[
-                Literal.from_dict(desc)
-                for desc in data["description"]
-            ],
+            label=[Literal.from_dict(label) for label in data["label"]],
+            description=[Literal.from_dict(desc) for desc in data["description"]],
             is_deprecated=data["is_deprecated"],
             super_classes=data["super_classes"],
         )
@@ -231,9 +203,7 @@ class Property(NamedNode):
 
     def __post_init__(self):
         if self.type != NamedNodeType.PROPERTY:
-            raise ValueError(
-                f"Property must have type {NamedNodeType.PROPERTY}"
-            )
+            raise ValueError(f"Property must have type {NamedNodeType.PROPERTY}")
 
     def to_dict(self):
         return {
@@ -249,14 +219,8 @@ class Property(NamedNode):
             belongs_to=data["belongs_to"],
             type=data["type"],
             full_uri=data["full_uri"],
-            label=[
-                Literal.from_dict(label)
-                for label in data["label"]
-            ],
-            description=[
-                Literal.from_dict(desc)
-                for desc in data["description"]
-            ],
+            label=[Literal.from_dict(label) for label in data["label"]],
+            description=[Literal.from_dict(desc) for desc in data["description"]],
             is_deprecated=data["is_deprecated"],
             property_type=data["property_type"],
             range=data["range"],
@@ -297,15 +261,9 @@ class Ontology:
             "name": self.name,
             "description": self.description,
             "base_uri": self.base_uri,
-            "classes": [
-                cls.to_dict() for cls in self.classes
-            ],
-            "individuals": [
-                ind.to_dict() for ind in self.individuals
-            ],
-            "properties": [
-                prop.to_dict() for prop in self.properties
-            ],
+            "classes": [cls.to_dict() for cls in self.classes],
+            "individuals": [ind.to_dict() for ind in self.individuals],
+            "properties": [prop.to_dict() for prop in self.properties],
         }
 
     @classmethod
@@ -316,16 +274,7 @@ class Ontology:
             name=data["name"],
             description=data["description"],
             base_uri=data["base_uri"],
-            classes=[
-                Class.from_dict(cls)
-                for cls in data["classes"]
-            ],
-            individuals=[
-                Individual.from_dict(ind)
-                for ind in data["individuals"]
-            ],
-            properties=[
-                Property.from_dict(prop)
-                for prop in data["properties"]
-            ],
+            classes=[Class.from_dict(cls) for cls in data["classes"]],
+            individuals=[Individual.from_dict(ind) for ind in data["individuals"]],
+            properties=[Property.from_dict(prop) for prop in data["properties"]],
         )

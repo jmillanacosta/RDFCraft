@@ -37,9 +37,7 @@ class WorkspaceMetadata:
             description=workspace_metadata.description,
             type=workspace_metadata.type,
             location=workspace_metadata.location,
-            enabled_features=workspace_metadata.enabled_features.split(
-                ","
-            ),
+            enabled_features=workspace_metadata.enabled_features.split(","),
         )
 
     def to_table(self):
@@ -49,9 +47,7 @@ class WorkspaceMetadata:
             description=self.description,
             type=self.type,
             location=self.location,
-            enabled_features=",".join(
-                self.enabled_features
-            ),
+            enabled_features=",".join(self.enabled_features),
         )
 
     @classmethod

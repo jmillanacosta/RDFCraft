@@ -13,23 +13,16 @@ from server.models.source import Source
 router = APIRouter()
 
 
-GetSourceFacadeDep = Annotated[
-    GetSourceFacade, Depends(lambda: di[GetSourceFacade])
-]
+GetSourceFacadeDep = Annotated[GetSourceFacade, Depends(lambda: di[GetSourceFacade])]
 
 
 @router.get("/{source_uuid}")
-async def get_source(
-    source_uuid: str, get_source_facade: GetSourceFacadeDep
-) -> Source:
+async def get_source(source_uuid: str, get_source_facade: GetSourceFacadeDep) -> Source:
     facade_response = get_source_facade.execute(
         source_uuid=source_uuid,
     )
 
-    if (
-        facade_response.status // 100 == 2
-        and facade_response.data
-    ):
+    if facade_response.status // 100 == 2 and facade_response.data:
         return facade_response.data
 
     raise HTTPException(

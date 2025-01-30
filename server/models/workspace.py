@@ -146,25 +146,15 @@ class WorkspaceModel:
         return WorkspaceModel(
             uuid=self.uuid,
             name=name if name is not None else self.name,
-            description=description
-            if description is not None
-            else self.description,
+            description=description if description is not None else self.description,
             type=type if type is not None else self.type,
-            location=location
-            if location is not None
-            else self.location,
+            location=location if location is not None else self.location,
             enabled_features=enabled_features
             if enabled_features is not None
             else self.enabled_features,
-            mappings=mappings
-            if mappings is not None
-            else self.mappings,
-            prefixes=prefixes
-            if prefixes is not None
-            else self.prefixes,
-            ontologies=ontologies
-            if ontologies is not None
-            else self.ontologies,
+            mappings=mappings if mappings is not None else self.mappings,
+            prefixes=prefixes if prefixes is not None else self.prefixes,
+            ontologies=ontologies if ontologies is not None else self.ontologies,
             used_uri_patterns=used_uri_patterns
             if used_uri_patterns is not None
             else self.used_uri_patterns,

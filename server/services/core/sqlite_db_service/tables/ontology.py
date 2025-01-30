@@ -9,9 +9,7 @@ from server.services.core.sqlite_db_service.base import (
 class OntologyTable(Base):
     __tablename__ = "ontology"
 
-    uuid: Mapped[str] = mapped_column(
-        String, primary_key=True
-    )
+    uuid: Mapped[str] = mapped_column(String, primary_key=True)
     name: Mapped[str] = mapped_column(String)
     json_file_uuid: Mapped[str] = mapped_column(String)
     ontology_file_uuid: Mapped[str] = mapped_column(String)

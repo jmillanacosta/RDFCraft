@@ -20,9 +20,7 @@ class GetWorkspacesFacade(BaseFacade):
         workspace_service: WorkspaceServiceProtocol,
     ):
         super().__init__()
-        self.workspace_metadata_service = (
-            workspace_metadata_service
-        )
+        self.workspace_metadata_service = workspace_metadata_service
         self.workspace_service = workspace_service
 
     @BaseFacade.error_wrapper
@@ -30,18 +28,12 @@ class GetWorkspacesFacade(BaseFacade):
         self,
         uuid: str | None = None,
     ) -> FacadeResponse:
-        self.logger.info(
-            "Retrieving all workspace metadata"
-        )
-        all_workspace_metadata = (
-            self.workspace_metadata_service.get_workspaces()
-        )
+        self.logger.info("Retrieving all workspace metadata")
+        all_workspace_metadata = self.workspace_metadata_service.get_workspaces()
 
         if uuid:
             all_workspace_metadata = [
-                metadata
-                for metadata in all_workspace_metadata
-                if metadata.uuid == uuid
+                metadata for metadata in all_workspace_metadata if metadata.uuid == uuid
             ]
 
         all_workspaces = [

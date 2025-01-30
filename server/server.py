@@ -48,15 +48,11 @@ access_logger = structlog.get_logger("api.access")
 
 
 @app.middleware("http")
-async def logging_middleware(
-    request: Request, call_next
-) -> Response:
+async def logging_middleware(request: Request, call_next) -> Response:
     structlog.contextvars.clear_contextvars()
     # These context vars will be added to all log entries emitted during the request
     request_id = correlation_id.get()
-    structlog.contextvars.bind_contextvars(
-        request_id=request_id
-    )
+    structlog.contextvars.bind_contextvars(request_id=request_id)
 
     start_time = time.perf_counter_ns()
     # If the call_next raises an error, we still want to return our own 500 response,
@@ -65,9 +61,7 @@ async def logging_middleware(
     try:
         response = await call_next(request)
     except Exception:
-        structlog.stdlib.get_logger("api.error").exception(
-            "Uncaught exception"
-        )
+        structlog.stdlib.get_logger("api.error").exception("Uncaught exception")
         raise
     finally:
         process_time = time.perf_counter_ns() - start_time
@@ -96,28 +90,18 @@ async def logging_middleware(
             },
             duration=process_time,
         )
-        response.headers["X-Process-Time"] = str(
-            process_time / 10**9
-        )
+        response.headers["X-Process-Time"] = str(process_time / 10**9)
     return response
 
 
 app.add_middleware(CorrelationIdMiddleware)
 
 tracing_middleware = next(
-    (
-        m
-        for m in app.user_middleware
-        if m.cls == TraceMiddleware
-    ),
+    (m for m in app.user_middleware if m.cls == TraceMiddleware),
     None,
 )
 if tracing_middleware is not None:
-    app.user_middleware = [
-        m
-        for m in app.user_middleware
-        if m.cls != TraceMiddleware
-    ]
+    app.user_middleware = [m for m in app.user_middleware if m.cls != TraceMiddleware]
     structlog.stdlib.get_logger("api.datadog_patch").info(
         "Patching Datadog tracing middleware to be the outermost middleware..."
     )

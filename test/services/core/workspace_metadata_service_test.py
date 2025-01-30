@@ -16,13 +16,9 @@ from server.services.core.workspace_metadata_service import (
 class TestWorkspaceMetadataService(unittest.TestCase):
     def setUp(self):
         self.db_service = MagicMock(spec=DBService)
-        self.service = WorkspaceMetadataService(
-            self.db_service
-        )
+        self.service = WorkspaceMetadataService(self.db_service)
 
-    @patch(
-        "server.services.core.workspace_metadata_service.uuid4"
-    )
+    @patch("server.services.core.workspace_metadata_service.uuid4")
     def test_create_workspace_metadata(self, mock_uuid4):
         mock_uuid4.return_value.hex = "test-uuid"
         session_mock = MagicMock()
@@ -46,15 +42,13 @@ class TestWorkspaceMetadataService(unittest.TestCase):
         result = self.service.get_workspaces()
 
         self.assertEqual(result, [])
-        session_mock.query.assert_called_once_with(
-            WorkspaceMetadataTable
-        )
+        session_mock.query.assert_called_once_with(WorkspaceMetadataTable)
 
     def test_update_workspace_metadata(self):
         session_mock = MagicMock()
         self.db_service.get_session.return_value.__enter__.return_value = session_mock
-        session_mock.execute.return_value.one_or_none.return_value = WorkspaceMetadataTable(
-            uuid="test-uuid"
+        session_mock.execute.return_value.one_or_none.return_value = (
+            WorkspaceMetadataTable(uuid="test-uuid")
         )
 
         self.service.update_workspace_metadata(
@@ -85,13 +79,11 @@ class TestWorkspaceMetadataService(unittest.TestCase):
     def test_delete_workspace_metadata(self):
         session_mock = MagicMock()
         self.db_service.get_session.return_value.__enter__.return_value = session_mock
-        session_mock.execute.return_value.one_or_none.return_value = WorkspaceMetadataTable(
-            uuid="test-uuid"
+        session_mock.execute.return_value.one_or_none.return_value = (
+            WorkspaceMetadataTable(uuid="test-uuid")
         )
 
-        self.service.delete_workspace_metadata(
-            uuid="test-uuid"
-        )
+        self.service.delete_workspace_metadata(uuid="test-uuid")
 
         session_mock.execute.assert_called()
         session_mock.commit.assert_called_once()
@@ -102,9 +94,7 @@ class TestWorkspaceMetadataService(unittest.TestCase):
         session_mock.execute.return_value.one_or_none.return_value = None
 
         with self.assertRaises(ServerException) as context:
-            self.service.delete_workspace_metadata(
-                uuid="test-uuid"
-            )
+            self.service.delete_workspace_metadata(uuid="test-uuid")
 
         self.assertEqual(
             context.exception.code,

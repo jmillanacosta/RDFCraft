@@ -18,9 +18,7 @@ class MappingServiceProtocol(ABC):
         pass
 
     @abstractmethod
-    def create_mapping(
-        self, name: str, description: str, source_uuid: str
-    ) -> str:
+    def create_mapping(self, name: str, description: str, source_uuid: str) -> str:
         """
         Create a new mapping
 
@@ -33,9 +31,7 @@ class MappingServiceProtocol(ABC):
         pass
 
     @abstractmethod
-    def update_mapping(
-        self, mapping_id: str, graph: MappingGraph
-    ) -> None:
+    def update_mapping(self, mapping_id: str, graph: MappingGraph) -> None:
         """
         Update a mapping
 

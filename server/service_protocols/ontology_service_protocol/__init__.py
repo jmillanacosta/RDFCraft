@@ -24,9 +24,7 @@ class OntologyServiceProtocol(ABC):
         ...
 
     @abstractmethod
-    def get_ontologies(
-        self, ids: list[str]
-    ) -> list[Ontology]:
+    def get_ontologies(self, ids: list[str]) -> list[Ontology]:
         """
         Get a list of ontologies by ids
 

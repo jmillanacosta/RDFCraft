@@ -11,9 +11,7 @@ class WorkspaceServiceProtocol(ABC):
     """
 
     @abstractmethod
-    def get_workspace(
-        self, location: str
-    ) -> WorkspaceModel:
+    def get_workspace(self, location: str) -> WorkspaceModel:
         """
         Get a workspace by location
 
@@ -26,9 +24,7 @@ class WorkspaceServiceProtocol(ABC):
         ...
 
     @abstractmethod
-    def create_workspace(
-        self, workspace: WorkspaceModel
-    ) -> None:
+    def create_workspace(self, workspace: WorkspaceModel) -> None:
         """
         Create a workspace
 
@@ -38,9 +34,7 @@ class WorkspaceServiceProtocol(ABC):
         ...
 
     @abstractmethod
-    def update_workspace(
-        self, workspace: WorkspaceModel
-    ) -> None:
+    def update_workspace(self, workspace: WorkspaceModel) -> None:
         """
         Update a workspace
 

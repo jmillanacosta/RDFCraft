@@ -13,9 +13,7 @@ from server.utils.schema_extractor.tabular_schema_extractor import (
 
 @inject
 class SchemaExtractor:
-    def __init__(
-        self, schema_extractors: list[ISchemaExtractor]
-    ) -> None:
+    def __init__(self, schema_extractors: list[ISchemaExtractor]) -> None:
         self.type_mapping: dict[str, ISchemaExtractor] = {}
         for schema_extractor in schema_extractors:
             for file_type in schema_extractor.file_types:
@@ -25,9 +23,7 @@ class SchemaExtractor:
                         f" {self.type_mapping[file_type].name} / Can't register"
                         f" to {schema_extractor.name} as well"
                     )
-                self.type_mapping[file_type] = (
-                    schema_extractor
-                )
+                self.type_mapping[file_type] = schema_extractor
 
     def extract_schema(
         self,
@@ -40,6 +36,6 @@ class SchemaExtractor:
                 " extractor"
             )
 
-        return self.type_mapping[
-            file_extension
-        ].extract_schema(file, file_extension, "")
+        return self.type_mapping[file_extension].extract_schema(
+            file, file_extension, ""
+        )

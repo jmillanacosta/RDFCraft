@@ -52,36 +52,22 @@ load_dotenv()
 
 DEBUG = os.getenv("DEBUG", False)
 
-os.environ["DD_TRACE_ENABLED"] = os.getenv(
-    "DD_TRACE_ENABLED", "false"
-)
+os.environ["DD_TRACE_ENABLED"] = os.getenv("DD_TRACE_ENABLED", "false")
 
 thread = None
 
-LOG_JSON_FORMAT = parse_obj_as(
-    bool, os.getenv("LOG_JSON_FORMAT", False)
-)
+LOG_JSON_FORMAT = parse_obj_as(bool, os.getenv("LOG_JSON_FORMAT", False))
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
-setup_logging(
-    json_logs=LOG_JSON_FORMAT, log_level=LOG_LEVEL
-)
+setup_logging(json_logs=LOG_JSON_FORMAT, log_level=LOG_LEVEL)
 
 
 def get_free_port():
     while True:
-        port = random.randint(
-            1024, 65535
-        )  # Ports below 1024 are reserved
-        with socket.socket(
-            socket.AF_INET, socket.SOCK_STREAM
-        ) as s:
+        port = random.randint(1024, 65535)  # Ports below 1024 are reserved
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             try:
-                s.bind(
-                    ("", port)
-                )  # Bind to the port on all network interfaces
-                s.listen(
-                    1
-                )  # Start listening to check if the port is available
+                s.bind(("", port))  # Bind to the port on all network interfaces
+                s.listen(1)  # Start listening to check if the port is available
                 return port  # If binding succeeds, the port is free
             except OSError:
                 continue  # If binding fails, try another port
@@ -95,9 +81,7 @@ di["PORT"] = port
 def start_fastapi():
     import uvicorn
 
-    uvicorn.run(
-        app, host="0.0.0.0", port=port, log_config=None
-    )
+    uvicorn.run(app, host="0.0.0.0", port=port, log_config=None)
 
 
 def on_closing():

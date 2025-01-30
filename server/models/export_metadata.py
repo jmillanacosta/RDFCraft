@@ -35,32 +35,19 @@ class ExportMetadata:
         """
         return cls(
             type=ExportMetadataType(data["type"]),
-            files=[
-                FileMetadata.from_dict(file)
-                for file in data["files"]
-            ],
-            sources=[
-                Source.from_dict(source)
-                for source in data["sources"]
-            ],
+            files=[FileMetadata.from_dict(file) for file in data["files"]],
+            sources=[Source.from_dict(source) for source in data["sources"]],
             workspace_metadata=(
-                WorkspaceMetadata.from_dict(
-                    data["workspace_metadata"]
-                )
+                WorkspaceMetadata.from_dict(data["workspace_metadata"])
                 if data["workspace_metadata"] is not None
                 else None
             ),
             workspace_model=(
-                WorkspaceModel.from_dict(
-                    data["workspace_model"]
-                )
+                WorkspaceModel.from_dict(data["workspace_model"])
                 if data["workspace_model"] is not None
                 else None
             ),
-            mappings=[
-                MappingGraph.from_dict(mapping)
-                for mapping in data["mappings"]
-            ],
+            mappings=[MappingGraph.from_dict(mapping) for mapping in data["mappings"]],
         )
 
     def to_dict(self):
@@ -69,12 +56,8 @@ class ExportMetadata:
         """
         return {
             "type": self.type,
-            "files": [
-                file.to_dict() for file in self.files
-            ],
-            "sources": [
-                source.to_dict() for source in self.sources
-            ],
+            "files": [file.to_dict() for file in self.files],
+            "sources": [source.to_dict() for source in self.sources],
             "workspace_metadata": (
                 self.workspace_metadata.to_dict()
                 if self.workspace_metadata is not None
@@ -85,8 +68,5 @@ class ExportMetadata:
                 if self.workspace_model is not None
                 else None
             ),
-            "mappings": [
-                mapping.to_dict()
-                for mapping in self.mappings
-            ],
+            "mappings": [mapping.to_dict() for mapping in self.mappings],
         }

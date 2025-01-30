@@ -18,17 +18,13 @@ class FacadeResponse:
             "status": self.status,
             "message": self.message,
             "data": self.data,
-            "err_code": self.err_code.value
-            if self.err_code
-            else None,
+            "err_code": self.err_code.value if self.err_code else None,
         }
 
 
 class BaseFacade(ABC):
     def __init__(self):
-        self.logger = logging.getLogger(
-            self.__class__.__name__
-        )
+        self.logger = logging.getLogger(self.__class__.__name__)
 
     @abstractmethod
     def execute(self, *args, **kwargs) -> FacadeResponse:

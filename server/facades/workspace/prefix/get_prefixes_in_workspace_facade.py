@@ -20,9 +20,7 @@ class GetPrefixInWorkspaceFacade(BaseFacade):
         workspace_service: WorkspaceServiceProtocol,
     ):
         super().__init__()
-        self.workspace_metadata_service = (
-            workspace_metadata_service
-        )
+        self.workspace_metadata_service = workspace_metadata_service
         self.workspace_service = workspace_service
 
     @BaseFacade.error_wrapper

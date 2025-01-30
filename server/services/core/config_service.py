@@ -23,16 +23,12 @@ class ConfigService(ConfigServiceProtocol):
     def get(self, key: str) -> str | None:
         self.logger.info(f"Getting config: {key}")
         with self._db_service.get_session() as session:
-            result: ConfigTable | None = session.get(
-                ConfigTable, key
-            )
+            result: ConfigTable | None = session.get(ConfigTable, key)
             self.logger.info(f"Got config {key}: {result}")
             return result.value if result else None
 
     def set(self, key: str, value: str):
-        self.logger.info(
-            f"Setting config: {key} to {value}"
-        )
+        self.logger.info(f"Setting config: {key} to {value}")
         with self._db_service.get_session() as session:
             session.merge(ConfigTable(key=key, value=value))
             session.commit()
@@ -44,15 +40,9 @@ class ConfigService(ConfigServiceProtocol):
         with self._db_service.get_session() as session:
             item = session.get(ConfigTable, key)
             if not item:
-                self.logger.info(
-                    f"Config {key} not found, ignoring delete"
-                )
+                self.logger.info(f"Config {key} not found, ignoring delete")
                 return
-            session.execute(
-                delete(ConfigTable).where(
-                    ConfigTable.key == key
-                )
-            )
+            session.execute(delete(ConfigTable).where(ConfigTable.key == key))
             session.commit()
 
         self.logger.info(f"Deleted config {key}")

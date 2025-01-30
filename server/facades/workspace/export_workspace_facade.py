@@ -17,7 +17,6 @@ from server.models.export_metadata import (
 from server.models.file_metadata import FileMetadata
 from server.models.mapping import MappingGraph
 from server.models.ontology import Ontology
-from server.models.source import Source
 from server.models.workspace import WorkspaceModel
 from server.models.workspace_metadata import (
     WorkspaceMetadata,
@@ -31,14 +30,14 @@ from server.service_protocols.mapping_service_protocol import (
 from server.service_protocols.ontology_service_protocol import (
     OntologyServiceProtocol,
 )
+from server.service_protocols.source_service_protocol import (
+    SourceServiceProtocol,
+)
 from server.service_protocols.workspace_metadata_service_protocol import (
     WorkspaceMetadataServiceProtocol,
 )
 from server.service_protocols.workspace_service_protocol import (
     WorkspaceServiceProtocol,
-)
-from server.services.local.local_source_service import (
-    SourceServiceProtocol,
 )
 
 
@@ -95,7 +94,7 @@ class ExportWorkspaceFacade(BaseFacade):
 
         workspace: WorkspaceModel = (
             self.workspace_service.get_workspace(
-                workspace_id
+                workspace_metadata.location
             )
         )
 
@@ -187,9 +186,7 @@ class ExportWorkspaceFacade(BaseFacade):
                 f"Creating tar file for workspace {workspace_id}"
             )
 
-            tarinfo = tarfile.TarInfo(
-                "export_metadata.json"
-            )
+            tarinfo = tarfile.TarInfo("metadata.json")
             export_metadata_dumps = json.dumps(
                 export_metadata.to_dict()
             ).encode("utf-8")

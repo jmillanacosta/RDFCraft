@@ -18,7 +18,9 @@ class MappingServiceProtocol(ABC):
         pass
 
     @abstractmethod
-    def create_mapping(self, name:str, description:str, source_uuid: str) -> str:
+    def create_mapping(
+        self, name: str, description: str, source_uuid: str
+    ) -> str:
         """
         Create a new mapping
 

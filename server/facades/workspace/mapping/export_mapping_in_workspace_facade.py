@@ -22,7 +22,7 @@ from server.service_protocols.fs_service_protocol import (
 from server.service_protocols.mapping_service_protocol import (
     MappingServiceProtocol,
 )
-from server.services.local.local_source_service import (
+from server.service_protocols.source_service_protocol import (
     SourceServiceProtocol,
 )
 

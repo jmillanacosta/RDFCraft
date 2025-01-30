@@ -52,3 +52,9 @@ class ErrCodes(Enum):
     # RML Mapper Service
 
     RML_MAPPING_EXECUTION_ERROR = 180
+
+    # Export Service
+
+    # Import Service
+    METADATA_NOT_FOUND = 200
+    WRONG_IMPORT_TYPE = 201

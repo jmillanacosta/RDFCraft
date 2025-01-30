@@ -1,8 +1,9 @@
 from pathlib import Path
 from typing import Annotated, cast
 
+from bottle import FileUpload
 from fastapi.exceptions import HTTPException
-from fastapi.params import Depends
+from fastapi.params import Depends, File
 from fastapi.routing import APIRouter
 from kink.container import di
 from starlette.responses import FileResponse
@@ -32,6 +33,9 @@ from server.facades.workspace.mapping.export_mapping_in_workspace_facade import 
 )
 from server.facades.workspace.mapping.get_mappings_in_workspace_facade import (
     GetMappingsInWorkspaceFacade,
+)
+from server.facades.workspace.mapping.import_mapping_in_workspace_facade import (
+    ImportMappingInWorkspaceFacade,
 )
 from server.facades.workspace.mapping.mapping_to_yarrrml_facade import (
     MappingToYARRRMLFacade,
@@ -144,6 +148,11 @@ UpdateMappingDep = Annotated[
 ExportMappingInWorkspaceDep = Annotated[
     ExportMappingInWorkspaceFacade,
     Depends(lambda: di[ExportMappingInWorkspaceFacade]),
+]
+
+ImportMappingInWorkspaceDep = Annotated[
+    ImportMappingInWorkspaceFacade,
+    Depends(lambda: di[ImportMappingInWorkspaceFacade]),
 ]
 
 MappingToYARRRMLDep = Annotated[
@@ -562,6 +571,31 @@ async def export_mapping(
             filename=_data.name,
             media_type="application/gzip",
         )
+
+    raise HTTPException(
+        status_code=facade_response.status,
+        detail=facade_response.to_dict(),
+    )
+
+
+@router.post(
+    "/{workspace_id}/mapping/import",
+    response_class=PlainTextResponse,
+)
+async def import_mapping(
+    workspace_id: str,
+    tar: Annotated[bytes, File()],
+    import_mapping_in_workspace_facade: ImportMappingInWorkspaceDep,
+) -> str:
+    facade_response = (
+        import_mapping_in_workspace_facade.execute(
+            workspace_id=workspace_id,
+            tar=tar,
+        )
+    )
+
+    if facade_response.status // 100 == 2:
+        return facade_response.message
 
     raise HTTPException(
         status_code=facade_response.status,

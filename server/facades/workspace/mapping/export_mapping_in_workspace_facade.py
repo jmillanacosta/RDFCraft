@@ -59,10 +59,16 @@ class ExportMappingInWorkspaceFacade(BaseFacade):
             self.mapping_service.get_mapping(mapping_id)
         )
         self.logger.info(
+            f"Retrieved mapping {mapping_id}: {mapping}"
+        )
+        self.logger.info(
             f"Retrieving source for mapping {mapping_id}"
         )
         source: Source = self.source_service.get_source(
             mapping.source_id
+        )
+        self.logger.info(
+            f"Retrieved source for mapping {mapping_id}: {source}"
         )
         self.logger.info(
             f"Retrieving source file metadata for mapping {mapping_id}"
@@ -73,11 +79,10 @@ class ExportMappingInWorkspaceFacade(BaseFacade):
             )
         )
         self.logger.info(
-            f"Downloading source file for mapping {mapping_id}"
+            f"Retrieved source file metadata for mapping {mapping_id}: {source_file_metadata}"
         )
-        tar_file_path = (
-            self.temp_dir
-            / f"export-{mapping.name}-{datetime.datetime.now().isoformat().replace(':', '_')}.tar.gz"
+        self.logger.info(
+            f"Downloading source file for mapping {mapping_id}"
         )
 
         export_metadata = ExportMetadata(
@@ -88,13 +93,31 @@ class ExportMappingInWorkspaceFacade(BaseFacade):
             files=[source_file_metadata],
             mappings=[mapping],
         )
+        self.logger.info(
+            f"Created export metadata for mapping {mapping_id}: {export_metadata}"
+        )
+
+        tar_file_path = (
+            self.temp_dir
+            / f"export-{mapping.name}-{datetime.datetime.now().isoformat().replace(':', '_')}.tar.gz"
+        )
+
+        self.logger.info(
+            f"Tar file path for mapping {mapping_id}: {tar_file_path}"
+        )
 
         with tarfile.open(tar_file_path, "w:gz") as tar:
+            self.logger.info(
+                f"Creating tar file for mapping {mapping_id}"
+            )
             files_folder = tarfile.TarInfo("files/")
             files_folder.type = tarfile.DIRTYPE
             files_folder.mode = 0o777
             tar.addfile(files_folder)
             for file in export_metadata.files:
+                self.logger.info(
+                    f"Adding file {file.uuid} to tar for mapping {mapping_id}"
+                )
                 _data = self.file_service.download_file_with_uuid(
                     file.uuid
                 )
@@ -108,6 +131,9 @@ class ExportMappingInWorkspaceFacade(BaseFacade):
                     fileobj=BytesIO(_data),
                 )
 
+            self.logger.info(
+                f"Adding metadata.json to tar for mapping {mapping_id}"
+            )
             metadata_info = tarfile.TarInfo("metadata.json")
             metadata_content = json.dumps(
                 export_metadata.to_dict()
@@ -119,6 +145,9 @@ class ExportMappingInWorkspaceFacade(BaseFacade):
                 fileobj=BytesIO(metadata_content),
             )
 
+        self.logger.info(
+            f"Successfully created tar file for mapping {mapping_id} at {tar_file_path}"
+        )
         return self._success_response(
             data=tar_file_path,
             message="Exported mapping successfully",

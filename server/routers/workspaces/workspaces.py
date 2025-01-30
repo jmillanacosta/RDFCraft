@@ -15,6 +15,9 @@ from server.facades.workspace.create_workspace_facade import (
 from server.facades.workspace.delete_workspace_facade import (
     DeleteWorkspaceFacade,
 )
+from server.facades.workspace.export_workspace_facade import (
+    ExportWorkspaceFacade,
+)
 from server.facades.workspace.get_workspaces_facade import (
     GetWorkspacesFacade,
 )
@@ -81,6 +84,11 @@ DeleteWorkspaceFacadeDep = Annotated[
 GetWorkspacesFacadeDep = Annotated[
     GetWorkspacesFacade,
     Depends(lambda: di[GetWorkspacesFacade]),
+]
+
+ExportWorkspaceFacadeDep = Annotated[
+    ExportWorkspaceFacade,
+    Depends(lambda: di[ExportWorkspaceFacade]),
 ]
 
 GetPrefixInWorkspaceFacadeDep = Annotated[
@@ -232,6 +240,36 @@ async def delete_workspace(
     if facade_response.status // 100 == 2:
         return BasicResponse(
             message=facade_response.message,
+        )
+
+    raise HTTPException(
+        status_code=facade_response.status,
+        detail=facade_response.to_dict(),
+    )
+
+
+@router.get(
+    "/{workspace_id}/export", response_class=FileResponse
+)
+async def export_workspace(
+    workspace_id: str,
+    export_workspace_facade: ExportWorkspaceFacadeDep,
+) -> FileResponse:
+    facade_response: FacadeResponse = (
+        export_workspace_facade.execute(
+            workspace_id=workspace_id,
+        )
+    )
+
+    if (
+        facade_response.status // 100 == 2
+        and facade_response.data
+    ):
+        _data = cast(Path, facade_response.data)
+        return FileResponse(
+            path=facade_response.data,
+            filename=_data.name,
+            media_type="application/gzip",
         )
 
     raise HTTPException(

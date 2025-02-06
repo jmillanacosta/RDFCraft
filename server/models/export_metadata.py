@@ -16,6 +16,31 @@ class ExportMetadataType(StrEnum):
 
 
 @dataclass
+class OntologyExportMetadata:
+    name: str
+    description: str
+    base_uri: str
+    file_uuid: str
+
+    def to_dict(self):
+        return {
+            "name": self.name,
+            "description": self.description,
+            "base_uri": self.base_uri,
+            "file_uuid": self.file_uuid,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        return cls(
+            name=data["name"],
+            description=data["description"],
+            base_uri=data["base_uri"],
+            file_uuid=data["file_uuid"],
+        )
+
+
+@dataclass
 class ExportMetadata:
     """
     Contains metadata for an export
@@ -27,6 +52,7 @@ class ExportMetadata:
     workspace_metadata: WorkspaceMetadata | None
     workspace_model: WorkspaceModel | None
     mappings: list[MappingGraph]
+    ontologies: list[OntologyExportMetadata] | None
 
     @classmethod
     def from_dict(cls, data: dict):
@@ -48,6 +74,12 @@ class ExportMetadata:
                 else None
             ),
             mappings=[MappingGraph.from_dict(mapping) for mapping in data["mappings"]],
+            ontologies=[
+                OntologyExportMetadata.from_dict(ontology)
+                for ontology in data["ontologies"]
+            ]
+            if data["ontologies"] is not None
+            else None,
         )
 
     def to_dict(self):
@@ -69,4 +101,7 @@ class ExportMetadata:
                 else None
             ),
             "mappings": [mapping.to_dict() for mapping in self.mappings],
+            "ontologies": [ontology.to_dict() for ontology in self.ontologies]
+            if self.ontologies is not None
+            else None,
         }

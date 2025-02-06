@@ -72,6 +72,7 @@ class ExportMappingInWorkspaceFacade(BaseFacade):
             sources=[source],
             files=[source_file_metadata],
             mappings=[mapping],
+            ontologies=None,
         )
         self.logger.info(
             f"Created export metadata for mapping {mapping_id}: {export_metadata}"

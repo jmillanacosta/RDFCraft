@@ -64,7 +64,7 @@ class ImportMappingInWorkspaceFacade(BaseFacade):
         workspace_id: str,
         tar: bytes,
     ) -> FacadeResponse:
-        self.logger.info(f"Importing mapping from tar")
+        self.logger.info("Importing mapping from tar")
 
         self.logger.info(f"Getting workspace {workspace_id}")
 
@@ -76,7 +76,7 @@ class ImportMappingInWorkspaceFacade(BaseFacade):
 
         self.logger.info(f"Workspace {workspace_id} retrieved")
 
-        self.logger.info(f"Extracting tar")
+        self.logger.info("Extracting tar")
 
         tar_f: tarfile.TarFile = tarfile.open(fileobj=BytesIO(tar))
 

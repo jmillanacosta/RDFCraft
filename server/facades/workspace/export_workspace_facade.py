@@ -13,6 +13,7 @@ from server.facades import (
 from server.models.export_metadata import (
     ExportMetadata,
     ExportMetadataType,
+    OntologyExportMetadata,
 )
 from server.models.file_metadata import FileMetadata
 from server.models.mapping import MappingGraph
@@ -133,6 +134,15 @@ class ExportWorkspaceFacade(BaseFacade):
             sources=sources,
             files=files,
             mappings=mappings,
+            ontologies=[
+                OntologyExportMetadata(
+                    name=ontology.name,
+                    description=ontology.description,
+                    base_uri=ontology.base_uri,
+                    file_uuid=ontology.file_uuid,
+                )
+                for ontology in ontologies
+            ],
         )
 
         self.logger.info(f"Creating tar file for workspace {workspace_id}")

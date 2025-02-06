@@ -22,6 +22,7 @@ from server.facades.workspace.export_workspace_facade import (
 from server.facades.workspace.get_workspaces_facade import (
     GetWorkspacesFacade,
 )
+from server.facades.workspace.import_workspace_facade import ImportWorkspaceFacade
 from server.facades.workspace.mapping.create_mapping_in_workspace_facade import (
     CreateMappingInWorkspaceFacade,
 )
@@ -93,6 +94,11 @@ GetWorkspacesFacadeDep = Annotated[
 ExportWorkspaceFacadeDep = Annotated[
     ExportWorkspaceFacade,
     Depends(lambda: di[ExportWorkspaceFacade]),
+]
+
+ImportWorkspaceFacadeDep = Annotated[
+    ImportWorkspaceFacade,
+    Depends(lambda: di[ImportWorkspaceFacade]),
 ]
 
 GetPrefixInWorkspaceFacadeDep = Annotated[
@@ -266,6 +272,24 @@ async def export_workspace(
             filename=_data.name,
             media_type="application/gzip",
         )
+
+    raise HTTPException(
+        status_code=facade_response.status,
+        detail=facade_response.to_dict(),
+    )
+
+
+@router.post("/import", response_class=PlainTextResponse)
+async def import_workspace(
+    tar: Annotated[bytes, File()],
+    import_workspace_facade: ImportWorkspaceFacadeDep,
+) -> str:
+    facade_response = import_workspace_facade.execute(
+        data=tar,
+    )
+
+    if facade_response.status // 100 == 2 and facade_response.data:
+        return facade_response.data
 
     raise HTTPException(
         status_code=facade_response.status,

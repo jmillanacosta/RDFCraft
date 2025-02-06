@@ -73,16 +73,9 @@ class LocalSourceService(SourceServiceProtocol):
                     "No matches found for the given json path",
                     ErrCodes.JSON_PATH_DATA_NOT_FOUND,
                 )
-            if len(matches) > 1:
-                raise ServerException(
-                    "Multiple matches found for the given json path",
-                    ErrCodes.JSON_PATH_DATA_NOT_UNIQUE,
-                )
+
             if not isinstance(matches[0].value, list):
-                raise ServerException(
-                    "The json path does not point to an array",
-                    ErrCodes.JSON_PATH_NOT_ARRAY,
-                )
+                return json.dumps([matches[0].value]).encode("utf-8")
             return json.dumps(matches[0].value).encode("utf-8")
         except json.JSONDecodeError as e:
             self.logger.error(

@@ -8,12 +8,14 @@ interface WorkspaceCardItemProps {
   workspace: Workspace;
   onDelete: (workspace: Workspace) => void;
   onOpen: (workspace: Workspace) => void;
+  onExport: (workspace: Workspace) => void;
 }
 
 const WorkspaceCardItem = ({
   workspace,
   onDelete,
   onOpen,
+  onExport,
 }: WorkspaceCardItemProps) => {
   return (
     <CardItem
@@ -26,7 +28,7 @@ const WorkspaceCardItem = ({
           </p>
           <p>
             <b>Description</b>: <br />
-            {workspace.description}
+            {workspace.description || 'No description'}
           </p>
           <p
             style={
@@ -43,6 +45,9 @@ const WorkspaceCardItem = ({
         <>
           <Button intent='danger' onClick={() => onDelete(workspace)}>
             Delete
+          </Button>
+          <Button intent='primary' onClick={() => onExport(workspace)}>
+            Export
           </Button>
           <Button intent='primary' onClick={() => onOpen(workspace)}>
             Open

@@ -14,6 +14,7 @@ from server.models.export_metadata import (
     ExportMetadata,
     ExportMetadataType,
 )
+from server.models.workspace import WorkspaceModel
 from server.service_protocols.fs_service_protocol import (
     FSServiceProtocol,
 )
@@ -106,12 +107,13 @@ class ImportWorkspaceFacade(BaseFacade):
 
         self.logger.info("Creating workspace")
 
-        new_workspace = export_metadata.workspace_model
-
-        new_workspace.uuid = new_workspace_metadata.uuid
-        new_workspace.location = new_workspace_metadata.location
-        new_workspace.mappings = []
-        new_workspace.ontologies = []
+        new_workspace = WorkspaceModel.create_with_defaults(
+            uuid=new_workspace_metadata.uuid,
+            name=new_workspace_metadata.name,
+            description=new_workspace_metadata.description,
+            type=new_workspace_metadata.type,
+            location=new_workspace_metadata.location,
+        )
 
         self.logger.info("Workspace created")
 

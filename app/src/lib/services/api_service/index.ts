@@ -30,6 +30,10 @@ class ApiService {
     return ApiService.instances[baseUrl];
   }
 
+  get baseUrl(): string {
+    return this._baseUrl;
+  }
+
   async callApi<T, D = unknown>(
     endpoint: string,
     options: ApiCallOptions<T, D>,

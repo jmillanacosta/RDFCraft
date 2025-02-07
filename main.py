@@ -107,5 +107,5 @@ if __name__ == "__main__":
             resizable=True,
         )
         window.events.closing += on_closing
-        webview._settings["debug"] = True
+        webview.settings["ALLOW_DOWNLOADS"] = True
         webview.start()

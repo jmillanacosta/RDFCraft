@@ -1,7 +1,6 @@
 from pathlib import Path
 from typing import Annotated, cast
 
-from bottle import FileUpload
 from fastapi.exceptions import HTTPException
 from fastapi.params import Depends, File
 from fastapi.routing import APIRouter

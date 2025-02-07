@@ -3,6 +3,7 @@ import {
   Workspace,
 } from '../../lib/api/workspaces_api/types';
 
+import ApiService from '@/lib/services/api_service';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import WorkspacesApi from '../../lib/api/workspaces_api';
@@ -16,6 +17,8 @@ interface WorkspacesPageState {
 
 interface WorkspacesPageStateActions {
   createWorkspace: (workspace: CreateWorkspaceMetadata) => void;
+  exportWorkspace: (workspace: Workspace) => void;
+  importWorkspace: (data: File) => void;
   refreshWorkspaces: () => void;
   deleteWorkspace: (workspace: Workspace) => void;
 }
@@ -69,6 +72,26 @@ const functions: ZustandActions<
         if (result) {
           get().refreshWorkspaces();
         }
+      })
+      .catch(error => {
+        if (error instanceof Error) {
+          set({ error: error.message });
+        }
+      })
+      .finally(() => {
+        set({ isLoading: false });
+      });
+  },
+  exportWorkspace(workspace) {
+    const a = document.createElement('a');
+    a.href = `${ApiService.getInstance('default').baseUrl}workspaces/${workspace.uuid}/export`;
+    a.click();
+  },
+  importWorkspace(data) {
+    set({ isLoading: true });
+    WorkspacesApi.importWorkspace(data)
+      .then(() => {
+        get().refreshWorkspaces();
       })
       .catch(error => {
         if (error instanceof Error) {

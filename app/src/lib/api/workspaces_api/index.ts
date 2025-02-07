@@ -114,6 +114,7 @@ class WorkspacesApi {
         method: 'POST',
         body: formData,
         parser: () => true,
+        timeout: 0,
       },
     );
 

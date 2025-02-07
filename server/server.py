@@ -27,7 +27,7 @@ from server.routers.workspaces.workspaces import (
 
 load_dotenv()
 
-DEBUG = getenv("DEBUG", False)
+DEBUG = bool(getenv("DEBUG", False))
 
 logger = logging.getLogger(__name__)
 

@@ -50,7 +50,7 @@ from server.server import app
 
 load_dotenv()
 
-DEBUG = os.getenv("DEBUG", False)
+DEBUG = bool(os.getenv("DEBUG", False))
 
 os.environ["DD_TRACE_ENABLED"] = os.getenv("DD_TRACE_ENABLED", "false")
 
@@ -62,15 +62,19 @@ setup_logging(json_logs=LOG_JSON_FORMAT, log_level=LOG_LEVEL)
 
 
 def get_free_port():
+    BIND_INTERFACE = os.getenv("BIND_INTERFACE", "127.0.0.1")
+    port = int(os.getenv("PORT", 8000))
     while True:
-        port = random.randint(1024, 65535)  # Ports below 1024 are reserved
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             try:
-                s.bind(("", port))  # Bind to the port on all network interfaces
+                s.bind(
+                    (BIND_INTERFACE, port)
+                )  # Bind to the port on all network interfaces
                 s.listen(1)  # Start listening to check if the port is available
                 return port  # If binding succeeds, the port is free
             except OSError:
-                continue  # If binding fails, try another port
+                port += 1  # If binding fails, try the next port
+                continue
 
 
 port = 8000 if DEBUG else get_free_port()

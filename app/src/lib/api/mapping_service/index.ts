@@ -139,6 +139,7 @@ class MappingService {
         method: 'POST',
         body: formData,
         parser: () => true,
+        timeout: 0,
       },
     );
 

@@ -7,11 +7,8 @@ import {
   FormGroup,
   InputGroup,
 } from '@blueprintjs/core';
-import { ItemRenderer, Select } from '@blueprintjs/select';
 import { useRef, useState } from 'react';
-import BasicSelectMenuItem, {
-  BasicSelectItem,
-} from '../../../../components/BasicSelectMenuItem';
+import { BasicSelectItem } from '../../../../components/BasicSelectMenuItem';
 import { CreateWorkspaceMetadata } from '../../../../lib/api/workspaces_api/types';
 
 import './styles.scss';
@@ -22,18 +19,18 @@ interface CreateWorkspaceDialogProps {
   onConfirm: (data: CreateWorkspaceMetadata) => void;
 }
 
-const WORKSPACE_TYPES: BasicSelectItem[] = [
-  {
-    value: 'local',
-    text: 'Local',
-    label: '',
-  },
-  {
-    value: 'remote',
-    text: 'Remote',
-    label: '',
-  },
-];
+// const WORKSPACE_TYPES: BasicSelectItem[] = [
+//   {
+//     value: 'local',
+//     text: 'Local',
+//     label: '',
+//   },
+//   {
+//     value: 'remote',
+//     text: 'Remote',
+//     label: '',
+//   },
+// ];
 
 const CreateWorkspaceDialog = ({
   open,
@@ -48,18 +45,18 @@ const CreateWorkspaceDialog = ({
 
   const [error, setError] = useState<string | null>(null);
 
-  const renderItem: ItemRenderer<BasicSelectItem> = (
-    item,
-    { handleClick, modifiers, query },
-  ) => {
-    return (
-      <BasicSelectMenuItem
-        key={item.value}
-        item={item}
-        itemRendererProps={{ handleClick, modifiers, query }}
-      />
-    );
-  };
+  // const renderItem: ItemRenderer<BasicSelectItem> = (
+  //   item,
+  //   { handleClick, modifiers, query },
+  // ) => {
+  //   return (
+  //     <BasicSelectMenuItem
+  //       key={item.value}
+  //       item={item}
+  //       itemRendererProps={{ handleClick, modifiers, query }}
+  //     />
+  //   );
+  // };
 
   const submit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -73,10 +70,10 @@ const CreateWorkspaceDialog = ({
       setError('Name is required');
       return;
     }
-    if (!type.value) {
-      setError('Type is required');
-      return;
-    }
+    // if (!type.value) {
+    //   setError('Type is required');
+    //   return;
+    // }
     if (type.value === 'remote' && !remote_connection_string.value) {
       setError('Remote Connection String is required');
       return;
@@ -85,7 +82,7 @@ const CreateWorkspaceDialog = ({
     const data: CreateWorkspaceMetadata = {
       name: workspace_name.value,
       description: description.value || '',
-      type: type.value,
+      type: 'local',
       location: remote_connection_string?.value || '',
     };
     onConfirm(data);
@@ -120,7 +117,7 @@ const CreateWorkspaceDialog = ({
           <FormGroup label='Description' labelFor='description'>
             <InputGroup id='description' name='description' />
           </FormGroup>
-          <FormGroup
+          {/* <FormGroup
             label='Type'
             labelFor='type'
             labelInfo='(required)'
@@ -151,7 +148,7 @@ const CreateWorkspaceDialog = ({
                 rightIcon='double-caret-vertical'
               />
             </Select>
-          </FormGroup>
+          </FormGroup> */}
           {workspaceType?.value === 'remote' && (
             <FormGroup
               label='Remote Connection String'

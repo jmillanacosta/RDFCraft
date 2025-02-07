@@ -16,8 +16,6 @@ from server.models.export_metadata import (
     ExportMetadata,
     ExportMetadataType,
 )
-from server.models.mapping import MappingGraph
-from server.models.source import Source
 from server.service_protocols.fs_service_protocol import (
     FSServiceProtocol,
 )
@@ -100,42 +98,56 @@ class ImportMappingInWorkspaceFacade(BaseFacade):
 
         self.logger.info(f"Importing mapping {export_metadata.mappings[0].name}")
 
-        self.logger.info("Dumping mapping jsons to files storage")
+        imported_mapping = export_metadata.mappings[0]
+        imported_source = export_metadata.sources[0]
 
-        mapping = export_metadata.mappings[0]
-        source = export_metadata.sources[0]
+        self.logger.info(f"Creating source with file uuid {imported_source.file_uuid}")
 
-        self.file_service.upload_file(
-            name=source.uuid,
-            uuid=source.uuid,
-            content=json.dumps(source.to_dict()).encode("utf-8"),
-        )
-        self.file_service.upload_file(
-            name=mapping.uuid,
-            uuid=mapping.uuid,
-            content=json.dumps(mapping.to_dict()).encode("utf-8"),
-        )
-        for file in export_metadata.files:
-            file_raw = tar_f.extractfile(f"files/{file.uuid}")
-            if file_raw is None:
-                raise ServerException(
-                    "File not found in tar",
-                    code=ErrCodes.FILE_NOT_FOUND,
-                )
-            self.file_service.upload_file(
-                name=file.name,
-                uuid=file.uuid,
-                content=file_raw.read(),
+        raw_source = tar_f.extractfile(f"files/{imported_source.file_uuid}")
+
+        if raw_source is None:
+            raise ServerException(
+                "Source file not found in the tar",
+                code=ErrCodes.CORRUPTED_TAR,
             )
 
-        self.logger.info(f"Mapping {mapping.name} imported, registering in workspace")
+        source_id = self.source_service.create_source(
+            type=imported_source.type,
+            extra=imported_source.extra,
+            content=raw_source.read(),
+        )
 
-        workspace.mappings.append(mapping.uuid)
+        self.logger.info(f"Source {source_id} created")
+
+        self.logger.info(f"Creating mapping {imported_mapping.name}")
+
+        mapping_id = self.mapping_service.create_mapping(
+            name=imported_mapping.name,
+            description=imported_mapping.description,
+            source_uuid=source_id,
+        )
+
+        self.logger.info(f"Mapping {mapping_id} created")
+
+        self.logger.info("Importing mapping file")
+
+        mapping_model = self.mapping_service.get_mapping(mapping_id)
+
+        mapping_model.nodes = imported_mapping.nodes
+        mapping_model.edges = imported_mapping.edges
+
+        self.mapping_service.update_mapping(mapping_id, mapping_model)
+
+        self.logger.info("Mapping file imported")
+
+        self.logger.info(f"Registering mapping in workspace {workspace_id}")
+
+        workspace.mappings.append(mapping_id)
 
         self.workspace_service.update_workspace(workspace)
 
         self.logger.info(
-            f"Mapping {mapping.name} registered in workspace {workspace_id}"
+            f"Mapping {imported_mapping.name} registered in workspace {workspace_id}"
         )
 
         return self._success_response(data=None, message="Mapping imported")

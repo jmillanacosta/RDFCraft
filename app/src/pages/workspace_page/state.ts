@@ -1,5 +1,6 @@
 import { Workspace } from '../../lib/api/workspaces_api/types';
 
+import ApiService from '@/lib/services/api_service';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import MappingService from '../../lib/api/mapping_service';
@@ -25,6 +26,8 @@ interface WorkspacePageStateActions {
     extra: Record<string, unknown>,
   ) => Promise<void>;
   deleteMapping: (workspaceUuid: string, mappingUuid: string) => Promise<void>;
+  exportMapping: (workspaceUuid: string, mappingUuid: string) => Promise<void>;
+  importMapping: (workspaceUuid: string, data: File) => Promise<void>;
 }
 
 const defaultState: WorkspacePageState = {
@@ -91,6 +94,28 @@ const functions: ZustandActions<
   async deleteMapping(workspaceUuid, mappingUuid) {
     set({ isLoading: 'Deleting mapping...' });
     MappingService.deleteMappingInWorkspace(workspaceUuid, mappingUuid)
+      .then(() => {
+        return get().loadWorkspace(workspaceUuid);
+      })
+      .catch(error => {
+        if (error instanceof Error) {
+          set({ error: error.message });
+        }
+      })
+      .finally(() => {
+        set({ isLoading: null });
+      });
+  },
+  async exportMapping(workspaceUuid, mappingUuid) {
+    set({ isLoading: 'Exporting mapping...' });
+    const a = document.createElement('a');
+    a.href = `${ApiService.getInstance('default').baseUrl}workspaces/${workspaceUuid}/mapping/${mappingUuid}/export`;
+    a.click();
+    set({ isLoading: null });
+  },
+  async importMapping(workspaceUuid, data) {
+    set({ isLoading: 'Importing mapping...' });
+    MappingService.importMapping(data, workspaceUuid)
       .then(() => {
         return get().loadWorkspace(workspaceUuid);
       })

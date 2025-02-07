@@ -126,7 +126,7 @@ class ImportWorkspaceFacade(BaseFacade):
             if file_raw is None:
                 raise ServerException(
                     f"File {source.file_uuid} not found",
-                    code=ErrCodes.FILE_NOT_FOUND,
+                    code=ErrCodes.CORRUPTED_TAR,
                 )
             new_source_id = self.source_service.create_source(
                 source.type, file_raw.read(), source.extra
@@ -155,7 +155,7 @@ class ImportWorkspaceFacade(BaseFacade):
             if file_raw is None:
                 raise ServerException(
                     f"File {ontology.file_uuid} not found",
-                    code=ErrCodes.FILE_NOT_FOUND,
+                    code=ErrCodes.CORRUPTED_TAR,
                 )
             new_ontology = self.ontology_service.create_ontology(
                 name=ontology.name,

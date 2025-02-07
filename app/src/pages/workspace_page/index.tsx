@@ -24,6 +24,8 @@ const WorkspacePage = () => {
   const loadWorkspace = useWorkspacePageState(state => state.loadWorkspace);
   const createMapping = useWorkspacePageState(state => state.createMapping);
   const deleteMapping = useWorkspacePageState(state => state.deleteMapping);
+  const exportMapping = useWorkspacePageState(state => state.exportMapping);
+  const importMapping = useWorkspacePageState(state => state.importMapping);
 
   useEffect(() => {
     if (props.uuid) {
@@ -42,6 +44,21 @@ const WorkspacePage = () => {
     }
     setOpen(null);
   }, [toBeDeleted, workspace, deleteMapping]);
+
+  const handleImport = useCallback(() => {
+    if (workspace) {
+      const fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.accept = '.tar.gz';
+      fileInput.onchange = async () => {
+        if (fileInput.files) {
+          const file = fileInput.files[0];
+          importMapping(workspace.uuid, file);
+        }
+      };
+      fileInput.click();
+    }
+  }, [workspace, importMapping]);
 
   return (
     <div className='workspace-page'>
@@ -92,6 +109,9 @@ const WorkspacePage = () => {
               }}
             >
               Create New Mapping
+            </Button>
+            <Button icon='import' onClick={handleImport}>
+              Import Mapping
             </Button>
             <Button
               icon='search-around'
@@ -146,6 +166,9 @@ const WorkspacePage = () => {
                   navigation(
                     `/workspaces/${workspace.uuid}/mapping/${mappingGraph.uuid}`,
                   );
+                }}
+                onExport={mappingGraph => {
+                  exportMapping(workspace.uuid, mappingGraph.uuid);
                 }}
               />
             ))}

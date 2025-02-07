@@ -58,3 +58,4 @@ class ErrCodes(Enum):
     # Import Service
     METADATA_NOT_FOUND = 200
     WRONG_IMPORT_TYPE = 201
+    CORRUPTED_TAR = 202

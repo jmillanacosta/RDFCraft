@@ -149,7 +149,7 @@ class ExportWorkspaceFacade(BaseFacade):
 
         tar_file_path = (
             self.temp_dir
-            / f"export-{workspace.name}-{datetime.datetime.now().isoformat().replace(':', '_')}.tar.gz"
+            / f"rc-workspace-export-{workspace.name}-{datetime.datetime.now().isoformat().replace(':', '_')}.tar.gz"
         )
 
         self.logger.info(f"Tar file path for mapping {workspace_id}: {tar_file_path}")

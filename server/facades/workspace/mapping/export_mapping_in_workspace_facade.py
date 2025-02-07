@@ -80,7 +80,7 @@ class ExportMappingInWorkspaceFacade(BaseFacade):
 
         tar_file_path = (
             self.temp_dir
-            / f"export-{mapping.name}-{datetime.datetime.now().isoformat().replace(':', '_')}.tar.gz"
+            / f"rc-mapping-export-{mapping.name}-{datetime.datetime.now().isoformat().replace(':', '_')}.tar.gz"
         )
 
         self.logger.info(f"Tar file path for mapping {mapping_id}: {tar_file_path}")

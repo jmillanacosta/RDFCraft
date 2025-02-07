@@ -28,16 +28,12 @@ class GetMappingsInWorkspaceFacade(BaseFacade):
         source_service: SourceServiceProtocol,
     ):
         super().__init__()
-        self.workspace_metadata_service: WorkspaceMetadataServiceProtocol = workspace_metadata_service
-        self.workspace_service: WorkspaceServiceProtocol = (
-            workspace_service
+        self.workspace_metadata_service: WorkspaceMetadataServiceProtocol = (
+            workspace_metadata_service
         )
-        self.mapping_service: MappingServiceProtocol = (
-            mapping_service
-        )
-        self.source_service: SourceServiceProtocol = (
-            source_service
-        )
+        self.workspace_service: WorkspaceServiceProtocol = workspace_service
+        self.mapping_service: MappingServiceProtocol = mapping_service
+        self.source_service: SourceServiceProtocol = source_service
 
     @BaseFacade.error_wrapper
     def execute(
@@ -45,12 +41,8 @@ class GetMappingsInWorkspaceFacade(BaseFacade):
         workspace_id: str,
         mapping_id: str | None = None,
     ) -> FacadeResponse:
-        self.logger.info(
-            f"Retrieving mappings in workspace {workspace_id}"
-        )
-        self.logger.info(
-            f"Retrieving workspace {workspace_id}"
-        )
+        self.logger.info(f"Retrieving mappings in workspace {workspace_id}")
+        self.logger.info(f"Retrieving workspace {workspace_id}")
         workspace_metadata = self.workspace_metadata_service.get_workspace_metadata(
             workspace_id,
         )
@@ -59,12 +51,8 @@ class GetMappingsInWorkspaceFacade(BaseFacade):
         )
 
         if mapping_id and mapping_id in workspace.mappings:
-            self.logger.info(
-                f"Retrieving mapping {mapping_id}"
-            )
-            mapping = self.mapping_service.get_mapping(
-                mapping_id
-            )
+            self.logger.info(f"Retrieving mapping {mapping_id}")
+            mapping = self.mapping_service.get_mapping(mapping_id)
             return FacadeResponse(
                 status=200,
                 message=f"Retrieved mapping {mapping_id}",

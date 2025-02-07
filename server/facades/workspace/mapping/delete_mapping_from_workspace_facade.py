@@ -30,16 +30,12 @@ class DeleteMappingFromWorkspaceFacade(BaseFacade):
         source_service: SourceServiceProtocol,
     ):
         super().__init__()
-        self.workspace_metadata_service: WorkspaceMetadataServiceProtocol = workspace_metadata_service
-        self.workspace_service: WorkspaceServiceProtocol = (
-            workspace_service
+        self.workspace_metadata_service: WorkspaceMetadataServiceProtocol = (
+            workspace_metadata_service
         )
-        self.mapping_service: MappingServiceProtocol = (
-            mapping_service
-        )
-        self.source_service: SourceServiceProtocol = (
-            source_service
-        )
+        self.workspace_service: WorkspaceServiceProtocol = workspace_service
+        self.mapping_service: MappingServiceProtocol = mapping_service
+        self.source_service: SourceServiceProtocol = source_service
 
     @BaseFacade.error_wrapper
     def execute(
@@ -47,12 +43,8 @@ class DeleteMappingFromWorkspaceFacade(BaseFacade):
         workspace_id: str,
         mapping_id: str,
     ) -> FacadeResponse:
-        self.logger.info(
-            f"Dropping mapping {mapping_id} from workspace {workspace_id}"
-        )
-        self.logger.info(
-            f"Retrieving workspace {workspace_id}"
-        )
+        self.logger.info(f"Dropping mapping {mapping_id} from workspace {workspace_id}")
+        self.logger.info(f"Retrieving workspace {workspace_id}")
         workspace_metadata = self.workspace_metadata_service.get_workspace_metadata(
             workspace_id,
         )
@@ -75,9 +67,7 @@ class DeleteMappingFromWorkspaceFacade(BaseFacade):
             mapping_id,
         )
 
-        self.logger.info(
-            f"Deleting source {mapping.source_id}"
-        )
+        self.logger.info(f"Deleting source {mapping.source_id}")
 
         self.source_service.delete_source(
             mapping.source_id,
@@ -89,16 +79,10 @@ class DeleteMappingFromWorkspaceFacade(BaseFacade):
             mapping_id,
         )
 
-        self.logger.info(
-            f"Removing mapping {mapping_id} from workspace {workspace_id}"
-        )
+        self.logger.info(f"Removing mapping {mapping_id} from workspace {workspace_id}")
 
         new_model = workspace.copy_with(
-            mappings=[
-                m
-                for m in workspace.mappings
-                if m != mapping_id
-            ],
+            mappings=[m for m in workspace.mappings if m != mapping_id],
         )
 
         self.workspace_service.update_workspace(

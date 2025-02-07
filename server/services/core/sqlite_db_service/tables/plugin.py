@@ -22,22 +22,12 @@ class PluginTable(Base):
 
     __tablename__ = "plugin"
 
-    name: Mapped[str] = mapped_column(
-        String, primary_key=True
-    )
-    description: Mapped[str] = mapped_column(
-        String, nullable=True
-    )
+    name: Mapped[str] = mapped_column(String, primary_key=True)
+    description: Mapped[str] = mapped_column(String, nullable=True)
     version: Mapped[str] = mapped_column(String)
-    repository: Mapped[str] = mapped_column(
-        String, nullable=True
-    )
-    license: Mapped[str] = mapped_column(
-        String, nullable=True
-    )
-    access_name: Mapped[str] = mapped_column(
-        String, nullable=True
-    )
+    repository: Mapped[str] = mapped_column(String, nullable=True)
+    license: Mapped[str] = mapped_column(String, nullable=True)
+    access_name: Mapped[str] = mapped_column(String, nullable=True)
 
     def __repr__(self):
         return f"<Plugin(name={self.name}, description={self.description}, version={self.version}, repository={self.repository}, license={self.license}, access_name={self.access_name})>"

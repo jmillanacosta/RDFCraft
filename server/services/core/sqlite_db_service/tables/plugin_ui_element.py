@@ -19,9 +19,7 @@ class PluginUIElementTable(Base):
 
     __tablename__ = "plugin_ui_element"
 
-    uuid: Mapped[int] = mapped_column(
-        String, primary_key=True
-    )
+    uuid: Mapped[int] = mapped_column(String, primary_key=True)
     plugin_id: Mapped[String] = mapped_column(
         String,
         ForeignKey("plugin.id", ondelete="CASCADE"),

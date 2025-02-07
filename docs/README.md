@@ -28,7 +28,11 @@ single executable using Nuitka.
 
 - Latest Java Runtime Environment (JRE) or Java Development Kit (JDK) to use the
   [RMLMapper](https://github.com/RMLio/rmlmapper-java)
+
   - This is required to generate RML mappings.
+
+- For MacOS, you need system version 15.0(Sequoia) or later to run the
+  executable.
 
 ## Installation 🚀
 
@@ -61,10 +65,12 @@ You can either use Codespaces or a local devcontainer to start developing.
 
 For Codespaces, just open the repository in Codespaces and you are good to go.
 
-For local devcontainer, you need to have Docker installed on your machine. Then clone the repository and run the following command and open the repository in VSCode. It should prompt you to open the repository in a devcontainer.
+For local devcontainer, you need to have Docker installed on your machine. Then
+clone the repository and run the following command and open the repository in
+VSCode. It should prompt you to open the repository in a devcontainer.
 
-Or you can use Command Palette (Ctrl/Command+Shift+P) and search for `Dev Container: Reopen in Container`.
-
+Or you can use Command Palette (Ctrl/Command+Shift+P) and search for
+`Dev Container: Reopen in Container`.
 
 ### Manual Installation
 

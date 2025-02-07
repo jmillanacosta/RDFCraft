@@ -21,9 +21,7 @@ class DeletePrefixFromWorkspaceFacade(BaseFacade):
         workspace_service: WorkspaceServiceProtocol,
     ):
         super().__init__()
-        self.workspace_metadata_service = (
-            workspace_metadata_service
-        )
+        self.workspace_metadata_service = workspace_metadata_service
         self.workspace_service = workspace_service
 
     @BaseFacade.error_wrapper
@@ -51,9 +49,7 @@ class DeletePrefixFromWorkspaceFacade(BaseFacade):
 
         new_model = workspace.copy_with(
             prefixes={
-                key: value
-                for key, value in workspace.prefixes.items()
-                if key != prefix
+                key: value for key, value in workspace.prefixes.items() if key != prefix
             }
         )
 

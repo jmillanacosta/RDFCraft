@@ -23,9 +23,7 @@ class GetSourceFacade(BaseFacade):
     ) -> FacadeResponse:
         self.logger.info("Getting source")
 
-        source: Source = self.source_service.get_source(
-            source_id=source_uuid
-        )
+        source: Source = self.source_service.get_source(source_id=source_uuid)
 
         return self._success_response(
             message="Source fetched successfully",

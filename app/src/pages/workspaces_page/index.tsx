@@ -22,6 +22,12 @@ const WorkspacesPage = () => {
   const deleteWorkspace = useWorkspacesPageState(
     state => state.deleteWorkspace,
   );
+  const exportWorkspace = useWorkspacesPageState(
+    state => state.exportWorkspace,
+  );
+  const importWorkspace = useWorkspacesPageState(
+    state => state.importWorkspace,
+  );
 
   const [open, setOpen] = useState<'create' | 'delete' | null>(null);
 
@@ -55,6 +61,21 @@ const WorkspacesPage = () => {
     },
     [navigate],
   );
+
+  const handleImport = useCallback(() => {
+    // Open file picker
+
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.tar.gz';
+    fileInput.onchange = async () => {
+      if (fileInput.files) {
+        const file = fileInput.files[0];
+        importWorkspace(file);
+      }
+    };
+    fileInput.click();
+  }, [importWorkspace]);
 
   return (
     <div>
@@ -96,6 +117,9 @@ const WorkspacesPage = () => {
             <Button icon='add' onClick={() => setOpen('create')}>
               Create Workspace
             </Button>
+            <Button icon='import' onClick={handleImport}>
+              Import Workspace
+            </Button>
           </ButtonGroup>
         </Navbar.Group>
       </Navbar>
@@ -125,6 +149,7 @@ const WorkspacesPage = () => {
                 workspace={workspace}
                 onDelete={showDeleteAlert}
                 onOpen={handleOpen}
+                onExport={exportWorkspace}
               />
             ))}
           </div>

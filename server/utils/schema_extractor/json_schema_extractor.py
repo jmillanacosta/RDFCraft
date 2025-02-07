@@ -22,8 +22,7 @@ class JSONSchemaExtractor(ISchemaExtractor):
 
             if isinstance(data, dict):
                 raise ValueError(
-                    "The root path you provided does not return an array of"
-                    " objects"
+                    "The root path you provided does not return an array of" " objects"
                 )
 
             return data
@@ -32,16 +31,10 @@ class JSONSchemaExtractor(ISchemaExtractor):
         result = set()
         if isinstance(obj, dict):
             for key, value in obj.items():
-                result.update(
-                    self.getPaths(
-                        value, parent + "." + str(key)
-                    )
-                )
+                result.update(self.getPaths(value, parent + "." + str(key)))
         elif isinstance(obj, list):
             for i, value in enumerate(obj):
-                result.update(
-                    self.getPaths(value, parent + "[*]")
-                )
+                result.update(self.getPaths(value, parent + "[*]"))
         else:
             result.add(parent)
         return result

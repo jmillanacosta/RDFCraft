@@ -23,9 +23,7 @@ from server.service_protocols.mapping_to_yarrrml_service_protocol import (
 
 
 @inject(alias=MappingToYARRRMLServiceProtocol)
-class MappingToYARRRMLService(
-    MappingToYARRRMLServiceProtocol
-):
+class MappingToYARRRMLService(MappingToYARRRMLServiceProtocol):
     def __init__(self, TEMP_DIR: Path) -> None:
         self.logger = logging.getLogger(__name__)
         self.temp_dir = TEMP_DIR
@@ -38,31 +36,19 @@ class MappingToYARRRMLService(
         fs_service: FSServiceProtocol,  # Implementation might change depending the environment (local, cloud, etc)
     ) -> str:
         try:
-            self.logger.info(
-                f"Converting mapping {mapping.name} to YARRRML"
-            )
+            self.logger.info(f"Converting mapping {mapping.name} to YARRRML")
             yarrrml_dict: dict = {
                 "prefixes": prefixes,
             }
 
-            source_path = self._prepare_source_file(
-                source, fs_service
-            )
-            yarrrml_dict["sources"] = self._get_source_dict(
-                source, source_path
-            )
+            source_path = self._prepare_source_file(source, fs_service)
+            yarrrml_dict["sources"] = self._get_source_dict(source, source_path)
 
-            yarrrml_dict["mappings"] = (
-                self._get_mappings_dict(mapping)
-            )
+            yarrrml_dict["mappings"] = self._get_mappings_dict(mapping)
 
             # Delete any empty keys
 
-            yarrrml_dict = {
-                k: v
-                for k, v in yarrrml_dict.items()
-                if len(v) > 0
-            }
+            yarrrml_dict = {k: v for k, v in yarrrml_dict.items() if len(v) > 0}
 
             yaml_str = yaml.dump(
                 yarrrml_dict,
@@ -97,24 +83,13 @@ class MappingToYARRRMLService(
         self.logger.info(
             "Downloading source file content, to workaround a limitation in the RMLMapper (files must have a extension)"
         )
-        source_content = fs_service.download_file_with_uuid(
-            source.file_uuid
-        )
+        source_content = fs_service.download_file_with_uuid(source.file_uuid)
 
-        extension = (
-            "csv"
-            if source.type == SourceType.CSV
-            else "json"
-        )
+        extension = "csv" if source.type == SourceType.CSV else "json"
 
-        source_path = (
-            self.temp_dir
-            / f"{source.file_uuid}.{extension}"
-        )
+        source_path = self.temp_dir / f"{source.file_uuid}.{extension}"
 
-        self.logger.info(
-            f"Writing source file content to {source_path}"
-        )
+        self.logger.info(f"Writing source file content to {source_path}")
 
         if source_path.exists():
             source_path.unlink()
@@ -125,9 +100,7 @@ class MappingToYARRRMLService(
 
         return source_path
 
-    def _get_source_dict(
-        self, source: Source, source_path: Path
-    ) -> dict:
+    def _get_source_dict(self, source: Source, source_path: Path) -> dict:
         source_dict: dict = {}
 
         match source.type:
@@ -146,9 +119,7 @@ class MappingToYARRRMLService(
 
         return source_dict
 
-    def _get_mappings_dict(
-        self, mapping: MappingGraph
-    ) -> dict:
+    def _get_mappings_dict(self, mapping: MappingGraph) -> dict:
         mappings: dict = {}
 
         entities: list[MappingNode] = [
@@ -161,17 +132,13 @@ class MappingToYARRRMLService(
             self._validate_entity(entity)
             entity_dict = self._create_entity_dict(entity)
             po = self._create_po_list(entity)
-            outgoing_edges_target_nodes = (
-                self._get_outgoing_edges(entity, mapping)
-            )
+            outgoing_edges_target_nodes = self._get_outgoing_edges(entity, mapping)
 
             for (
                 edge,
                 target_node,
             ) in outgoing_edges_target_nodes:
-                po.append(
-                    self._create_po_entry(edge, target_node)
-                )
+                po.append(self._create_po_entry(edge, target_node))
 
             entity_dict["po"] = po
             mappings[entity.id] = entity_dict
@@ -185,9 +152,7 @@ class MappingToYARRRMLService(
                 code=ErrCodes.ENTITY_URI_PATTERN_NOT_FOUND,
             )
 
-    def _create_entity_dict(
-        self, entity: MappingNode
-    ) -> dict:
+    def _create_entity_dict(self, entity: MappingNode) -> dict:
         return {
             "source": "data",
             "s": entity.uri_pattern,
@@ -210,9 +175,7 @@ class MappingToYARRRMLService(
     def _create_po_entry(
         self,
         edge: MappingEdge,
-        target_node: MappingNode
-        | MappingLiteral
-        | MappingURIRef,
+        target_node: MappingNode | MappingLiteral | MappingURIRef,
     ) -> dict:
         if isinstance(target_node, MappingLiteral):
             if target_node.value == "":
@@ -265,9 +228,7 @@ class MappingToYARRRMLService(
         outgoing_edges: list[
             tuple[
                 MappingEdge,
-                MappingNode
-                | MappingLiteral
-                | MappingURIRef,
+                MappingNode | MappingLiteral | MappingURIRef,
             ]
         ] = []
 
@@ -279,9 +240,7 @@ class MappingToYARRRMLService(
                 )
                 target_node = next(target_node_iter, None)
                 if target_node is not None:
-                    outgoing_edges.append(
-                        (edge, target_node)
-                    )
+                    outgoing_edges.append((edge, target_node))
                 else:
                     raise ServerException(
                         f"Target node with id {edge.target} not found",

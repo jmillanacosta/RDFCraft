@@ -1,5 +1,4 @@
 import os
-import random
 import socket
 import threading
 
@@ -50,41 +49,31 @@ from server.server import app
 
 load_dotenv()
 
-DEBUG = os.getenv("DEBUG", False)
+DEBUG = bool(os.getenv("DEBUG", False))
 
-os.environ["DD_TRACE_ENABLED"] = os.getenv(
-    "DD_TRACE_ENABLED", "false"
-)
+os.environ["DD_TRACE_ENABLED"] = os.getenv("DD_TRACE_ENABLED", "false")
 
 thread = None
 
-LOG_JSON_FORMAT = parse_obj_as(
-    bool, os.getenv("LOG_JSON_FORMAT", False)
-)
+LOG_JSON_FORMAT = parse_obj_as(bool, os.getenv("LOG_JSON_FORMAT", False))
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
-setup_logging(
-    json_logs=LOG_JSON_FORMAT, log_level=LOG_LEVEL
-)
+setup_logging(json_logs=LOG_JSON_FORMAT, log_level=LOG_LEVEL)
 
 
 def get_free_port():
+    BIND_INTERFACE = os.getenv("BIND_INTERFACE", "127.0.0.1")
+    port = int(os.getenv("PORT", 8000))
     while True:
-        port = random.randint(
-            1024, 65535
-        )  # Ports below 1024 are reserved
-        with socket.socket(
-            socket.AF_INET, socket.SOCK_STREAM
-        ) as s:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             try:
                 s.bind(
-                    ("", port)
+                    (BIND_INTERFACE, port)
                 )  # Bind to the port on all network interfaces
-                s.listen(
-                    1
-                )  # Start listening to check if the port is available
+                s.listen(1)  # Start listening to check if the port is available
                 return port  # If binding succeeds, the port is free
             except OSError:
-                continue  # If binding fails, try another port
+                port += 1  # If binding fails, try the next port
+                continue
 
 
 port = 8000 if DEBUG else get_free_port()
@@ -95,9 +84,7 @@ di["PORT"] = port
 def start_fastapi():
     import uvicorn
 
-    uvicorn.run(
-        app, host="0.0.0.0", port=port, log_config=None
-    )
+    uvicorn.run(app, host="0.0.0.0", port=port, log_config=None)
 
 
 def on_closing():
@@ -123,5 +110,5 @@ if __name__ == "__main__":
             resizable=True,
         )
         window.events.closing += on_closing
-        webview._settings["debug"] = True
+        webview.settings["ALLOW_DOWNLOADS"] = True
         webview.start()

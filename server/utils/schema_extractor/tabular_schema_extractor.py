@@ -24,9 +24,7 @@ class TabularSchemaExtractor(ISchemaExtractor):
             ],
         )
 
-    def read_file(
-        self, file: bytes, file_extension: str
-    ) -> pd.DataFrame:
+    def read_file(self, file: bytes, file_extension: str) -> pd.DataFrame:
         if file_extension == "csv":
             return pd.read_csv(
                 BytesIO(file),
@@ -38,18 +36,13 @@ class TabularSchemaExtractor(ISchemaExtractor):
                 sep="\t",
             )
 
-        if (
-            file_extension == "xls"
-            or file_extension == "xlsx"
-        ):
+        if file_extension == "xls" or file_extension == "xlsx":
             df = pd.read_excel(
                 BytesIO(file),
             )
 
             if len(df.sheet_names) > 1:
-                raise ValueError(
-                    "Multiple sheets are not supported yet"
-                )
+                raise ValueError("Multiple sheets are not supported yet")
 
             return df
 
@@ -63,7 +56,4 @@ class TabularSchemaExtractor(ISchemaExtractor):
     ):
         df = self.read_file(file, file_extension)
 
-        return [
-            "{}{}".format(name_prefix, column_name)
-            for column_name in df.columns
-        ]
+        return ["{}{}".format(name_prefix, column_name) for column_name in df.columns]

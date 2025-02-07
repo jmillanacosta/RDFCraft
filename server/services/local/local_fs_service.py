@@ -21,9 +21,7 @@ from server.services.core.sqlite_db_service import DBService
 
 @inject(alias=FSServiceProtocol)
 class LocalFSService(FSServiceProtocol):
-    def __init__(
-        self, APP_DIR: Path, db_service: DBService
-    ):
+    def __init__(self, APP_DIR: Path, db_service: DBService):
         self.logger = logging.getLogger(__name__)
         self._FILE_DIR = APP_DIR / "files"
         self._db_service = db_service
@@ -47,18 +45,12 @@ class LocalFSService(FSServiceProtocol):
     ) -> FileMetadata:
         self.logger.info(f"Uploading file {name}")
         with self._db_service.get_session() as session:
-            file_uuid = (
-                uuid if uuid is not None else uuid4().hex
-            )
+            file_uuid = uuid if uuid is not None else uuid4().hex
             if file_uuid not in self.mutexes:
                 self.mutexes[file_uuid] = threading.Lock()
             with self.mutexes[file_uuid]:
                 file_path = self._FILE_DIR / file_uuid
-                stem, suffix = (
-                    name.rsplit(".", 1)
-                    if "." in name
-                    else (name, "")
-                )
+                stem, suffix = name.rsplit(".", 1) if "." in name else (name, "")
                 file_hash = sha1(content).hexdigest()
                 if file_path.exists():
                     if not allow_overwrite:
@@ -86,13 +78,9 @@ class LocalFSService(FSServiceProtocol):
     def delete_file_with_uuid(self, uuid: str) -> None:
         self.logger.info(f"Deleting file with UUID {uuid}")
 
-        query = select(FileMetadataTable).filter(
-            FileMetadataTable.uuid == uuid
-        )
+        query = select(FileMetadataTable).filter(FileMetadataTable.uuid == uuid)
 
-        delete_query = delete(FileMetadataTable).filter(
-            FileMetadataTable.uuid == uuid
-        )
+        delete_query = delete(FileMetadataTable).filter(FileMetadataTable.uuid == uuid)
 
         with self._db_service.get_session() as session:
             res = session.execute(query).first()
@@ -115,19 +103,13 @@ class LocalFSService(FSServiceProtocol):
             session.commit()
 
     def download_file_with_uuid(self, uuid: str) -> bytes:
-        self.logger.info(
-            f"Downloading file with UUID {uuid}"
-        )
+        self.logger.info(f"Downloading file with UUID {uuid}")
 
         query = (
-            select(FileMetadataTable)
-            .filter(FileMetadataTable.uuid == uuid)
-            .limit(1)
+            select(FileMetadataTable).filter(FileMetadataTable.uuid == uuid).limit(1)
         )
         with self._db_service.get_session() as session:
-            res: Row[Tuple[FileMetadataTable]] | None = (
-                session.execute(query).first()
-            )
+            res: Row[Tuple[FileMetadataTable]] | None = session.execute(query).first()
 
             if not res:
                 raise ServerException(
@@ -155,9 +137,7 @@ class LocalFSService(FSServiceProtocol):
         return file_path.read_bytes()
 
     def provide_file_path_of_uuid(self, uuid: str) -> Path:
-        self.logger.info(
-            f"Providing file path of UUID {uuid}"
-        )
+        self.logger.info(f"Providing file path of UUID {uuid}")
         path = self._FILE_DIR / uuid
         if not path.exists():
             raise ServerException(
@@ -166,6 +146,22 @@ class LocalFSService(FSServiceProtocol):
             )
 
         return path
+
+    def get_file_metadata_by_uuid(self, uuid: str) -> FileMetadata:
+        self.logger.info(f"Getting file metadata by UUID {uuid}")
+        query = (
+            select(FileMetadataTable).filter(FileMetadataTable.uuid == uuid).limit(1)
+        )
+        with self._db_service.get_session() as session:
+            res: Row[Tuple[FileMetadataTable]] | None = session.execute(query).first()
+
+            if not res:
+                raise ServerException(
+                    f"File with UUID {uuid} does not exist",
+                    code=ErrCodes.FILE_NOT_FOUND,
+                )
+
+            return FileMetadata.from_table(res.tuple()[0])
 
 
 __all__ = ["LocalFSService"]

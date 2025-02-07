@@ -141,9 +141,7 @@ class OntologyIndexer:
             datatype=rdflib_literal.datatype or "",
         )
 
-    def get_classes(
-        self, ontology_uri: str, g: Graph
-    ) -> list[ontology.Class]:
+    def get_classes(self, ontology_uri: str, g: Graph) -> list[ontology.Class]:
         """
         Get classes from the ontology
 
@@ -160,17 +158,11 @@ class OntologyIndexer:
             class_result = cast(ResultRow, class_result)
             class_uri = class_result["class"]
             if class_uri not in classes:
-                classes[class_uri] = (
-                    self._initialize_class_data(
-                        g, class_uri, class_result
-                    )
+                classes[class_uri] = self._initialize_class_data(
+                    g, class_uri, class_result
                 )
-            self._update_class_labels_and_descriptions(
-                classes, class_uri, class_result
-            )
-        return self._create_class_models(
-            ontology_uri, classes
-        )
+            self._update_class_labels_and_descriptions(classes, class_uri, class_result)
+        return self._create_class_models(ontology_uri, classes)
 
     def _initialize_class_data(
         self,
@@ -179,32 +171,22 @@ class OntologyIndexer:
         class_result: ResultRow,
     ) -> dict:
         super_classes_result = g.query(
-            self.GET_SUPER_CLASSES_SPARQL.replace(
-                "___class_uri___", class_uri
-            )
+            self.GET_SUPER_CLASSES_SPARQL.replace("___class_uri___", class_uri)
         )
         super_classes = [
-            str(
-                cast(ResultRow, super_class_result)[
-                    "superClass"
-                ]
-            )
+            str(cast(ResultRow, super_class_result)["superClass"])
             for super_class_result in super_classes_result
         ]
         try:
             super_classes.remove(str(class_uri))
         except ValueError:
             pass
-        is_deprecated = cast(
-            Literal, class_result["isDeprecated"]
-        )
+        is_deprecated = cast(Literal, class_result["isDeprecated"])
         return {
             "super_classes": super_classes,
             "label": [],
             "description": [],
-            "is_deprecated": is_deprecated.toPython()
-            if is_deprecated
-            else False,
+            "is_deprecated": is_deprecated.toPython() if is_deprecated else False,
         }
 
     def _update_class_labels_and_descriptions(
@@ -214,20 +196,14 @@ class OntologyIndexer:
         class_result: ResultRow,
     ) -> None:
         result_label = cast(Literal, class_result["label"])
-        result_description = cast(
-            Literal, class_result["description"]
-        )
+        result_description = cast(Literal, class_result["description"])
         if label := result_label:
             classes[class_uri]["label"].append(
-                self._create_literal_from_rdflib_literal(
-                    label
-                )
+                self._create_literal_from_rdflib_literal(label)
             )
         if description := result_description:
             classes[class_uri]["description"].append(
-                self._create_literal_from_rdflib_literal(
-                    description
-                )
+                self._create_literal_from_rdflib_literal(description)
             )
 
     def _create_class_models(
@@ -245,9 +221,7 @@ class OntologyIndexer:
             for class_uri, class_data in classes.items()
         ]
 
-    def get_properties(
-        self, ontology_uri: str, g: Graph
-    ) -> list[ontology.Property]:
+    def get_properties(self, ontology_uri: str, g: Graph) -> list[ontology.Property]:
         """
         Get properties from the ontology
 
@@ -258,30 +232,22 @@ class OntologyIndexer:
         Returns:
             list[models.Property]: The list of properties
         """
-        properties_result = g.query(
-            self.GET_PROPERTY_SPARQL
-        )
+        properties_result = g.query(self.GET_PROPERTY_SPARQL)
         properties: dict[str, dict] = {}
         for property_result in properties_result:
-            property_result = cast(
-                ResultRow, property_result
-            )
+            property_result = cast(ResultRow, property_result)
             property_uri = property_result["property"]
 
             if property_uri not in properties:
-                properties[property_uri] = (
-                    self._initialize_property_data(
-                        g, property_uri, property_result
-                    )
+                properties[property_uri] = self._initialize_property_data(
+                    g, property_uri, property_result
                 )
 
             self._update_property_labels_and_descriptions(
                 properties, property_uri, property_result
             )
 
-        return self._create_property_models(
-            ontology_uri, properties
-        )
+        return self._create_property_models(ontology_uri, properties)
 
     def _initialize_property_data(
         self,
@@ -290,9 +256,7 @@ class OntologyIndexer:
         property_result: ResultRow,
     ) -> dict:
         range_result = g.query(
-            self.GET_PROPERTY_RANGE_SPARQL.replace(
-                "___property_uri___", property_uri
-            )
+            self.GET_PROPERTY_RANGE_SPARQL.replace("___property_uri___", property_uri)
         )
         range_union_result = g.query(
             self.GET_PROPERTY_RANGE_OWL_UNION_SPARQL.replace(
@@ -314,9 +278,7 @@ class OntologyIndexer:
         ]
 
         domain_result = g.query(
-            self.GET_PROPERTY_DOMAIN_SPARQL.replace(
-                "___property_uri___", property_uri
-            )
+            self.GET_PROPERTY_DOMAIN_SPARQL.replace("___property_uri___", property_uri)
         )
 
         domain_union_result = g.query(
@@ -339,23 +301,15 @@ class OntologyIndexer:
                 *domain_intersection_result,
             ]
         ]
-        is_deprecated = cast(
-            Literal, property_result["isDeprecated"]
-        )
-        property_type = cast(ResultRow, property_result)[
-            "propertyType"
-        ]
+        is_deprecated = cast(Literal, property_result["isDeprecated"])
+        property_type = cast(ResultRow, property_result)["propertyType"]
         return {
             "label": [],
             "description": [],
-            "property_type": self._get_property_type(
-                str(property_type)
-            ),
+            "property_type": self._get_property_type(str(property_type)),
             "range": range_values,
             "domain": domain_values,
-            "is_deprecated": is_deprecated.toPython()
-            if is_deprecated
-            else False,
+            "is_deprecated": is_deprecated.toPython() if is_deprecated else False,
         }
 
     def _update_property_labels_and_descriptions(
@@ -366,17 +320,11 @@ class OntologyIndexer:
     ) -> None:
         if label := cast(Literal, property_result["label"]):
             properties[property_uri]["label"].append(
-                self._create_literal_from_rdflib_literal(
-                    label
-                )
+                self._create_literal_from_rdflib_literal(label)
             )
-        if description := cast(
-            Literal, property_result["description"]
-        ):
+        if description := cast(Literal, property_result["description"]):
             properties[property_uri]["description"].append(
-                self._create_literal_from_rdflib_literal(
-                    description
-                )
+                self._create_literal_from_rdflib_literal(description)
             )
 
     def _create_property_models(
@@ -388,21 +336,15 @@ class OntologyIndexer:
                 full_uri=str(property_uri),
                 label=property_data["label"],
                 description=property_data["description"],
-                property_type=property_data[
-                    "property_type"
-                ],
+                property_type=property_data["property_type"],
                 range=property_data["range"],
                 domain=property_data["domain"],
-                is_deprecated=property_data[
-                    "is_deprecated"
-                ],
+                is_deprecated=property_data["is_deprecated"],
             )
             for property_uri, property_data in properties.items()
         ]
 
-    def _get_property_type(
-        self, property_type: str
-    ) -> ontology.PropertyType:
+    def _get_property_type(self, property_type: str) -> ontology.PropertyType:
         match property_type:
             case "http://www.w3.org/2002/07/owl#ObjectProperty":
                 return ontology.PropertyType.OBJECT
@@ -411,13 +353,9 @@ class OntologyIndexer:
             case "http://www.w3.org/2002/07/owl#AnnotationProperty":
                 return ontology.PropertyType.ANNOTATION
             case _:
-                raise ValueError(
-                    f"Unknown property type: {property_type}"
-                )
+                raise ValueError(f"Unknown property type: {property_type}")
 
-    def get_individuals(
-        self, ontology_uri: str, g: Graph
-    ) -> list[ontology.Individual]:
+    def get_individuals(self, ontology_uri: str, g: Graph) -> list[ontology.Individual]:
         """
         Get individuals from the ontology
 
@@ -428,14 +366,10 @@ class OntologyIndexer:
         Returns:
             list[models.Individual]: The list of individuals
         """
-        individuals_result = g.query(
-            self.GET_INDIVIDUAL_SPARQL
-        )
+        individuals_result = g.query(self.GET_INDIVIDUAL_SPARQL)
         individuals: dict[str, dict] = {}
         for individual_result in individuals_result:
-            individual_result = cast(
-                ResultRow, individual_result
-            )
+            individual_result = cast(ResultRow, individual_result)
             individual_uri = individual_result["individual"]
 
             if individual_uri not in individuals:
@@ -451,9 +385,7 @@ class OntologyIndexer:
                 individual_result,
             )
 
-        return self._create_individual_models(
-            ontology_uri, individuals
-        )
+        return self._create_individual_models(ontology_uri, individuals)
 
     def _update_individual_labels_and_descriptions(
         self,
@@ -461,34 +393,20 @@ class OntologyIndexer:
         individual_uri: str,
         individual_result: ResultRow,
     ) -> None:
-        result_label = cast(
-            Literal, individual_result["label"]
-        )
-        result_description = cast(
-            Literal, individual_result["description"]
-        )
-        is_deprecated = cast(
-            Literal, individual_result["isDeprecated"]
-        )
+        result_label = cast(Literal, individual_result["label"])
+        result_description = cast(Literal, individual_result["description"])
+        is_deprecated = cast(Literal, individual_result["isDeprecated"])
 
         if result_label:
             individuals[individual_uri]["label"].append(
-                self._create_literal_from_rdflib_literal(
-                    result_label
-                )
+                self._create_literal_from_rdflib_literal(result_label)
             )
         if result_description:
-            individuals[individual_uri][
-                "description"
-            ].append(
-                self._create_literal_from_rdflib_literal(
-                    result_description
-                )
+            individuals[individual_uri]["description"].append(
+                self._create_literal_from_rdflib_literal(result_description)
             )
         if is_deprecated:
-            individuals[individual_uri]["is_deprecated"] = (
-                is_deprecated.toPython()
-            )
+            individuals[individual_uri]["is_deprecated"] = is_deprecated.toPython()
 
     def _create_individual_models(
         self, ontology_uri: str, individuals: dict
@@ -499,9 +417,7 @@ class OntologyIndexer:
                 full_uri=str(individual_uri),
                 label=individual_data["label"],
                 description=individual_data["description"],
-                is_deprecated=individual_data[
-                    "is_deprecated"
-                ],
+                is_deprecated=individual_data["is_deprecated"],
             )
             for individual_uri, individual_data in individuals.items()
         ]

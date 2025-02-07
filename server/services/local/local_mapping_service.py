@@ -24,23 +24,15 @@ class LocalMappingService(MappingServiceProtocol):
     def get_mapping(self, mapping_id: str) -> MappingGraph:
         self.logger.info(f"Getting mapping {mapping_id}")
         try:
-            raw_mapping = (
-                self._fs_service.download_file_with_uuid(
-                    mapping_id
-                )
-            )
+            raw_mapping = self._fs_service.download_file_with_uuid(mapping_id)
         except ServerException as e:
             if e.code == ErrCodes.FILE_NOT_FOUND:
-                self.logger.error(
-                    f"Mapping {mapping_id} not found"
-                )
+                self.logger.error(f"Mapping {mapping_id} not found")
                 raise ServerException(
                     f"Mapping {mapping_id} not found",
                     code=ErrCodes.MAPPING_NOT_FOUND,
                 )
-            self.logger.error(
-                f"Failed to get mapping {mapping_id}"
-            )
+            self.logger.error(f"Failed to get mapping {mapping_id}")
             raise e
         except Exception as e:
             self.logger.error(
@@ -52,20 +44,12 @@ class LocalMappingService(MappingServiceProtocol):
                 code=ErrCodes.UNKNOWN_ERROR,
             )
 
-        self.logger.info(
-            f"Mapping {mapping_id} found, parsing"
-        )
-        mapping = MappingGraph.from_dict(
-            json.loads(raw_mapping.decode("utf-8"))
-        )
-        self.logger.info(
-            f"Mapping {mapping_id} parsed successfully"
-        )
+        self.logger.info(f"Mapping {mapping_id} found, parsing")
+        mapping = MappingGraph.from_dict(json.loads(raw_mapping.decode("utf-8")))
+        self.logger.info(f"Mapping {mapping_id} parsed successfully")
         return mapping
 
-    def update_mapping(
-        self, mapping_id: str, graph: MappingGraph
-    ) -> None:
+    def update_mapping(self, mapping_id: str, graph: MappingGraph) -> None:
         self.logger.info(f"Fetching mapping {mapping_id}")
         self.get_mapping(
             mapping_id
@@ -80,20 +64,14 @@ class LocalMappingService(MappingServiceProtocol):
         self.logger.info(f"Updating mapping {mapping_id}")
         self._fs_service.upload_file(
             name=mapping_id,
-            content=json.dumps(graph.to_dict()).encode(
-                "utf-8"
-            ),
+            content=json.dumps(graph.to_dict()).encode("utf-8"),
             uuid=mapping_id,
             allow_overwrite=True,
         )
 
-        self.logger.info(
-            f"Mapping {mapping_id} updated successfully"
-        )
+        self.logger.info(f"Mapping {mapping_id} updated successfully")
 
-    def create_mapping(
-        self, name: str, description: str, source_uuid: str
-    ) -> str:
+    def create_mapping(self, name: str, description: str, source_uuid: str) -> str:
         graph = MappingGraph(
             uuid=uuid4().hex,
             name=name,
@@ -111,9 +89,7 @@ class LocalMappingService(MappingServiceProtocol):
             graph.uuid,
         )
 
-        self.logger.info(
-            f"Mapping {graph.uuid} created successfully"
-        )
+        self.logger.info(f"Mapping {graph.uuid} created successfully")
         return graph.uuid
 
     def delete_mapping(self, mapping_id: str) -> None:

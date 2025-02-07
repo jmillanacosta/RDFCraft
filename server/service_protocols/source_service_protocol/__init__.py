@@ -49,9 +49,7 @@ class SourceServiceProtocol(ABC):
         pass
 
     @abstractmethod
-    def update_source(
-        self, source_id: str, source: Source
-    ) -> None:
+    def update_source(self, source_id: str, source: Source) -> None:
         """
         Update a source
 

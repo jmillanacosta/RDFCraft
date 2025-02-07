@@ -63,4 +63,16 @@ class FSServiceProtocol(ABC):
         Returns:
             pathlib.Path: path of the file
         """
-        
+
+    @abstractmethod
+    def get_file_metadata_by_uuid(self, uuid: str) -> FileMetadata:
+        """
+        Get file metadata by UUID
+
+        Args:
+            uuid (str): UUID of the file
+
+        Returns:
+            FileMetadata: metadata of the file
+        """
+        ...

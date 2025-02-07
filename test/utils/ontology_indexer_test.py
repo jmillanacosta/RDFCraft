@@ -67,9 +67,7 @@ class TestOntologyIndexer(unittest.TestCase):
     def setUp(self):
         self.indexer = OntologyIndexer()
         self.graph = Graph()
-        self.bytes = Path(
-            "test/test_assets/test_ontology.ttl"
-        ).read_bytes()
+        self.bytes = Path("test/test_assets/test_ontology.ttl").read_bytes()
         self.graph = RDFLoader.load_rdf_bytes(self.bytes)
         self.ontology_uri = "http://example.org/ontology"
 
@@ -78,9 +76,7 @@ class TestOntologyIndexer(unittest.TestCase):
         return super().tearDown()
 
     def test_get_classes(self):
-        classes: list[Class] = self.indexer.get_classes(
-            self.ontology_uri, self.graph
-        )
+        classes: list[Class] = self.indexer.get_classes(self.ontology_uri, self.graph)
         self.assertEqual(len(classes), 6)
 
         expected_full_uris = set(
@@ -94,18 +90,12 @@ class TestOntologyIndexer(unittest.TestCase):
             ]
         )
 
-        found_full_uris = set(
-            [str(cls.full_uri) for cls in classes]
-        )
+        found_full_uris = set([str(cls.full_uri) for cls in classes])
 
-        self.assertEqual(
-            expected_full_uris, found_full_uris
-        )
+        self.assertEqual(expected_full_uris, found_full_uris)
 
     def test_get_properties(self):
-        properties = self.indexer.get_properties(
-            self.ontology_uri, self.graph
-        )
+        properties = self.indexer.get_properties(self.ontology_uri, self.graph)
         self.assertEqual(len(properties), 3)
 
         expected_full_uris = set(
@@ -116,13 +106,9 @@ class TestOntologyIndexer(unittest.TestCase):
             ]
         )
 
-        found_full_uris = set(
-            [str(prop.full_uri) for prop in properties]
-        )
+        found_full_uris = set([str(prop.full_uri) for prop in properties])
 
-        self.assertEqual(
-            expected_full_uris, found_full_uris
-        )
+        self.assertEqual(expected_full_uris, found_full_uris)
 
         self.assertEqual(
             str(properties[0].domain[0]),
@@ -130,9 +116,7 @@ class TestOntologyIndexer(unittest.TestCase):
         )
 
     def test_get_individuals(self):
-        individuals = self.indexer.get_individuals(
-            self.ontology_uri, self.graph
-        )
+        individuals = self.indexer.get_individuals(self.ontology_uri, self.graph)
         self.assertEqual(len(individuals), 4)
 
         expected_full_uris = set(
@@ -144,13 +128,9 @@ class TestOntologyIndexer(unittest.TestCase):
             ]
         )
 
-        found_full_uris = set(
-            [str(ind.full_uri) for ind in individuals]
-        )
+        found_full_uris = set([str(ind.full_uri) for ind in individuals])
 
-        self.assertEqual(
-            expected_full_uris, found_full_uris
-        )
+        self.assertEqual(expected_full_uris, found_full_uris)
 
 
 if __name__ == "__main__":

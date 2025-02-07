@@ -21,9 +21,7 @@ class CreateWorkspaceFacade(BaseFacade):
         workspace_service: WorkspaceServiceProtocol,
     ):
         super().__init__()
-        self.workspace_metadata_service = (
-            workspace_metadata_service
-        )
+        self.workspace_metadata_service = workspace_metadata_service
         self.workspace_service = workspace_service
 
     @BaseFacade.error_wrapper
@@ -44,18 +42,14 @@ class CreateWorkspaceFacade(BaseFacade):
         )
 
         self.logger.info("Creating workspace")
-        model: WorkspaceModel = (
-            WorkspaceModel.create_with_defaults(
-                uuid=workspace_metadata.uuid,
-                name=name,
-                description=description,
-                type=type,
-                location=location,
-            )
+        model: WorkspaceModel = WorkspaceModel.create_with_defaults(
+            uuid=workspace_metadata.uuid,
+            name=name,
+            description=description,
+            type=type,
+            location=location,
         )
-        self.workspace_service.create_workspace(
-            workspace=model
-        )
+        self.workspace_service.create_workspace(workspace=model)
 
         return self._success_response(
             data=workspace_metadata,

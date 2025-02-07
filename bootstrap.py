@@ -16,9 +16,7 @@ from server.services.core.sqlite_db_service import (
 
 async def bootstrap():
     logger = logging.getLogger(__name__)
-    logging.getLogger("sqlalchemy.engine").setLevel(
-        logging.ERROR
-    )
+    logging.getLogger("sqlalchemy.engine").setLevel(logging.ERROR)
     logger.info("Bootstrapping...")
     load_dotenv()
     logger.info("Loading environment variables")
@@ -39,9 +37,7 @@ async def bootstrap():
     )
     if not di["APP_DIR"].exists():
         di["APP_DIR"].mkdir()
-    logger.info(
-        f"Application directory set to {di['APP_DIR']}"
-    )
+    logger.info(f"Application directory set to {di['APP_DIR']}")
 
     di["TEMP_DIR"] = di["APP_DIR"] / "temp"
 
@@ -64,9 +60,7 @@ async def bootstrap():
 
     di[ConfigServiceProtocol].set("system", di["SYSTEM"])
     di[ConfigServiceProtocol].set("arch", di["ARCH"])
-    di[ConfigServiceProtocol].set(
-        "app_dir", str(di["APP_DIR"])
-    )
+    di[ConfigServiceProtocol].set("app_dir", str(di["APP_DIR"]))
 
     logger.info("Environment variables loaded")
 

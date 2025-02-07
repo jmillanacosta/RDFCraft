@@ -126,6 +126,31 @@ class MappingService {
       `Failed to update mapping: ${result.message} (status: ${result.status})`,
     );
   }
+
+  public static async importMapping(
+    data: File,
+    workspaceUuid: string,
+  ): Promise<boolean> {
+    const formData = new FormData();
+    formData.append('tar', data);
+    const result = await this.getApiClient().callApi<boolean>(
+      `/workspaces/${workspaceUuid}/mapping/import`,
+      {
+        method: 'POST',
+        body: formData,
+        parser: () => true,
+        timeout: 0,
+      },
+    );
+
+    if (result.type === 'success') {
+      return result.data;
+    }
+
+    throw new Error(
+      `Failed to import mapping: ${result.message} (status: ${result.status})`,
+    );
+  }
 }
 
 export default MappingService;

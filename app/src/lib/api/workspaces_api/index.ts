@@ -77,6 +77,55 @@ class WorkspacesApi {
       `Failed to delete workspace: ${result.message} (status: ${result.status})`,
     );
   }
+
+  public static async exportWorkspace(uuid: string): Promise<{
+    blob: Blob;
+    fileName: string;
+  }> {
+    const result = await this.getApiClient().callApi<{
+      blob: Blob;
+      fileName: string
+    }>(
+      `/workspaces/${uuid}/export`,
+      {
+        method: 'GET',
+        parser: (data) => data as { blob: Blob; fileName: string },
+      },
+    );
+
+    if (result.type === 'success') {
+      return result.data;
+    }
+
+    throw new Error(
+      `Failed to export workspace: ${result.message} (status: ${result.status})`,
+    );
+  }
+
+  public static async importWorkspace(
+    file: File,
+  ): Promise<boolean> {
+    const formData = new FormData();
+    formData.append('tar', file);
+
+    const result = await this.getApiClient().callApi<boolean>(
+      '/workspaces/import',
+      {
+        method: 'POST',
+        body: formData,
+        parser: () => true,
+        timeout: 0,
+      },
+    );
+
+    if (result.type === 'success') {
+      return result.data;
+    }
+
+    throw new Error(
+      `Failed to import workspace: ${result.message} (status: ${result.status})`,
+    );
+  }
 }
 
 export default WorkspacesApi;

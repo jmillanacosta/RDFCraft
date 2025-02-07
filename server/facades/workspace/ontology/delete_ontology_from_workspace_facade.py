@@ -25,9 +25,7 @@ class DeleteOntologyFromWorkspaceFacade(BaseFacade):
         ontology_service: OntologyServiceProtocol,
     ):
         super().__init__()
-        self.workspace_metadata_service = (
-            workspace_metadata_service
-        )
+        self.workspace_metadata_service = workspace_metadata_service
         self.workspace_service = workspace_service
         self.ontology_service = ontology_service
 
@@ -60,9 +58,7 @@ class DeleteOntologyFromWorkspaceFacade(BaseFacade):
         self.logger.info("Updating workspace")
         new_model = workspace.copy_with(
             ontologies=[
-                ontology
-                for ontology in workspace.ontologies
-                if ontology != ontology_id
+                ontology for ontology in workspace.ontologies if ontology != ontology_id
             ]
         )
 

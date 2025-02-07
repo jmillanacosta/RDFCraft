@@ -34,23 +34,15 @@ class LocalSourceService(SourceServiceProtocol):
         self.logger.info(f"Getting source {source_id}")
 
         try:
-            source_file_raw = (
-                self.fs_service.download_file_with_uuid(
-                    source_id
-                )
-            )
+            source_file_raw = self.fs_service.download_file_with_uuid(source_id)
         except ServerException as e:
             if e.code == ErrCodes.FILE_NOT_FOUND:
-                self.logger.error(
-                    f"Source {source_id} not found"
-                )
+                self.logger.error(f"Source {source_id} not found")
                 raise ServerException(
                     f"Source {source_id} not found",
                     code=ErrCodes.SOURCE_NOT_FOUND,
                 )
-            self.logger.error(
-                f"Failed to get source {source_id}"
-            )
+            self.logger.error(f"Failed to get source {source_id}")
             raise e
         except Exception as e:
             self.logger.error(
@@ -62,23 +54,15 @@ class LocalSourceService(SourceServiceProtocol):
                 ErrCodes.UNKNOWN_ERROR,
             )
 
-        return Source.from_dict(
-            json.loads(source_file_raw.decode("utf-8"))
-        )
+        return Source.from_dict(json.loads(source_file_raw.decode("utf-8")))
 
     def download_source(self, source_id: str) -> bytes:
         self.logger.info(f"Getting source {source_id}")
         source = self.get_source(source_id)
-        source_file_raw = (
-            self.fs_service.download_file_with_uuid(
-                source.file_uuid
-            )
-        )
+        source_file_raw = self.fs_service.download_file_with_uuid(source.file_uuid)
         return source_file_raw
 
-    def adjust_json_source(
-        self, content: bytes, json_path: str
-    ) -> bytes:
+    def adjust_json_source(self, content: bytes, json_path: str) -> bytes:
         try:
             json_path_exp = jsonpath_ng.parse(json_path)
             json_data = json.loads(content.decode("utf-8"))
@@ -89,19 +73,10 @@ class LocalSourceService(SourceServiceProtocol):
                     "No matches found for the given json path",
                     ErrCodes.JSON_PATH_DATA_NOT_FOUND,
                 )
-            if len(matches) > 1:
-                raise ServerException(
-                    "Multiple matches found for the given json path",
-                    ErrCodes.JSON_PATH_DATA_NOT_UNIQUE,
-                )
+
             if not isinstance(matches[0].value, list):
-                raise ServerException(
-                    "The json path does not point to an array",
-                    ErrCodes.JSON_PATH_NOT_ARRAY,
-                )
-            return json.dumps(matches[0].value).encode(
-                "utf-8"
-            )
+                return json.dumps([matches[0].value]).encode("utf-8")
+            return json.dumps(matches[0].value).encode("utf-8")
         except json.JSONDecodeError as e:
             self.logger.error(
                 "Failed to decode the json content",
@@ -128,16 +103,10 @@ class LocalSourceService(SourceServiceProtocol):
                     "JSON path is required for JSON source",
                     ErrCodes.JSON_PATH_NOT_PROVIDED,
                 )
-            schema_content = self.adjust_json_source(
-                content, extra["json_path"]
-            )
+            schema_content = self.adjust_json_source(content, extra["json_path"])
 
         try:
-            references = (
-                self.schema_extractor.extract_schema(
-                    schema_content, type
-                )
-            )
+            references = self.schema_extractor.extract_schema(schema_content, type)
         except KeyError:
             self.logger.error(
                 f"Unsupported file type {type}",
@@ -155,17 +124,13 @@ class LocalSourceService(SourceServiceProtocol):
                 "Unexpected error",
                 ErrCodes.UNKNOWN_ERROR,
             )
-        self.logger.info(
-            f"Extracted references: {references}"
-        )
+        self.logger.info(f"Extracted references: {references}")
         source_uuid = str(uuid4())
         file_metadata = self.fs_service.upload_file(
             f"{source_uuid}_file",
             content,
         )
-        self.logger.info(
-            f"Uploaded file with uuid {file_metadata.uuid}"
-        )
+        self.logger.info(f"Uploaded file with uuid {file_metadata.uuid}")
 
         source = Source(
             uuid=source_uuid,
@@ -185,16 +150,12 @@ class LocalSourceService(SourceServiceProtocol):
 
         return source_uuid
 
-    def update_source(
-        self, source_id: str, source: Source
-    ) -> None:
+    def update_source(self, source_id: str, source: Source) -> None:
         raise NotImplementedError()
 
     def delete_source(self, source_id: str) -> None:
         self.logger.info(f"Deleting source {source_id}")
         source = self.get_source(source_id)
-        self.fs_service.delete_file_with_uuid(
-            source.file_uuid
-        )
+        self.fs_service.delete_file_with_uuid(source.file_uuid)
         self.fs_service.delete_file_with_uuid(source_id)
         self.logger.info(f"Deleted source {source_id}")

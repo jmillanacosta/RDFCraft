@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "description": "RDF Craft",
     "scripts": {
-        "frontend:prod": "rm -r public && cd app && npm i && npm run build && mv dist ../public",
+        "frontend:prod": "rm -rf public && cd app && npm i && npm run build && mv dist ../public",
         "frontend:dev": "cd app && npm run dev",
         "clean": "run-script-os",
         "clean:default": "rm -rf dist 2>/dev/null; rm -rf gui 2>/dev/null; rm -rf build 2>/dev/null;",

@@ -75,11 +75,6 @@ jobs:
         with:
           node-version: '22.9.0'
 
-      - name: Set up MinGW
-        uses: egor-tensin/setup-mingw@84c781b557efd538dec66bde06988d81cd3138cf
-        with:
-          platform: x64
-
       - name: Build
         run: |
           mkdir -p bin

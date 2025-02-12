@@ -41,6 +41,7 @@ jobs:
             --include-data-dir=public=public \
             --include-data-dir=bin=bin \
             --macos-create-app-bundle \
+            --macos-app-protected-resource="NSLocalNetworkUsageDescription:This application requires to run a local server to serve the frontend." \
             --product-name=RDFCraft \
             --assume-yes-for-downloads \
             --deployment \
@@ -73,6 +74,11 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: '22.9.0'
+
+      - name: Set up MinGW
+        uses: egor-tensin/setup-mingw@84c781b557efd538dec66bde06988d81cd3138cf
+        with:
+          platform: x64
 
       - name: Build
         run: |

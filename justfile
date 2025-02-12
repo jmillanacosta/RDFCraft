@@ -27,6 +27,7 @@ package-mac: install-dev
     --include-data-dir=public=public \
     --include-data-dir=bin=bin \
     --macos-create-app-bundle \
+    --macos-app-protected-resource="NSLocalNetworkUsageDescription:This application requires to run a local server to serve the frontend." \
     --product-name=RDFCraft \
     --assume-yes-for-downloads \
     --deployment \

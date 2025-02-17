@@ -115,6 +115,8 @@ class ImportWorkspaceFacade(BaseFacade):
             location=new_workspace_metadata.location,
         )
 
+        new_workspace.prefixes = export_metadata.workspace_model.prefixes
+
         self.logger.info("Workspace created")
 
         self.logger.info("Importing sources")

@@ -63,7 +63,7 @@ const defaultState: MappingPageState = {
 
 const functions: ZustandActions<MappingPageStateActions, MappingPageState> = (
   set,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
   get,
 ) => ({
   async loadMapping(workspaceUuid: string, mappingUuid: string) {
@@ -146,7 +146,7 @@ const functions: ZustandActions<MappingPageStateActions, MappingPageState> = (
         mappingUuid,
       );
       set({ isLoading: 'Creating RML' });
-      const rml = await YARRRMLService.yarrrmlToRML(yarrrml);
+      const rml = await YARRRMLService.yarrrmlToRML(yarrrml, get().prefixes ?? []);
       set({ isLoading: 'Creating TTL' });
       const ttl = await YARRRMLService.rmlToTTL(rml);
       set({ error: null, isLoading: null });

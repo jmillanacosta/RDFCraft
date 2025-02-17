@@ -1,3 +1,4 @@
+import { Prefix } from '@/lib/api/prefix_api/types';
 import RMLGenerator from '@rmlio/yarrrml-parser/lib/rml-generator';
 import { Writer } from 'n3';
 import ApiService from '../../services/api_service';
@@ -28,10 +29,18 @@ class YARRRMLService {
     );
   }
 
-  public static async yarrrmlToRML(yarrrml: string): Promise<string> {
+  public static async yarrrmlToRML(yarrrml: string, prefixes: Prefix[]): Promise<string> {
     const y2r = new RMLGenerator();
     const quads = y2r.convert(yarrrml);
-    const writer = new Writer();
+    const writer = new Writer(
+      {
+        format: 'application/Turtle',
+        prefixes: prefixes.reduce(
+          (acc, prefix) => ({ ...acc, [prefix.prefix]: prefix.uri }),
+          {},
+        ),
+      }
+    );
     writer.addQuads(quads);
     return new Promise((resolve, reject) => {
       writer.end((error: Error | null, result: string) => {

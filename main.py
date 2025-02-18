@@ -105,8 +105,7 @@ if __name__ == "__main__":
         window = webview.create_window(
             "RDFCraft",
             f"http://localhost:{port}",
-            width=800,
-            height=600,
+            min_size=(800, 600),
             resizable=True,
         )
         window.events.closing += on_closing

@@ -111,6 +111,9 @@ class MappingToYARRRMLService(MappingToYARRRMLServiceProtocol):
                 }
 
             case SourceType.JSON:
+                # If iterator does not end with .[*] add it
+                if not source.extra["json_path"].endswith(".[*]"):
+                    source.extra["json_path"] += ".[*]"
                 source_dict["data"] = {
                     "access": str(source_path.absolute()),
                     "referenceFormulation": "jsonpath",

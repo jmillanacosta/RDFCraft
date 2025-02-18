@@ -13,6 +13,7 @@ type NavbarProps = {
   mapping_uuid: string | undefined;
   name: string | undefined;
   isLoading: string | null;
+  triggerSaveAlert: () => void;
   onCompleteMapping: () => void;
 };
 
@@ -21,6 +22,7 @@ const Navbar = ({
   mapping_uuid,
   name,
   isLoading,
+  triggerSaveAlert,
   onCompleteMapping,
 }: NavbarProps) => {
   const navigation = useNavigate();
@@ -44,7 +46,8 @@ const Navbar = ({
           icon='arrow-left'
           minimal
           onClick={() => {
-            navigation(`/workspaces/${workspace_uuid}`);
+            if (isSaved) navigation(`/workspaces/${workspace_uuid}`);
+            else triggerSaveAlert();
           }}
         />
         <div style={{ width: 10 }} />

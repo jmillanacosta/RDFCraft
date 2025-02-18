@@ -261,6 +261,7 @@ const MainPanel = ({ initialGraph }: MainPanelProps) => {
           source: fromNode.id,
           sourceHandle: fromHandle.id,
         });
+        setNewNode(null);
 
         if (event instanceof MouseEvent)
           openMenu({

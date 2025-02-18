@@ -1,5 +1,6 @@
 import toast from '@/consts/toast';
 import MappingDialog from '@/pages/mapping_page/components/MappingDialog';
+import SaveAlert from '@/pages/mapping_page/components/SaveAlert';
 import useAIPanel from '@/pages/mapping_page/components/SidePanel/components/AIPanel/state';
 import { ReactFlowProvider } from '@xyflow/react';
 import { languages } from 'monaco-editor';
@@ -10,7 +11,7 @@ import {
   PanelGroup,
   PanelResizeHandle,
 } from 'react-resizable-panels';
-import { useParams } from 'react-router-dom';
+import { useBlocker, useParams } from 'react-router-dom';
 import useRegisterCompletionItemProvider from '../../components/OneLineMonacoEditor/hooks/useRegisterCompletionItemProvider';
 import useRegisterLanguage from '../../components/OneLineMonacoEditor/hooks/useRegisterLanguage';
 import useRegisterTheme from '../../components/OneLineMonacoEditor/hooks/useRegisterTheme';
@@ -45,7 +46,9 @@ const MappingPage = () => {
   const completeMapping = useMappingPage(state => state.completeMapping);
   const clearAIState = useAIPanel(state => state.clear);
 
-  const [openDialog, setOpenDialog] = useState<'complete_mapping' | null>(null);
+  const [openDialog, setOpenDialog] = useState<
+    'complete_mapping' | 'save_alert' | null
+  >(null);
   useRegisterTheme('mapping-theme', mapping_theme);
   useRegisterLanguage('mapping_language', mapping_language, {});
   useRegisterCompletionItemProvider('mapping_language', [
@@ -108,6 +111,14 @@ const MappingPage = () => {
     }
   }, [props.uuid, props.mapping_uuid, loadMapping]);
 
+  useBlocker(tx => {
+    if (tx.historyAction === 'POP' && !isSaved) {
+      setOpenDialog('save_alert');
+      return true;
+    }
+    return false;
+  });
+
   useErrorToast(error);
 
   const handleTabClick = (tabId: string) => {
@@ -145,6 +156,12 @@ const MappingPage = () => {
   return (
     <ReactFlowProvider>
       <div className='mapping-page'>
+        <SaveAlert
+          workspace_uuid={props.uuid}
+          mapping_uuid={props.mapping_uuid}
+          open={openDialog === 'save_alert'}
+          onClose={() => setOpenDialog(null)}
+        />
         <MappingDialog
           open={openDialog === 'complete_mapping'}
           yarrrml={completeMappingResult?.yarrrml ?? ''}
@@ -158,6 +175,7 @@ const MappingPage = () => {
           name={mapping?.name}
           isLoading={isLoading}
           onCompleteMapping={onCompleteMapping}
+          triggerSaveAlert={() => setOpenDialog('save_alert')}
         />
         <div className='mapping-page-content'>
           <PanelGroup direction='horizontal' style={{ height: '100%' }}>

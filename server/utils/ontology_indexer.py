@@ -49,7 +49,7 @@ class OntologyIndexer:
     SELECT DISTINCT ?property ?label ?description ?isDeprecated ?propertyType
     WHERE {{
         ?property a ?propertyType .
-        FILTER (?propertyType = owl:ObjectProperty || ?propertyType = owl:DatatypeProperty || ?propertyType = owl:AnnotationProperty)
+        FILTER (?propertyType = owl:ObjectProperty || ?propertyType = owl:DatatypeProperty || ?propertyType = owl:AnnotationProperty || ?propertyType = rdf:Property)
         FILTER (!isBlank(?property))
         OPTIONAL {{ ?property rdfs:label ?label }}
         OPTIONAL {{ ?property rdfs:comment ?description }}

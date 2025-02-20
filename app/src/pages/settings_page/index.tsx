@@ -165,6 +165,7 @@ const SettingsPage = () => {
       updateJavaPath,
       updateOpenaiKey,
       updateOpenaiUrl,
+      updateOpenaiModel,
     ],
   );
 

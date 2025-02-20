@@ -115,7 +115,9 @@ async def get_logs():
     if new_path.exists():
         new_path.unlink()
     new_path.write_text(path.read_text())
-    return FileResponse(new_path, filename="rdfcraft.log")
+    return FileResponse(
+        new_path, filename="rdfcraft.log", media_type="application/octet-stream"
+    )
 
 
 @router.delete("/logs")

@@ -14,8 +14,6 @@ RUN npm run build
 
 FROM ghcr.io/astral-sh/uv:python3.11-alpine
 
-
-
 # Install JRE and curl
 
 RUN apk add --no-cache openjdk11-jre && \
@@ -30,19 +28,6 @@ WORKDIR /app
 # Download RMLMapper
 
 ADD https://github.com/RMLio/rmlmapper-java/releases/download/v7.2.0/rmlmapper-7.2.0-r374-all.jar ./bin/mapper.jar
-
-# Copy the backend dependencies
-
-COPY ./pyproject.toml ./uv.lock ./.python-version ./
-
-# Install backend dependencies
-
-RUN uv sync
-
-# Copy Backend source code
-
-COPY main.py bootstrap.py ./
-COPY ./server ./server
 
 
 # Copy the frontend build

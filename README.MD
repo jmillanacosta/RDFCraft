@@ -54,12 +54,29 @@ compressed. Run the executable and you are good to go.
 
 ### With Docker 🐳
 
+Build the Docker Image:
+
+```bash
+docker build -t rdfcraft .
+```
+
+Start the container in detached mode with a custom name:
+
+```bash
+docker run --name rdfcraft -d -p 8080:8000 rdfcraft
+```
+
+This maps port **8000** inside the container to **8080** on your local machine.
+
+After running the container, the application will be available at: [http://localhost:8080](http://localhost:8080)
+
+-----------
 You can also run RDFCraft using Docker. Just run the following command:
 
 For Linux/Mac:
 
 ```bash
-docker run -p 8080:8080 -v $(HOME)/rdfcraft:/home/app/rdfcraft ghcr.io/maastrichtu-ids/rdfcraft:latest
+docker run -p 8080:8000 -v $(HOME)/rdfcraft:/home/app/rdfcraft ghcr.io/maastrichtu-ids/rdfcraft:latest
 ```
 
 For Windows:

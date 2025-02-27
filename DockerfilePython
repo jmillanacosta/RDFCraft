@@ -2,8 +2,6 @@ FROM ghcr.io/astral-sh/uv:python3.11-alpine as RDFCraftPython
 
 WORKDIR /app
 
-USER app
-
 ENV DEBUG=1
 
 # Copy the backend dependencies

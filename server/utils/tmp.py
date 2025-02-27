@@ -4,42 +4,6 @@ from rdflib.namespace import RDF
 g = Graph()
 g.parse("Dataset.ttl", format="turtle")  # Change format if needed
 
-# Define SHACL namespace
-SH = Namespace("http://www.w3.org/ns/shacl#")
-
-# Query for all classes that are the target of a shape
-query = """
-SELECT DISTINCT ?class WHERE {
-    ?shape a sh:NodeShape ;
-           sh:targetClass ?class .
-}
-"""
-
-# Execute the query
-results = g.query(query, initNs={"sh": SH})
-
-# Print the extracted classes
-for row in results:
-    print(row)
-    # print(row.class)
-
-
-print("---")
-
-targetClass = URIRef(SH.targetClass)
-DASH_EDITOR = URIRef('http://datashapes.org/dash#editor')
-DASH_VIEWER = URIRef('http://datashapes.org/dash#viewer')
-
-for s, p, o in g.triples((None, targetClass, None)):
-    # print(f"{s}, {p}, {o}")
-    for s, p, o in g.triples((s, SH.property, None)):
-        for s, p, o in g.triples((o, None, None)):
-            if (p == DASH_EDITOR or p == DASH_VIEWER):
-                continue
-            print(f"{s}, {p}, {o}")
-    print("---")
-print("*****")
-
 
 query = """
 PREFIX sh: <http://www.w3.org/ns/shacl#>
@@ -59,4 +23,11 @@ WHERE {
 results = g.query(query)
 for result in results:
     print(result)
+
+# map the triples to the classes for the data model
+
+# classes are Class class
+
+# for properties infer class from node node kind property
+
 # default node kind should be literal

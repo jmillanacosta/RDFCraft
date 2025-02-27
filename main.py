@@ -62,7 +62,7 @@ setup_logging(json_logs=LOG_JSON_FORMAT, log_level=LOG_LEVEL)
 
 def get_free_port():
     BIND_INTERFACE = os.getenv("BIND_INTERFACE", "127.0.0.1")
-    port = int(os.getenv("PORT", 8000))
+    port = int(os.getenv("PORT", 8080))
     while True:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             try:
@@ -76,7 +76,7 @@ def get_free_port():
                 continue
 
 
-port = 8000 if DEBUG else get_free_port()
+port = 8080 if DEBUG else get_free_port()
 
 di["PORT"] = port
 

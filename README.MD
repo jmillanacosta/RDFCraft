@@ -65,7 +65,7 @@ docker run -p 8080:8080 -v $(HOME)/rdfcraft:/home/app/rdfcraft ghcr.io/maastrich
 For Windows:
 
 ```bash
-docker run -p 8080:8080 -v %USERPROFILE%/rdfcraft:/home/app/rdfcraft ghcr.io/maastrichtu-ids/rdfcraft:latest
+docker run -p 8080:8000 -v %USERPROFILE%/rdfcraft:/home/app/rdfcraft ghcr.io/maastrichtu-ids/rdfcraft:latest
 ```
 
 ## Getting Started 🚦

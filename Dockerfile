@@ -19,6 +19,7 @@ FROM ghcr.io/astral-sh/uv:python3.11-alpine
 # Install JRE and curl
 
 RUN apk add --no-cache openjdk11-jre && \
+    apk add --no-cache openjdk11 && \
     addgroup -S app && adduser -S app -G app
 
 USER app

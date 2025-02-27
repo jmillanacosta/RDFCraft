@@ -2,6 +2,8 @@ FROM openjdk:11 AS RDFCraftJava
 
 WORKDIR /app
 
+USER app
+
 ENV DEBUG=1
 
 # Download RMLMapper

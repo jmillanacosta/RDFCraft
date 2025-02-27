@@ -1,29 +1,11 @@
+version: 3.5
+
 services:
-  rdfcraftfrontend:
+  RDFCraftFrontEnd:
     container_name: RDFCraftFrontEnd
     hostname: RDFCraftFrontEnd
     build:
-      dockerfile: Dockerfile
+      dockerfile: DockerFile
       context: .
     ports:
-      - 8080:8080
-  rdfcraftjava:
-    container_name: RDFCraftJava
-    hostname: RDFCraftJava
-    build:
-      dockerfile: DockerfileJava
-      context: .
-    ports:
-      - 8090:8080
-    depends_on:
-      - rdfcraftfrontend
-  rdfcraftpython:
-    container_name: RDFCraftPython
-    hostname: RDFCraftPython
-    build:
-      dockerfile: DockerfilePython
-      context: .
-    ports:
-      - 8070:8080
-    depends_on:
-      - rdfcraftfrontend
+      - 8000:8080

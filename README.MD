@@ -70,20 +70,6 @@ This maps port **8000** inside the container to **8080** on your local machine.
 
 After running the container, the application will be available at: [http://localhost:8080](http://localhost:8080)
 
------------
-You can also run RDFCraft using Docker. Just run the following command:
-
-For Linux/Mac:
-
-```bash
-docker run -p 8080:8000 -v $(HOME)/rdfcraft:/home/app/rdfcraft ghcr.io/maastrichtu-ids/rdfcraft:latest
-```
-
-For Windows:
-
-```bash
-docker run -p 8080:8000 -v %USERPROFILE%/rdfcraft:/home/app/rdfcraft ghcr.io/maastrichtu-ids/rdfcraft:latest
-```
 
 ## Getting Started 🚦
 

@@ -81,6 +81,17 @@ const MainPanel = ({ initialGraph }: MainPanelProps) => {
   const [edges, setEdges, xyOnEdgesChange] = useEdgesState<XYEdgeType>([]);
   const [ignoreNodesChange, setIgnoreNodesChange] = useState(false);
 
+  const createNode = useCallback(
+    (newNode: XYNodeTypes) => {
+      setNodes(nodes => [
+        ...nodes.map(n => ({ ...n, selected: false })),
+        newNode,
+      ]);
+      setNewNode(newNode);
+    },
+    [setNodes, setNewNode],
+  );
+
   const onNodesChange = useCallback(
     (nodes: NodeChange<XYNodeTypes>[]) => {
       setIsSaved(ignoreNodesChange);
@@ -168,10 +179,9 @@ const MainPanel = ({ initialGraph }: MainPanelProps) => {
         type: 'entity',
         selected: true,
       } as EntityNodeType;
-      setNodes(nodes => [...nodes, newNode]);
-      setNewNode(newNode);
+      createNode(newNode);
     },
-    [setNodes, screenToFlowPosition, setNewNode],
+    [createNode, screenToFlowPosition],
   );
 
   const handleAddUriRefNode = useCallback(
@@ -193,10 +203,9 @@ const MainPanel = ({ initialGraph }: MainPanelProps) => {
         type: 'uri_ref',
         selected: true,
       } as URIRefNodeType;
-      setNodes(nodes => [...nodes, newNode]);
-      setNewNode(newNode);
+      createNode(newNode);
     },
-    [setNodes, screenToFlowPosition, setNewNode],
+    [createNode, screenToFlowPosition],
   );
 
   const handleAddLiteralNode = useCallback(
@@ -220,10 +229,9 @@ const MainPanel = ({ initialGraph }: MainPanelProps) => {
         type: 'literal',
         selected: true,
       } as LiteralNodeType;
-      setNodes(nodes => [...nodes, newNode]);
-      setNewNode(newNode);
+      createNode(newNode);
     },
-    [setNodes, screenToFlowPosition, setNewNode],
+    [screenToFlowPosition, createNode],
   );
 
   const openMenu = useCallback(
